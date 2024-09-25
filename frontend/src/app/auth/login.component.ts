@@ -14,7 +14,7 @@ export class LoginComponent implements OnInit {
 
   isLogged = false;
   isLoginFail = false;
-  loginUsuario!: LoginUser;
+  loginUser!: LoginUser;
   email!: string;
   password!: string;
   roles!: string[];
@@ -35,8 +35,8 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(): void {
-    this.loginUsuario = new LoginUser(this.email, this.password);
-    this.authService.loginUser(this.loginUsuario).pipe(
+    this.loginUser = new LoginUser(this.email, this.password);
+    this.authService.loginUser(this.loginUser).pipe(
       tap((data) => {
         this.isLogged = true;
         this.tokenService.setToken(data.token);
