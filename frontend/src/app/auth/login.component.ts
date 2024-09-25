@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   email!: string;
   password!: string;
   roles!: string[];
-  errMsj!: string[];
+  errMsj!: string;
 
   constructor(
     private tokenService: TokenService,
@@ -43,12 +43,20 @@ export class LoginComponent implements OnInit {
         this.tokenService.setEmail(data.email);
         this.tokenService.setAuthorities(data.authorities);
         this.roles = data.authorities;
+        window.location.href = 'http://localhost:9090/wordle';
       }),
       catchError((err) => {
         this.isLogged = false;
         this.isLoginFail = true;
-        this.errMsj = err.error.mensaje;
+
+        if (err && err.error && err.error.message) {
+          this.errMsj = err.error.message;  // Mensaje de error desde el servidor
+        } else {
+          this.errMsj = "Error en el inicio de sesión. Intenta de nuevo.";  // Mensaje de error genérico
+        }
+        
         console.log(this.errMsj);
+
         return of(null); // Retorna un observable vacío en caso de error
       })
     ).subscribe();
