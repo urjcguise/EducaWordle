@@ -23,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -66,13 +67,17 @@ public class AuthController {
             return new ResponseEntity("ese nombre ya existe", HttpStatus.BAD_REQUEST);
         if(userService.existsByEmail(newUser.getEmail()))
             return new ResponseEntity("ese email ya existe", HttpStatus.BAD_REQUEST);
+
         User usuario = new User(newUser.getName(), newUser.getEmail(), passwordEncoder.encode(newUser.getPassword()));
         Set<Rol> roles = new HashSet<>();
         roles.add(rolService.getRol(RolName.ROL_PROFESSOR).get());
+
         if(newUser.getRoles().contains("admin"))
             roles.add(rolService.getRol(RolName.ROL_ADMIN).get());
+
         usuario.setRoles(roles);
         userService.save(usuario);
-        return new ResponseEntity("usuario guardado", HttpStatus.CREATED);
+
+        return new ResponseEntity<>(Map.of("message", "usuario guardado"), HttpStatus.CREATED);
     }
 }

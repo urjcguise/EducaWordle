@@ -10,6 +10,7 @@ import { RegisterComponent } from './auth/register.component';
 import { IndexComponent } from './index/index.component';
 import { FormsModule } from '@angular/forms';
 import { MenuComponent } from './menu/menu.component';
+import { WordleComponent } from './wordle/wordle.component';
 
 @NgModule({
   declarations: [
@@ -17,14 +18,15 @@ import { MenuComponent } from './menu/menu.component';
     LoginComponent,
     RegisterComponent,
     IndexComponent,
-    MenuComponent
+    MenuComponent,
+    WordleComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    CommonModule
+    CommonModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
