@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
         this.tokenService.setEmail(data.email);
         this.tokenService.setAuthorities(data.authorities);
         this.roles = data.authorities;
-        window.location.href = 'http://localhost:9090/wordle';
+        this.router.navigate(['/wordle']);
       }),
       catchError((err) => {
         this.isLogged = false;
