@@ -7,8 +7,11 @@ import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.jwt.JwtProvider;
+import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.RolService;
 import app.TFGWordle.security.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -45,6 +49,8 @@ public class AuthController {
 
     @Autowired
     JwtProvider jwtProvider;
+
+    private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     @PostMapping("/login")
     public ResponseEntity<JwtDto> login(@RequestBody LoginUser loginUser, BindingResult bindingResult){
@@ -68,15 +74,21 @@ public class AuthController {
         if(userService.existsByEmail(newUser.getEmail()))
             return new ResponseEntity("ese email ya existe", HttpStatus.BAD_REQUEST);
 
-        User usuario = new User(newUser.getName(), newUser.getEmail(), passwordEncoder.encode(newUser.getPassword()));
+        User user = new User(newUser.getName(), newUser.getEmail(), passwordEncoder.encode(newUser.getPassword()));
+
         Set<Rol> roles = new HashSet<>();
-        roles.add(rolService.getRol(RolName.ROL_PROFESSOR).get());
+        for(String rolName : newUser.getRoles()){
+            logger.info(rolName);
+            if(Objects.equals(rolName, "admin"))
+                roles.add(rolService.getRol(RolName.ROL_ADMIN).get());
+            if(Objects.equals(rolName, "professor"))
+                roles.add(rolService.getRol(RolName.ROL_PROFESSOR).get());
+            if(Objects.equals(rolName, "student"))
+                roles.add(rolService.getRol(RolName.ROL_STUDENT).get());
+        }
 
-        if(newUser.getRoles().contains("admin"))
-            roles.add(rolService.getRol(RolName.ROL_ADMIN).get());
-
-        usuario.setRoles(roles);
-        userService.save(usuario);
+        user.setRoles(roles);
+        userService.save(user);
 
         return new ResponseEntity<>(Map.of("message", "usuario guardado"), HttpStatus.CREATED);
     }

@@ -11,6 +11,7 @@ import { IndexComponent } from './index/index.component';
 import { FormsModule } from '@angular/forms';
 import { MenuComponent } from './menu/menu.component';
 import { WordleComponent } from './wordle/wordle.component';
+import { interceptorProvider } from './interceptors/prod-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import { WordleComponent } from './wordle/wordle.component';
     HttpClientModule,
     CommonModule,
   ],
-  providers: [],
+  providers: [interceptorProvider],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -21,15 +21,6 @@ public class DatabaseInitializer {
         if (wordleRepository.count() == 0) {
             Wordle wordle = new Wordle("Agile");
             wordleRepository.save(wordle);
-
-//            User admin = new User("Nombre Admin","user@gmail.com", passwordEncoder.encode("pass"), "ADMIN");
-//            User user2 = new User();
-//            user2.setUsername("Usuario 2");
-//            user2.setEmail("user2@gmail.com");
-//            user2.setPassword(passwordEncoder.encode("1234"));
-//            user2.setRol("STUDENT");
-//            userRepository.save(user2);
-//            userRepository.save(admin);
         }
 
     }

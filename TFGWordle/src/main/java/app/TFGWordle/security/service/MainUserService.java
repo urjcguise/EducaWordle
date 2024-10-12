@@ -14,8 +14,8 @@ public class MainUserService implements UserDetailsService {
     @Autowired
     UserService userService;
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userService.getByEmail(email).get();
+    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+        User user = userService.getByUserName(name).get();
         return MainUser.build(user);
     }
 }

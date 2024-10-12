@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-index',
@@ -7,9 +8,35 @@ import { Component, OnInit } from '@angular/core';
 })
 export class IndexComponent implements OnInit {
 
-  constructor() { }
+  isLogged = false;
+  userName = '';
+
+  roles!: string[];
+  authority!: string;
+  isAdmin = false;
+  isProfessor = false;
+  isStudent = false;
+
+  constructor(private tokenService: TokenService) { }
 
   ngOnInit(): void {
+    this.roles = this.tokenService.getAuthorities();
+    this.roles.forEach(rol => {
+      if (rol === 'ROL_ADMIN') {
+        this.isAdmin = true;
+      } else if (rol === 'ROL_PROFESSOR') {
+        this.isProfessor = true;
+      } else if (rol === 'ROL_STUDENT') {
+        this.isStudent = true;
+      }
+    })
+    if (this.tokenService.getToken()) {
+      this.isLogged = true;
+      this.userName = this.tokenService.getUserName() ?? '';
+    } else {
+      this.isLogged = false;
+      this.userName = '';
+    }
   }
 
 }

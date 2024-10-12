@@ -35,10 +35,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
                 if (jwtProvider.validateToken(token)) {
                     logger.info("Token válido, autenticando...");
+                    //logger.info("Obteniendo nombre de usuario del token...");
                     String userName = jwtProvider.getUserNameFromToken(token);
+                    //logger.info("Nombre de usuario obtenido: " + userName);
+
+                    //logger.info("Cargando detalles del usuario...");
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    //logger.info("Detalles del usuario cargados.");
+
+                    //logger.info("Creando objeto de autenticación...");
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    //logger.info("Autenticación creada.");
+
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
                     logger.warn("Token no válido o expirado.");

@@ -2,11 +2,12 @@ export class NewUser {
     name!: string;
     email!: string;
     password!: string;
-    authorities!: string[];
+    roles!: string[];
 
-    constructor(name: string, email: string, password: string) {
+    constructor(name: string, email: string, password: string, roles: string[]) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.roles = roles;
     }
 }

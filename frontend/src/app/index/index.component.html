@@ -1,2 +1,22 @@
 <app-menu></app-menu>
-<p> index works!</p>
+<div class="container text-center">
+    <div *ngIf="isLogged else loggedOut"><h2>Bienvenido {{userName}}</h2></div>
+    <ng-template #loggedOut><h2>No has iniciado sesión</h2></ng-template>
+
+    <div class="mt-3" *ngIf="isAdmin">
+        <button class="btn btn-outline-success btn-lg" routerLink="/register">
+            <i class="fas fa-plus-circle"></i> Registrar usuario
+        </button>
+    </div>
+    <div class="mt-3" *ngIf="isProfessor">
+        <button class="btn btn-outline-success btn-lg">
+            <i class="fas fa-plus-circle"></i> Comenzar concurso
+        </button>
+    </div>
+    <div class="mt-3" *ngIf="isStudent">
+        <button class="btn btn-outline-success btn-lg" routerLink="/wordle">
+            <i class="fas fa-plus-circle"></i> Jugar Wordle
+        </button>
+    </div>
+
+</div>

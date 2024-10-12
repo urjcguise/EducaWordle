@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
   isLogged = false;
   isLoginFail = false;
   loginUser!: LoginUser;
-  email!: string;
+  userName!: string;
   password!: string;
   roles!: string[];
   errMsj!: string;
@@ -35,15 +35,15 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(): void {
-    this.loginUser = new LoginUser(this.email, this.password);
+    this.loginUser = new LoginUser(this.userName, this.password);
     this.authService.loginUser(this.loginUser).pipe(
       tap((data) => {
         this.isLogged = true;
         this.tokenService.setToken(data.token);
-        this.tokenService.setEmail(data.email);
+        this.tokenService.setUserName(data.userName);
         this.tokenService.setAuthorities(data.authorities);
         this.roles = data.authorities;
-        this.router.navigate(['/wordle']);
+        this.router.navigate(['/']);
       }),
       catchError((err) => {
         this.isLogged = false;
