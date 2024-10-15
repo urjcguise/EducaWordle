@@ -1,7 +1,13 @@
 package app.TFGWordle.repository;
 
 import app.TFGWordle.model.Competition;
-import org.springframework.data.repository.CrudRepository;
+import app.TFGWordle.security.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CompetitionRepository extends CrudRepository<Competition, Long> {
+import java.util.List;
+import java.util.Optional;
+
+public interface CompetitionRepository extends JpaRepository<Competition, Long> {
+    Optional<Competition> findByName(String name);
+    List<Competition> findByProfessor(User professor);
 }

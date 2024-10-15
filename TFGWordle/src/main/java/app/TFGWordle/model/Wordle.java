@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name="wordle")
 public class Wordle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

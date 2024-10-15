@@ -1,0 +1,14 @@
+<div class="container">
+    <h2>Crear Nueva Competición</h2>
+    <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="competitionName">Nombre de la Competición:</label>
+            <input id="competitionName" type="text" formControlName="competitionName" class="form-control"
+                placeholder="Introduce el nombre" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="competitionForm.invalid">
+            Crear Competición
+        </button>
+    </form>
+</div>

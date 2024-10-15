@@ -9,8 +9,11 @@
         </button>
     </div>
     <div class="mt-3" *ngIf="isProfessor">
-        <button class="btn btn-outline-success btn-lg">
-            <i class="fas fa-plus-circle"></i> Comenzar concurso
+        <button class="btn btn-outline-success btn-lg" routerLink="/competition">
+            <i class="fas fa-plus-circle"></i> Comenzar competición
+        </button>
+        <button class="btn btn-outline-success btn-lg" routerLink="/competitionList">
+            <i class="fas fa-plus-circle"></i> Ver competiciones
         </button>
     </div>
     <div class="mt-3" *ngIf="isStudent">

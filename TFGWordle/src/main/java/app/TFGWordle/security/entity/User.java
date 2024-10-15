@@ -11,13 +11,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String username;
     @Column(unique = true)
     private String email;
     private String password;
+
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_rol", joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "rol_id"))
+    @JoinTable(name = "user_rol",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
 
     public User() {
