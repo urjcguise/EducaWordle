@@ -17,13 +17,12 @@ export class ProdGuardService implements CanActivate{
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const expectedRol = route.data['expectedRol'];
     const roles = this.tokenService.getAuthorities();
-    //this.realRol = 'user';
     roles.forEach(rol => {
-      if (rol === 'ROL_ADMIN') {
+      if (rol === 'ROLE_ADMIN') {
         this.realRol = 'admin';
-      } else if (rol === 'ROL_PROFESSOR') {
+      } else if (rol === 'ROLE_PROFESSOR') {
         this.realRol = 'professor';
-      } else if (rol === 'ROL_STUDENT') {
+      } else if (rol === 'ROLE_STUDENT') {
         this.realRol = 'student';
       }
     });

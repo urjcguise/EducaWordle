@@ -1,0 +1,11 @@
+<div class="contest-form">
+    <h2>Crear Nuevo Concurso</h2>
+    <form (ngSubmit)="createContest()">
+        <div class="form-group">
+            <label for="contestName">Nombre del Concurso</label>
+            <input type="text" id="contestName" [(ngModel)]="contestName" name="contestName" class="form-control"
+                placeholder="Escribe el nombre del concurso" required />
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Crear Concurso</button>
+    </form>
+</div>

@@ -4,6 +4,7 @@ import app.TFGWordle.security.enums.RolName;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="role")
 public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

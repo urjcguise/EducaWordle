@@ -15,6 +15,8 @@ import { WordleComponent } from './wordle/wordle.component';
 import { interceptorProvider } from './interceptors/prod-interceptor.service';
 import { CompetitionComponent } from './competition/competition.component';
 import { CompetitionListComponent } from './competition/competition-list.component';
+import { ContestComponent } from './contest/contest.component';
+import { ContestListComponent } from './contest/contest-list.component';
 
 
 @NgModule({
@@ -26,7 +28,9 @@ import { CompetitionListComponent } from './competition/competition-list.compone
     MenuComponent,
     WordleComponent,
     CompetitionComponent,
-    CompetitionListComponent
+    CompetitionListComponent,
+    ContestComponent,
+    ContestListComponent
   ],
   imports: [
     BrowserModule,

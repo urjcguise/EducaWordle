@@ -1,5 +1,5 @@
 package app.TFGWordle.security.enums;
 
 public enum RolName {
-    ROL_ADMIN, ROL_PROFESSOR, ROL_STUDENT
+    ROLE_ADMIN, ROLE_PROFESSOR, ROLE_STUDENT
 }

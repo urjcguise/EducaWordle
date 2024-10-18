@@ -1,9 +1,19 @@
 <div class="competition-list">
-    <h2>Competiciones Disponibles</h2>
-    <ul>
-      <li *ngFor="let competition of competitions">
-        {{ competition.competitionName }}
-      </li>
-    </ul>
-  </div>
-  
+  <h2>Competiciones Disponibles</h2>
+  <ul>
+    <li *ngFor="let competition of competitions" class="competition-item">
+      <span>{{ competition.competitionName }}</span>
+      <button class="btn btn-primary btn-sm ml-3" (click)="navigateToCreateContest(competition.id)">
+        Nuevo concurso
+      </button>
+      <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName)">
+        <i class="far fa-eye"></i>
+        Ver Concursos
+      </button>
+      <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
+        <i class="far fa-trash-alt"></i>
+        Borrar Competición
+      </button>
+    </li>
+  </ul>
+</div>

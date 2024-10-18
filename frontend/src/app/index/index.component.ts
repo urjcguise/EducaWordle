@@ -22,11 +22,11 @@ export class IndexComponent implements OnInit {
   ngOnInit(): void {
     this.roles = this.tokenService.getAuthorities();
     this.roles.forEach(rol => {
-      if (rol === 'ROL_ADMIN') {
+      if (rol === 'ROLE_ADMIN') {
         this.isAdmin = true;
-      } else if (rol === 'ROL_PROFESSOR') {
+      } else if (rol === 'ROLE_PROFESSOR') {
         this.isProfessor = true;
-      } else if (rol === 'ROL_STUDENT') {
+      } else if (rol === 'ROLE_STUDENT') {
         this.isStudent = true;
       }
     })

@@ -56,7 +56,7 @@ public class AuthController {
         if(bindingResult.hasErrors())
             return new ResponseEntity("campos mal puestos", HttpStatus.BAD_REQUEST);
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword()));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUserName(), loginUser.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
         UserDetails userDetails = (UserDetails)authentication.getPrincipal();
@@ -79,11 +79,11 @@ public class AuthController {
         for(String rolName : newUser.getRoles()){
             logger.info(rolName);
             if(Objects.equals(rolName, "admin"))
-                roles.add(rolService.getRol(RolName.ROL_ADMIN).get());
+                roles.add(rolService.getRol(RolName.ROLE_ADMIN).get());
             if(Objects.equals(rolName, "professor"))
-                roles.add(rolService.getRol(RolName.ROL_PROFESSOR).get());
+                roles.add(rolService.getRol(RolName.ROLE_PROFESSOR).get());
             if(Objects.equals(rolName, "student"))
-                roles.add(rolService.getRol(RolName.ROL_STUDENT).get());
+                roles.add(rolService.getRol(RolName.ROLE_STUDENT).get());
         }
 
         user.setRoles(roles);

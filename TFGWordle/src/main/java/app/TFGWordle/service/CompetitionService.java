@@ -4,13 +4,10 @@ import app.TFGWordle.model.Competition;
 import app.TFGWordle.repository.CompetitionRepository;
 import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
-import app.TFGWordle.security.enums.RolName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class CompetitionService {
@@ -26,11 +23,9 @@ public class CompetitionService {
         }
     }
 
-
-
     private boolean isProfessor(User user) {
         for (Rol rol : user.getRoles()) {
-            if (rol.getRolName().name().equals("ROL_PROFESSOR"))
+            if (rol.getRolName().name().equals("ROLE_PROFESSOR"))
                 return true;
         }
         return false;
@@ -38,5 +33,17 @@ public class CompetitionService {
 
     public List<Competition> getCompetitionsByProfesor(User professor) {
         return competitionRepository.findByProfessor(professor);
+    }
+
+    public Competition getCompetitionById(Long id) {
+        return competitionRepository.findById(id).orElse(null);
+    }
+
+    public void deleteCompetition(Long id) {
+        competitionRepository.deleteById(id);
+    }
+
+    public boolean existsCompetition(Long id) {
+        return competitionRepository.existsById(id);
     }
 }
