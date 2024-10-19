@@ -31,8 +31,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             String token = getToken(req);
             if (token != null) {
-                logger.info("Token detectado: " + token); // Log cuando se detecta un token
-
                 if (jwtProvider.validateToken(token)) {
                     logger.info("Token válido, autenticando...");
                     //logger.info("Obteniendo nombre de usuario del token...");
@@ -57,6 +55,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             logger.error("Error en el doFilterInternal", e);
         }
+
         filterChain.doFilter(req, res);
     }
 

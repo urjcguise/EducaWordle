@@ -8,12 +8,12 @@ import { Contest } from '../models/contest';
 })
 export class ContestService {
 
-  private apiUrl = 'http://localhost:9090/api/contest/';
+  private apiUrl = 'http://localhost:9090/api/contests/';
 
   constructor(private httpClient: HttpClient) {}
 
-  public createContest(contest: Contest): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + 'newContest', contest);
+  public createContest(contest: Contest, competitionId: number): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'newContest/' + competitionId, contest);
   }
 
   public getContestsByCompetition(competitionId: number): Observable<any[]> {

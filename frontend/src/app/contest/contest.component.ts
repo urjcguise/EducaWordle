@@ -1,35 +1,39 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
-import { Router } from '@angular/router';
-import { TokenService } from '../service/token.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-contest',
   templateUrl: './contest.component.html',
   styleUrls: ['./contest.component.css']
 })
-export class ContestComponent implements OnInit{
-  
-  competitionId!: number;
-  contestName = '';
+export class ContestComponent implements OnInit {
 
-  constructor(private contestService: ContestService, private router: Router, private tokenService: TokenService) {}
+  contestForm!: FormGroup;
+  competitionId!: number;
+
+  constructor(private fb: FormBuilder, private contestService: ContestService) { 
+    this.contestForm = this.fb.group({
+      contestName: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
-
     if (!this.competitionId) {
       console.error('No se encontró la competición');
     }
   }
 
   createContest(): void {
-    const newContest: Contest = { contestName: this.contestName, competitionId: this.competitionId };
-    this.contestService.createContest(newContest).subscribe({
-      next: (res) => {
+    if (this.contestForm.invalid) return;
+
+    const newContest: Contest = this.contestForm.value;
+    this.contestService.createContest(newContest, this.competitionId).subscribe({
+      next: () => {
         alert('Concurso creado con éxito');
-        this.contestName = '';
+        this.contestForm.reset();
       },
       error: (err) => console.error('Error al crear concurso', err)
     });
