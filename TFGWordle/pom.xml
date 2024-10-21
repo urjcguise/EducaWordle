@@ -12,7 +12,7 @@
 	<artifactId>TFGWordle</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>TFGWordle</name>
-	<description>Aplicación adivinar Wordle</description>
+	<description>Aplicación Wordle</description>
 	<url/>
 	<licenses>
 		<license/>
