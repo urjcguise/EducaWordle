@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contests")
@@ -38,10 +39,20 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/{competitionId}/contest")
-    public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable Long competitionId) {
-        Competition competition = competitionService.getCompetitionById(competitionId);
+    @GetMapping("/{competitionName}/contests")
+    public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
+        Competition competition = competitionService.getCompetitionByName(competitionName);
         List<Contest> contests = contestService.getContestsByCompetition(competition);
         return ResponseEntity.ok(contests);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @DeleteMapping("/deleteContest/{contestName}")
+    public ResponseEntity<?> deleteCompetition(@PathVariable("contestName") String contestName) {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+        Contest contest = contestService.getByName(contestName);
+        contestService.deleteCompetition(contest.getId());
+        return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
     }
 }

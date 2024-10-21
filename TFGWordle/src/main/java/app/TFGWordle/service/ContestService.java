@@ -23,4 +23,16 @@ public class ContestService {
     public List<Contest> getContestsByCompetition(Competition competition) {
         return contestRepository.findByCompetition(competition);
     }
+
+    public Boolean existsContest(String contestName) {
+        return contestRepository.findByName(contestName).isPresent();
+    }
+
+    public Contest getByName(String contestName) {
+        return contestRepository.findByName(contestName).get();
+    }
+
+    public void deleteCompetition(Long id) {
+        contestRepository.deleteById(id);
+    }
 }

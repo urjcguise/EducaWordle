@@ -7,7 +7,10 @@ import app.TFGWordle.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class CompetitionService {
@@ -33,6 +36,11 @@ public class CompetitionService {
 
     public List<Competition> getCompetitionsByProfesor(User professor) {
         return competitionRepository.findByProfessor(professor);
+
+    }
+
+    public Competition getCompetitionByName(String name) {
+        return competitionRepository.findByName(name).orElseThrow(() -> new NoSuchElementException("Competicion con nombre: " + name + " no existe"));
     }
 
     public Competition getCompetitionById(Long id) {

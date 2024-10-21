@@ -11,17 +11,20 @@ import { ActivatedRoute } from '@angular/router';
 export class ContestListComponent implements OnInit {
 
   contests: Contest[] = [];
-  competitionId!: number;
+  competitionName!: string;
 
   constructor(private contestService: ContestService, private route: ActivatedRoute) {}
   
   ngOnInit(): void {
-    this.competitionId = +this.route.snapshot.paramMap.get('competitionId')!;
+    this.competitionName = this.route.snapshot.paramMap.get('competitionName')!;
+    if (!this.competitionName) {
+      console.error('No se encontró la competición');
+    }
     this.loadContests();
   }
 
   loadContests(): void {
-    this.contestService.getContestsByCompetition(this.competitionId).subscribe({
+    this.contestService.getContestsByCompetition(this.competitionName).subscribe({
       next: (data) => {
         this.contests = data;
       },
@@ -29,6 +32,19 @@ export class ContestListComponent implements OnInit {
         console.error('Error consiguiendo los concursos', error);
       }
     });
+  }
+
+  deleteContest(contestName: string) {
+    const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta concurso?');
+    if (confirmDelete) {
+      this.contestService.deleteContest(contestName).subscribe({
+        next: () => {
+          alert('Concurso eliminada con éxito.');
+          this.loadContests();
+        },
+        error: (err) => console.error('Error al eliminar la concurso:', err)
+      });
+    }
   }
 
 }

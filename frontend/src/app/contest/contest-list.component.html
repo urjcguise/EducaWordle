@@ -3,6 +3,10 @@
     <ul>
       <li *ngFor="let contest of contests" class="contest-item">
         <span>{{ contest.contestName }}</span>
+        <button class="btn btn-danger btn-sm ml-2" (click)="deleteContest(contest.contestName)">
+          <i class="far fa-trash-alt"></i>
+          Borrar Competición
+        </button>
       </li>
     </ul>
   </div>
