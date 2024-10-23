@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class CompetitionController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User professor = userService.getByUserName(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
 
         competition.setProfessor(professor);
         competitionService.save(competition, professor);
@@ -54,7 +55,7 @@ public class CompetitionController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User professor = userService.getByUserName(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
 
         List<Competition> competitions = competitionService.getCompetitionsByProfesor(professor);
         return new ResponseEntity<>(competitions, HttpStatus.OK);
@@ -64,7 +65,7 @@ public class CompetitionController {
     @DeleteMapping("/deleteCompetition/{id}")
     public ResponseEntity<?> deleteCompetition(@PathVariable("id") Long id) {
         if (!competitionService.existsCompetition(id))
-            return new ResponseEntity<>("Competition no encontrada", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
         competitionService.deleteCompetition(id);
         return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
     }
