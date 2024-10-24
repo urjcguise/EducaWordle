@@ -15,7 +15,9 @@ export class ContestComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private contestService: ContestService) { 
     this.contestForm = this.fb.group({
-      contestName: ['', Validators.required]
+      contestName: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required]
     });
   }
 
@@ -29,7 +31,11 @@ export class ContestComponent implements OnInit {
   createContest(): void {
     if (this.contestForm.invalid) return;
 
-    const newContest: Contest = this.contestForm.value;
+    const newContest: Contest = {
+      ...this.contestForm.value,
+      startDate: new Date(this.contestForm.value.startDate),
+      endDate: new Date(this.contestForm.value.endDate)     
+    };
     this.contestService.createContest(newContest, this.competitionId).subscribe({
       next: () => {
         alert('Concurso creado con éxito');

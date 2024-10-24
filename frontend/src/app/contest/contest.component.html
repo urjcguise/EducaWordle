@@ -1,14 +1,22 @@
 <div class="contest-form">
-    <h2>Crear Nuevo Concurso</h2>
-    <form [formGroup]="contestForm" (ngSubmit)="createContest()">
-      <div class="form-group">
-        <label for="contestName">Nombre del Concurso</label>
-        <input type="text" id="contestName" formControlName="contestName" class="form-control"
-               placeholder="Escribe el nombre del concurso" required />
-      </div>
-      <button type="submit" class="btn btn-primary mt-3" [disabled]="contestForm.invalid">
-        Crear Concurso
-      </button>
-    </form>
-  </div>
-  
+  <h2>Crear Nuevo Concurso</h2>
+  <form [formGroup]="contestForm" (ngSubmit)="createContest()">
+    <div class="form-group">
+      <label for="contestName">Nombre del Concurso</label>
+      <input type="text" id="contestName" formControlName="contestName" class="form-control"
+        placeholder="Escribe el nombre del concurso" required />
+    </div>
+    <div class="form-group mt-3">
+      <label for="startDate">Fecha de Inicio</label>
+      <input type="date" id="startDate" formControlName="startDate" class="form-control" required />
+    </div>
+    <div class="form-group mt-3">
+      <label for="endDate">Fecha de Fin</label>
+      <input type="date" id="endDate" formControlName="endDate" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-3" [disabled]="contestForm.invalid">
+      Crear Concurso
+    </button>
+  </form>
+
+</div>
