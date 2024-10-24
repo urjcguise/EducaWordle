@@ -45,6 +45,7 @@ class CompetitionControllerTest {
 
     private Competition competition;
     private User professor;
+
     @BeforeEach
     void setUp() {
         competition = new Competition();
