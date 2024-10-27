@@ -1,0 +1,34 @@
+<div class="container">
+    <div *ngFor="let wordle of wordles; index as i">
+        <input type="text" placeholder="Palabra" [attr.id]="'wordle' + i" class="wordle-input" />
+    </div>
+    <button (click)="addWordle()" [disabled]="wordles.length >= 3">
+        Añadir más Wordle
+    </button>
+
+    <div class="checkbox-group">
+        <p>¿Desea utilizar diccionario?</p>
+        <label>
+            <input type="checkbox" (change)="useDictionary(true)" [checked]="useDictionary" />
+            Sí
+        </label>
+        <label>
+            <input type="checkbox" (change)="useDictionary(false)" [checked]="!useDictionary" />
+            No
+        </label>
+    </div>
+    <div *ngIf="useDictionary" class="checkbox-group">
+        <p>¿Desea importar un fichero .env?</p>
+        <label>
+            <input type="checkbox" (change)="useFile(true)" [checked]="file" />
+            Sí
+        </label>
+        <label>
+            <input type="checkbox" (change)="useFile(false)" [checked]="!file" />
+            No
+        </label>
+        <div *ngIf="file">
+            <input type="file" accept=".env" (change)="selectFile($event)" />
+        </div>
+    </div>
+</div>

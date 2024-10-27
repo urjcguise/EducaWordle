@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ContestService } from '../service/contest.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-contest-list',
@@ -12,15 +13,18 @@ export class ContestListComponent implements OnInit {
 
   contests: Contest[] = [];
   competitionName!: string;
+  isProfessor = false;
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute) {}
-  
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) { }
+
   ngOnInit(): void {
     this.competitionName = this.route.snapshot.paramMap.get('competitionName')!;
     if (!this.competitionName) {
       console.error('No se encontró la competición');
     }
     this.loadContests();
+    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
+      this.isProfessor = true;
   }
 
   loadContests(): void {
@@ -47,4 +51,7 @@ export class ContestListComponent implements OnInit {
     }
   }
 
+  navigateToEditWordle(contestName: string) {
+    this.router.navigate([`${contestName}/editar`]);
+  }
 }

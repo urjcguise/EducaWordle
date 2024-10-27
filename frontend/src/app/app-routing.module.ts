@@ -9,6 +9,7 @@ import { CompetitionComponent } from './competition/competition.component';
 import { CompetitionListComponent } from './competition/competition-list.component';
 import { ContestComponent } from './contest/contest.component';
 import { ContestListComponent } from './contest/contest-list.component';
+import { EditWordleComponent } from './wordle/edit-wordle.component';
 
 const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -18,7 +19,8 @@ const routes: Routes = [
   {path: 'nuevaCompeticion', component: CompetitionComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: 'competiciones', component: CompetitionListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: 'nuevoConcurso', component: ContestComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
-  {path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }}
+  {path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
+  {path: ':contestName/editar', component: EditWordleComponent, canActivate: [guard], data: { expectedRol: ['professor'] }}
 ];
 
 @NgModule({
