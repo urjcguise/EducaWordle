@@ -12,8 +12,13 @@ public class Wordle {
 
     private String word;
 
-    public Wordle(String word) {
+    @ManyToOne
+    @JoinColumn(name = "contest_id")
+    private Contest contest;
+
+    public Wordle(String word, Contest contest) {
         this.word = word;
+        this.contest = contest;
     }
 
     public Wordle() {
@@ -32,5 +37,13 @@ public class Wordle {
     }
     public String getWord() {
         return word;
+    }
+
+    public Contest getContest() {
+        return contest;
+    }
+
+    public void setContest(Contest contest) {
+        this.contest = contest;
     }
 }

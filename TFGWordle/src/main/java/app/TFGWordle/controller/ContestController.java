@@ -35,6 +35,7 @@ public class ContestController {
     public ResponseEntity<Contest> createContest(@RequestBody Contest contest, @PathVariable Long competitionId) {
         Competition competition = competitionService.getCompetitionById(competitionId);
         contest.setCompetition(competition);
+        contest.setUseDictionary(false);
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
