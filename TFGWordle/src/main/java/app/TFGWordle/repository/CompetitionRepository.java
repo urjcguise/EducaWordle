@@ -11,4 +11,5 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     Optional<Competition> findByName(String name);
     Optional<Competition> findById(Long id);
     List<Competition> findByProfessor(User professor);
+    boolean existsByName(String name);
 }

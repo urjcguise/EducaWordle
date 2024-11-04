@@ -40,6 +40,9 @@ public class CompetitionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
+        if (competitionService.existsCompetitionByName(competition.getCompetitionName()))
+            return new ResponseEntity<>("Nombre ya utilizado", HttpStatus.CONFLICT);
+
         User professor = userService.getByUserName(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
 

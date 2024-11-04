@@ -52,4 +52,8 @@ public class CompetitionService {
     public boolean existsCompetition(Long id) {
         return competitionRepository.existsById(id);
     }
+
+    public boolean existsCompetitionByName(String name) {
+        return competitionRepository.existsByName(name);
+    }
 }
