@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
-import { ContestService } from '../service/contest.service';
-import { ActivatedRoute } from '@angular/router';
 import { Contest } from '../models/contest';
+import { ActivatedRoute } from '@angular/router';
+import { ContestService } from '../service/contest.service';
 import { Wordle } from '../models/wordle';
 
 @Component({
-  selector: 'app-edit-wordle',
-  templateUrl: './edit-wordle.component.html',
-  styleUrls: ['./edit-wordle.component.css']
+  selector: 'app-edit-contest',
+  templateUrl: './edit-contest.component.html',
+  styleUrls: ['./edit-contest.component.css']
 })
-export class EditWordleComponent {
-
+export class EditContestComponent {
+  
   contest: Contest = new Contest("", new Date(), new Date(), false, false, "", 0, []);
   contestName = "";
   dictionary: boolean = false;
@@ -102,4 +102,3 @@ export class EditWordleComponent {
     });
   }
 }
-
