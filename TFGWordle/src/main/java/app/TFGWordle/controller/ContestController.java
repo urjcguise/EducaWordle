@@ -2,16 +2,20 @@ package app.TFGWordle.controller;
 
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
+import app.TFGWordle.model.Wordle;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
+import app.TFGWordle.service.WordleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,20 +26,26 @@ public class ContestController {
 
     private final ContestService contestService;
     private final CompetitionService competitionService;
+    private final WordleService wordleService;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public ContestController(ContestService contestService, CompetitionService competitionService) {
+    public ContestController(ContestService contestService, CompetitionService competitionService, WordleService wordleService) {
         this.contestService = contestService;
         this.competitionService = competitionService;
+        this.wordleService = wordleService;
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
     @PostMapping("/newContest/{competitionId}")
     public ResponseEntity<Contest> createContest(@RequestBody Contest contest, @PathVariable Long competitionId) {
+        if (contestService.existsContest(contest.getContestName()))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         Competition competition = competitionService.getCompetitionById(competitionId);
         contest.setCompetition(competition);
         contest.setUseDictionary(false);
+        contest.setUseExternalFile(false);
+        contest.setFileRoute("");
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
@@ -55,5 +65,23 @@ public class ContestController {
         Contest contest = contestService.getByName(contestName);
         contestService.deleteCompetition(contest.getId());
         return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PostMapping("/editContest/{contestName}")
+    public ResponseEntity<?> updateContest(@PathVariable String contestName, @RequestBody Contest contest) {
+
+        wordleService.deleteByContestId(contest.getId());
+
+        wordleService.saveAll(contest.getWordles());
+
+        return ResponseEntity.ok(contestService.save(contest));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/{contestName}/contest")
+    public ResponseEntity<Contest> getContestByName(@PathVariable String contestName) {
+        Contest contest = contestService.getByName(contestName);
+        return ResponseEntity.ok(contest);
     }
 }

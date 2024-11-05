@@ -1,24 +1,56 @@
 <div class="container">
+
+    <div>
+        <label for="contestName">Nombre del Concurso:</label>
+        <input type="text" id="contestName" [(ngModel)]="contest.contestName" class="name-input" />
+    </div>
+
     <div *ngFor="let wordle of wordles; index as i">
-        <input type="text" placeholder="Palabra" [attr.id]="'wordle' + i" class="wordle-input" />
+        <input
+            type="text"
+            placeholder="Palabra"
+            [(ngModel)]="wordles[i].word"
+            class="wordle-input"
+        />
     </div>
     <button (click)="addWordle()" [disabled]="wordles.length >= 3">
-        Añadir más Wordle
+        Añadir Wordle
     </button>
+
+    <div>
+        <label for="startDateTime">Fecha y hora de inicio:</label>
+        <input
+            type="datetime-local"
+            id="startDateTime"
+            [(ngModel)]="formattedStartDate"
+            class="date-input"
+        />
+    </div>
+
+    <div>
+        <label for="endDateTime">Fecha y hora de fin:</label>
+        <input
+            type="datetime-local"
+            id="endDateTime"
+            [(ngModel)]="formattedEndDate"
+            class="date-input"
+        />
+    </div>
 
     <div class="checkbox-group">
         <p>¿Desea utilizar diccionario?</p>
         <label>
-            <input type="checkbox" (change)="useDictionary(true)" [checked]="useDictionary" />
+            <input type="checkbox" (change)="useDictionary(true)" [checked]="dictionary" />
             Sí
         </label>
         <label>
-            <input type="checkbox" (change)="useDictionary(false)" [checked]="!useDictionary" />
+            <input type="checkbox" (change)="useDictionary(false)" [checked]="!dictionary" />
             No
         </label>
     </div>
-    <div *ngIf="useDictionary" class="checkbox-group">
-        <p>¿Desea importar un fichero .env?</p>
+
+    <div *ngIf="dictionary" class="checkbox-group">
+        <p>¿Desea importar un fichero de diccionario?</p>
         <label>
             <input type="checkbox" (change)="useFile(true)" [checked]="file" />
             Sí
@@ -31,4 +63,5 @@
             <input type="file" accept=".env" (change)="selectFile($event)" />
         </div>
     </div>
+    <button (click)="updateContest()">Guardar Concurso</button>
 </div>

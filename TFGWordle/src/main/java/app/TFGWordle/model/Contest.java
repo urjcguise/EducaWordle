@@ -17,22 +17,27 @@ public class Contest {
     private Date startDate;
     private Date endDate;
     private Boolean useDictionary;
+    private Boolean useExternalFile;
+    private String fileRoute;
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private Competition competition;
 
-    @OneToMany(mappedBy = "contest_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wordle> wordles = new ArrayList<>();
+
 
     public Contest() {}
 
-    public Contest(String name, Competition competition, Date startDate, Date endDate, Boolean useDictionary) {
+    public Contest(String name, Competition competition, Date startDate, Date endDate, Boolean useDictionary, Boolean useExternalFile, String fileRoute) {
         this.name = name;
         this.competition = competition;
         this.startDate = startDate;
         this.endDate = endDate;
         this.useDictionary = useDictionary;
+        this.useExternalFile = useExternalFile;
+        this.fileRoute = fileRoute;
     }
 
     public void setId(Long id) {
@@ -73,6 +78,22 @@ public class Contest {
 
     public void setUseDictionary(Boolean useDictionary) {
         this.useDictionary = useDictionary;
+    }
+
+    public Boolean getUseExternalFile() {
+        return useExternalFile;
+    }
+
+    public void setUseExternalFile(Boolean useExternalFile) {
+        this.useExternalFile = useExternalFile;
+    }
+
+    public String getFileRoute() {
+        return fileRoute;
+    }
+
+    public void setFileRoute(String fileRoute) {
+        this.fileRoute = fileRoute;
     }
 
     public Competition getCompetition() {

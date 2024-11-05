@@ -14,10 +14,12 @@ export class ContestListComponent implements OnInit {
   contests: Contest[] = [];
   competitionName!: string;
   isProfessor = false;
+  competitionId!: number;
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) { }
 
   ngOnInit(): void {
+    this.competitionId = history.state.competitionId;
     this.competitionName = this.route.snapshot.paramMap.get('competitionName')!;
     if (!this.competitionName) {
       console.error('No se encontró la competición');
@@ -52,6 +54,7 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToEditWordle(contestName: string) {
-    this.router.navigate([`${contestName}/editar`]);
+    this.router.navigate([`/${contestName}/editar`], { state: { competitionId: this.competitionId } });
+
   }
 }
