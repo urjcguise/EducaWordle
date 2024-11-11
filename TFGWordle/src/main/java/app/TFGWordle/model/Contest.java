@@ -1,5 +1,6 @@
 package app.TFGWordle.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Contest {
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
+    @JsonIgnore
     private Competition competition;
 
     @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -110,5 +112,10 @@ public class Contest {
 
     public void setWordles(List<Wordle> wordles) {
         this.wordles = wordles;
+    }
+
+    public void updateWordles(List<Wordle> wordles) {
+        this.wordles.clear();
+        this.wordles.addAll(wordles);
     }
 }

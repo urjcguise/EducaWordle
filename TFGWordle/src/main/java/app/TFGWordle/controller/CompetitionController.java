@@ -65,6 +65,13 @@ public class CompetitionController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getCompetitionById/{id}")
+    public ResponseEntity<Competition> getCompetitionById(@PathVariable Long id) {
+        Competition competition = competitionService.getCompetitionById(id);
+        return new ResponseEntity<>(competition, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
     @DeleteMapping("/deleteCompetition/{id}")
     public ResponseEntity<?> deleteCompetition(@PathVariable("id") Long id) {
         if (!competitionService.existsCompetition(id))

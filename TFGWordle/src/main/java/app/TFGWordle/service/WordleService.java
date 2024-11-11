@@ -22,7 +22,11 @@ public class WordleService {
         wordleRepository.deleteByContestId(id);
     }
 
-    public void saveAll(List<Wordle> wordles) {
-        wordleRepository.saveAll(wordles);
+    public List<Wordle> saveAll(List<Wordle> wordles) {
+        return wordleRepository.saveAll(wordles);
+    }
+
+    public List<Wordle> findByContestId(Long id) {
+        return wordleRepository.findByContestId(id);
     }
 }

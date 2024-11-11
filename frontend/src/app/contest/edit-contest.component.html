@@ -5,11 +5,11 @@
         <input type="text" id="contestName" [(ngModel)]="contest.contestName" class="name-input" />
     </div>
 
-    <div *ngFor="let wordle of wordles; index as i">
+    <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex">
         <input
             type="text"
-            placeholder="Palabra"
-            [(ngModel)]="wordles[i].word"
+            placeholder="Nuevo Wordle"
+            [(ngModel)]="wordles[i]"
             class="wordle-input"
         />
     </div>

@@ -18,6 +18,7 @@ import { CompetitionListComponent } from './competition/competition-list.compone
 import { ContestComponent } from './contest/contest.component';
 import { ContestListComponent } from './contest/contest-list.component';
 import { EditContestComponent } from './contest/edit-contest.component';
+import { PlayWordleComponent } from './wordle/play-wordle.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { EditContestComponent } from './contest/edit-contest.component';
     CompetitionListComponent,
     ContestComponent,
     ContestListComponent,
-    EditContestComponent
+    EditContestComponent,
+    PlayWordleComponent
   ],
   imports: [
     BrowserModule,

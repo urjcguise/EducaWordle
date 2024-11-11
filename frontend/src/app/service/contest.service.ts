@@ -24,8 +24,8 @@ export class ContestService {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteContest/' + contestName);
   }
 
-  public editContest(contestName: string, updateContest: Contest) {
-    return this.httpClient.post<any>(this.apiUrl + "editContest/" + contestName, updateContest);
+  public editContest(contestName: string, updatedContest: Contest) {
+    return this.httpClient.post<any>(this.apiUrl + "editContest/" + contestName, updatedContest);
   }
 
   public getContestByName(contestName: string) {

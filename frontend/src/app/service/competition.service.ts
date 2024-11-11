@@ -21,6 +21,10 @@ export class CompetitionService {
     return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions');
   }
 
+  public getCompetitionById(id: number): Observable<Competition> {
+    return this.httpClient.get<Competition>(this.apiUrl + 'getCompetitionById/' + id);
+  }
+
   public deleteCompetition(id: number): Observable<Contest> {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteCompetition/' + id);
   }

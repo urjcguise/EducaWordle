@@ -70,10 +70,11 @@ public class ContestController {
     @PreAuthorize("hasRole('PROFESSOR')")
     @PostMapping("/editContest/{contestName}")
     public ResponseEntity<?> updateContest(@PathVariable String contestName, @RequestBody Contest contest) {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+        Contest oldContest = contestService.getByName(contestName);
 
-        wordleService.deleteByContestId(contest.getId());
-
-        wordleService.saveAll(contest.getWordles());
+        contest.setCompetition(oldContest.getCompetition());
 
         return ResponseEntity.ok(contestService.save(contest));
     }

@@ -1,5 +1,6 @@
 package app.TFGWordle.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +15,7 @@ public class Wordle {
 
     @ManyToOne
     @JoinColumn(name = "contest_id")
+    @JsonIgnore
     private Contest contest;
 
     public Wordle(String word, Contest contest) {

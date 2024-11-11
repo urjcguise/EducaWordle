@@ -1,8 +1,9 @@
+import { Competition } from './competition';
 import { Wordle } from './wordle';
 
 export class Contest {
     contestName!: string;
-    competitionId!: number;
+    competition!: Competition;
     startDate!: Date;
     endDate!: Date;
     useDictionary!: boolean;
@@ -16,7 +17,7 @@ export class Contest {
         useDictionary: boolean,
         useExternalFile: boolean,
         fileRoute: string,
-        competitionId: number,
+        competition: Competition,
         wordles: Wordle[] = []) {
         this.contestName = contestName;
         this.startDate = startDate;
@@ -24,7 +25,7 @@ export class Contest {
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
         this.fileRoute = fileRoute;
-        this.competitionId = competitionId;
+        this.competition = competition;
         this.wordles = wordles;
     }
 }

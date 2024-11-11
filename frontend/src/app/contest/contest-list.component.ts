@@ -54,7 +54,10 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToEditWordle(contestName: string) {
-    this.router.navigate([`/${contestName}/editar`], { state: { competitionId: this.competitionId } });
-
+    if (this.competitionId != null) {
+      this.router.navigate([`/${contestName}/editar`]);
+    } else {
+      console.error("competitionId no está definido. Verifica su inicialización.");
+    }
   }
 }

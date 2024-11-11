@@ -3,6 +3,8 @@ import { Contest } from '../models/contest';
 import { ActivatedRoute } from '@angular/router';
 import { ContestService } from '../service/contest.service';
 import { Wordle } from '../models/wordle';
+import { WordleService } from '../service/wordle.service';
+import { Competition } from '../models/competition';
 
 @Component({
   selector: 'app-edit-contest',
@@ -11,42 +13,55 @@ import { Wordle } from '../models/wordle';
 })
 export class EditContestComponent {
   
-  contest: Contest = new Contest("", new Date(), new Date(), false, false, "", 0, []);
+  contest: Contest = new Contest("", new Date(), new Date(), false, false, "", new Competition(""), []);
   contestName = "";
   dictionary: boolean = false;
   file: boolean = false;
   fileRoute = "";
-  competitionId!: number;
-  wordles: Wordle[] = [{ word: '' }];
+  wordles: string[] = [];
 
   formattedStartDate: string = "";
   formattedEndDate: string = "";
 
-  constructor(private route: ActivatedRoute, private contestService: ContestService) { }
+  competition!: Competition;
+
+  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService) { }
 
   ngOnInit(): void {
-    this.competitionId = history.state.competitionId;
     const contestNameParam = this.route.snapshot.paramMap.get('contestName');
     this.contestName = contestNameParam || '';
     this.loadContest();
+    this.getWordles();
   }
 
   loadContest(): void {
     this.contestService.getContestByName(this.contestName).subscribe({
       next: (data: Contest) => {
         this.contest = data;
-        this.wordles = data.wordles || [{ word: '' }];
         this.dictionary = data.useDictionary || false;
         this.file = data.useExternalFile || false;
         this.fileRoute = data.fileRoute || "";
         this.formattedStartDate = this.formatDateForInput(this.contest.startDate);
         this.formattedEndDate = this.formatDateForInput(this.contest.endDate);
       },
-      error: (err) => console.error('Error al cargar concurso', err)
+      error: (err) => console.error('Error al cargar el concurso', err)
     });
   }
 
-  private formatDateForInput(date: Date | string): string {
+  getWordles(): void {
+    this.wordleService.getWordles(this.contestName).subscribe({
+      next: (data: Wordle[]) => {
+        if (data && data.length > 0) {
+          this.wordles = data.map((elem) => elem.word);
+        } else {
+          this.wordles = [''];
+        }
+      },
+      error: (err) => console.error('Error al obtener Wordles', err)
+    });
+  }
+
+  formatDateForInput(date: Date | string): string {
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -58,7 +73,7 @@ export class EditContestComponent {
 
   addWordle() {
     if (this.wordles.length < 3) {
-      this.wordles.push({ word: '' });
+      this.wordles.push('');
     }
   }
 
@@ -77,7 +92,7 @@ export class EditContestComponent {
   selectFile(event: any) {
     const file: File = event.target.files[0];
     if (file) {
-      this.fileRoute = file.name; // Aquí se asigna solo el nombre, pero podrías manejar la subida del archivo
+      this.fileRoute = file.name; // Se asigna solo el nombre
       this.contest.fileRoute = this.fileRoute;
     }
   }
@@ -91,14 +106,29 @@ export class EditContestComponent {
       useDictionary: this.dictionary,
       useExternalFile: this.file,
       fileRoute: this.fileRoute,
-      competitionId: this.competitionId,
-      wordles: this.wordles
+      wordles: []
     };
     this.contestService.editContest(this.contestName, updatedContest).subscribe({
       next: () => {
-        alert('Concurso editado con éxito');
+        if (this.wordles.length > 0)
+          this.saveWordles();
+        else
+        alert('Concurso guardado con éxito');
       },
       error: (err) => console.error('Error al editar concurso', err)
     });
   }
+
+  saveWordles() {
+    this.wordleService.saveWordles(this.wordles, this.contest.contestName).subscribe({
+      next: () => {
+        alert('Concurso y Wordles guardados con éxito');
+      },
+      error: (err) => console.error('Error al editar Wordles', err)
+    });
+  }
+
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }  
 }

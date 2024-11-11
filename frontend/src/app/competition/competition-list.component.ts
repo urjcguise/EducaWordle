@@ -29,8 +29,8 @@ export class CompetitionListComponent implements OnInit {
     });
   }
 
-  viewContests(competitionName: string): void {
-    this.router.navigate(['/' + competitionName + '/concursos']);
+  viewContests(competitionName: string, competitionId: number): void {
+    this.router.navigate(['/' + competitionName + '/concursos'], { state: {competitionId }});
   }
 
   deleteCompetition(id: number): void {
