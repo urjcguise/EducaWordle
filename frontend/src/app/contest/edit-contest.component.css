@@ -1,72 +1,93 @@
-form, div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, sans-serif;
-  }
-  
-  .container {
-    width: 100%;
-    max-width: 500px;
-    padding: 20px;
-    margin: 0 auto;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .wordle-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  button:hover:not(:disabled) {
-    background-color: #45a049;
-  }
-  
-  label, p {
-    font-size: 16px;
-    color: #333;
-    margin: 5px 0;
-  }
-  
-  .checkbox-group {
-    display: flex;
+form,
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.wordle-input {
+  flex: 1;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.delete-wordle-button {
+  background-color: #FF4D4D;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-wordle-button:hover {
+  background-color: #e04141;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+label,
+p {
+  font-size: 16px;
+  color: #333;
+  margin: 5px 0;
+}
+
+.checkbox-group {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   margin-top: 10px;
-  }
-  
-  .checkbox-group input {
-    margin-right: 5px;
-  }
-  
-  input[type="file"] {
-    margin-top: 10px;
-    padding: 5px;
-    font-size: 16px;
-  }
-  
+}
+
+.checkbox-group input {
+  margin-right: 5px;
+}
+
+input[type="file"] {
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 16px;
+}

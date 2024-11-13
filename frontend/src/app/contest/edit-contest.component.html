@@ -12,6 +12,9 @@
             [(ngModel)]="wordles[i]"
             class="wordle-input"
         />
+        <button type="button" class="delete-wordle-button" (click)="removeWordle(i)">
+            🗑️
+        </button>
     </div>
     <button (click)="addWordle()" [disabled]="wordles.length >= 3">
         Añadir Wordle
@@ -60,7 +63,7 @@
             No
         </label>
         <div *ngIf="file">
-            <input type="file" accept=".env" (change)="selectFile($event)" />
+            <input type="file" accept=".txt" (change)="selectFile($event)" />
         </div>
     </div>
     <button (click)="updateContest()">Guardar Concurso</button>

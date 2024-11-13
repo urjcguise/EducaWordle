@@ -131,4 +131,9 @@ export class EditContestComponent {
   trackByIndex(index: number, item: any): number {
     return index;
   }  
+
+  removeWordle(index: number) {
+    this.wordles.splice(index, 1);
+}
+
 }
