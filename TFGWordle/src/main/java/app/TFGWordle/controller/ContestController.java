@@ -63,8 +63,8 @@ public class ContestController {
         if (!contestService.existsContest(contestName))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
         Contest contest = contestService.getByName(contestName);
-        contestService.deleteCompetition(contest.getId());
-        return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
+        contestService.deleteContest(contest.getId());
+        return ResponseEntity.ok(Map.of("message", "Concurso eliminada"));
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")

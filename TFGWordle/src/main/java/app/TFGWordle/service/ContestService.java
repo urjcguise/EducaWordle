@@ -32,7 +32,7 @@ public class ContestService {
         return contestRepository.findByName(contestName).get();
     }
 
-    public void deleteCompetition(Long id) {
+    public void deleteContest(Long id) {
         contestRepository.deleteById(id);
     }
 }

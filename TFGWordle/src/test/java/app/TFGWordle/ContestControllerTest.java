@@ -128,7 +128,7 @@ public class ContestControllerTest {
         contest.setId(1L);
         when(contestService.getByName("Contest")).thenReturn(contest);
 
-        doNothing().when(contestService).deleteCompetition(1L);
+        doNothing().when(contestService).deleteContest(1L);
 
         mockMvc.perform(delete("/api/contests/deleteContest/Contest"))
                 .andExpect(status().isOk())

@@ -1,10 +1,12 @@
 package app.TFGWordle.controller;
 
 import app.TFGWordle.model.Competition;
+import app.TFGWordle.model.Contest;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
+import app.TFGWordle.service.ContestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,12 +27,14 @@ import java.util.Map;
 public class CompetitionController {
 
     private final CompetitionService competitionService;
+    private final ContestService contestService;
     private final UserService userService;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public CompetitionController(CompetitionService competitionService, UserService userService) {
+    public CompetitionController(CompetitionService competitionService, ContestService contestService, UserService userService) {
         this.competitionService = competitionService;
+        this.contestService = contestService;
         this.userService = userService;
     }
 
@@ -76,6 +80,10 @@ public class CompetitionController {
     public ResponseEntity<?> deleteCompetition(@PathVariable("id") Long id) {
         if (!competitionService.existsCompetition(id))
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
+        List<Contest> contestInCompetition = contestService.getContestsByCompetition(competitionService.getCompetitionById(id));
+        for (Contest contest : contestInCompetition) {
+            contestService.deleteContest(contest.getId());
+        }
         competitionService.deleteCompetition(id);
         return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
     }

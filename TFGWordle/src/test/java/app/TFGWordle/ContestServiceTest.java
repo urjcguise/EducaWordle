@@ -109,7 +109,7 @@ class ContestServiceTest {
 
     @Test
     void testDeleteCompetition() {
-        contestService.deleteCompetition(1L);
+        contestService.deleteContest(1L);
 
         verify(contestRepository, times(1)).deleteById(1L);
     }
