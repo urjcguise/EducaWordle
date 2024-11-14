@@ -1,5 +1,6 @@
 package app.TFGWordle.security.entity;
 
+import app.TFGWordle.model.Participation;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -8,11 +9,13 @@ import java.util.Set;
 @Entity
 @Table(name="users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String username;
+
     @Column(unique = true)
     private String email;
     private String password;
@@ -22,6 +25,9 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Participation> participations = new HashSet<>();
 
     public User() {
     }
@@ -70,5 +76,13 @@ public class User {
 
     public void setRoles(Set<Rol> roles) {
         this.roles = roles;
+    }
+
+    public Set<Participation> getParticipations() {
+        return participations;
+    }
+
+    public void setParticipations(Set<Participation> participations) {
+        this.participations = participations;
     }
 }

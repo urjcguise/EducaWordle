@@ -3,6 +3,9 @@ package app.TFGWordle.model;
 import app.TFGWordle.security.entity.User;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 public class Competition {
 
@@ -15,6 +18,9 @@ public class Competition {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User professor;
+
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Participation> participations = new HashSet<>();
 
     public Competition() {
     }
@@ -46,5 +52,13 @@ public class Competition {
 
     public void setProfessor(User professor) {
         this.professor = professor;
+    }
+
+    public Set<Participation> getParticipations() {
+        return participations;
+    }
+
+    public void setParticipations(Set<Participation> participations) {
+        this.participations = participations;
     }
 }
