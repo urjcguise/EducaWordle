@@ -45,8 +45,4 @@ export class CompetitionListComponent implements OnInit {
       });
     }
   }
-
-  navigateToCreateContest(competitionId: number): void {
-    this.router.navigate(['/nuevoConcurso'], { state: { competitionId } });
-  }
 }

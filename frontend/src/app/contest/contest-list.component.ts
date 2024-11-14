@@ -60,4 +60,8 @@ export class ContestListComponent implements OnInit {
       console.error("competitionId no está definido. Verifica su inicialización.");
     }
   }
+
+  navigateToCreateContest(): void {
+    this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
+  }
 }
