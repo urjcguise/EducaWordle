@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Competition } from '../models/competition';
 import { CompetitionService } from '../service/competition.service';
 import { Router } from '@angular/router';
+import { TokenService } from '../service/token.service';
+import { UserService } from '../service/user.service';
 
 @Component({
   selector: 'app-competition-list',
@@ -10,15 +12,46 @@ import { Router } from '@angular/router';
 })
 export class CompetitionListComponent implements OnInit {
 
-  competitions: Competition[] = [];
+  isProfessor = false;
+  isStudent = false;
+  roles: string[] = [];
 
-  constructor(private competitionService: CompetitionService, private router: Router) { }
+  competitions: Competition[] = [];
+  noCompetitions = true; 
+
+  constructor(private competitionService: CompetitionService, private router: Router, private tokenService: TokenService, private userService: UserService) { }
 
   ngOnInit(): void {
-    this.loadCompetitions();
+    this.roles = this.tokenService.getAuthorities();
+    this.roles.forEach(rol => {
+      if (rol === 'ROLE_PROFESSOR') {
+        this.isProfessor = true;
+        this.loadCompetitionsProfessor();
+      } else if (rol === 'ROLE_STUDENT') {
+        this.isStudent = true;
+        this.loadCompetitionsStudent();
+      }
+    })
   }
 
-  loadCompetitions(): void {
+  loadCompetitionsStudent() {
+    console.log(this.tokenService.getUserName());
+    this.userService.getCompetitionsByUserName(this.tokenService.getUserName()!).subscribe({
+      next: (data) => {
+        if (data.length != 0) {
+          this.competitions = data;
+          this.noCompetitions = false;
+        } else {
+          this.noCompetitions = true;
+        }
+      },
+      error: (error) => {
+        console.error('Error consiguiendo las competiciones', error);
+      }
+    });
+  }
+
+  loadCompetitionsProfessor(): void {
     this.competitionService.getCompetitions().subscribe({
       next: (data) => {
         this.competitions = data;
@@ -39,7 +72,7 @@ export class CompetitionListComponent implements OnInit {
       this.competitionService.deleteCompetition(id).subscribe({
         next: () => {
           alert('Competición eliminada con éxito.');
-          this.loadCompetitions();
+          this.loadCompetitionsProfessor();
         },
         error: (err) => console.error('Error al eliminar la competición:', err)
       });

@@ -19,7 +19,7 @@ const routes: Routes = [
   {path: 'register', component: RegisterComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},
   {path: 'wordle', component: PlayWordleComponent, canActivate: [guard], data: { expectedRol: ['student'] }},
   {path: 'nuevaCompeticion', component: CompetitionComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
-  {path: 'competiciones', component: CompetitionListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
+  {path: 'competiciones', component: CompetitionListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student'] }},
   {path: 'nuevoConcurso', component: ContestComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: ':contestName/editar', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},

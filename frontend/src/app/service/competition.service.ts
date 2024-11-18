@@ -33,4 +33,8 @@ export class CompetitionService {
   public getStudentsByCompetition(id: number): Observable<User[]> {
     return this.httpClient.get<User[]>(this.apiUrl + 'getStudents/' + id);
   }
+
+  public createUser(competitionId: number, userId: number): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'linkStudentToCompetition/' + competitionId + '/' + userId, null);
+  }
 }

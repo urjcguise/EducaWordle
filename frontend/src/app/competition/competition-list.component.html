@@ -1,20 +1,32 @@
 <div class="competition-list">
   <h2>Competiciones Disponibles</h2>
-  <ul>
-    <li *ngFor="let competition of competitions" class="competition-item">
-      <span>{{ competition.competitionName }}</span>
-      <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
-        <i class="far fa-eye"></i>
-        Ver Concursos
-      </button>
-      <button class="btn btn-primary btn-sm ml-3" (click)="viewStudents(competition.competitionName, competition.id)">
-        <i class="far fa-user"></i>
-        Ver Alumnos
-      </button>
-      <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
-        <i class="far fa-trash-alt"></i>
-        Borrar Competición
-      </button>
-    </li>
-  </ul>
+  <div *ngIf="isProfessor">
+    <ul>
+      <li *ngFor="let competition of competitions" class="competition-item">
+        <span>{{ competition.competitionName }}</span>
+        <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
+          <i class="far fa-eye"></i>
+          Ver Concursos
+        </button>
+        <button class="btn btn-primary btn-sm ml-3" (click)="viewStudents(competition.competitionName, competition.id)">
+          <i class="far fa-user"></i>
+          Ver Alumnos
+        </button>
+        <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
+          <i class="far fa-trash-alt"></i>
+          Borrar Competición
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="isStudent">
+    <div *ngIf="noCompetitions">
+      <h4>No estás en ninguna competición</h4>
+    </div>
+    <div *ngIf="!noCompetitions">
+      <li *ngFor="let competition of competitions" class="competition-item">
+        <span>{{ competition.competitionName }}</span>
+      </li>
+    </div>
+  </div>
 </div>

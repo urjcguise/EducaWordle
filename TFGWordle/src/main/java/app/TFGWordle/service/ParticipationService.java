@@ -1,5 +1,6 @@
 package app.TFGWordle.service;
 
+import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.repository.ParticipationRepository;
 import app.TFGWordle.security.entity.User;
@@ -22,6 +23,9 @@ public class ParticipationService {
         return participationRepository.findByCompetitionId(competitionId);
     }
 
+    public List<Participation> findCompetitionsByStudent(Long studentId) {
+        return participationRepository.findByUserId(studentId);
+    }
     public void save(Participation participation) {
         participationRepository.save(participation);
     }

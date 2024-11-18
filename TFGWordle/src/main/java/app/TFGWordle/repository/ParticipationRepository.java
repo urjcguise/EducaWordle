@@ -1,5 +1,6 @@
 package app.TFGWordle.repository;
 
+import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
 
     @Query("SELECT p.student FROM Participation p JOIN p.student.roles r WHERE p.competition.id = :competitionId AND r.rolName = 'ROLE_STUDENT'")
     List<User> findByCompetitionId(@Param("competitionId")Long competitionId);
+
+    @Query("SELECT p FROM Participation p WHERE p.student.id = :userId")
+    List<Participation> findByUserId(@Param("userId") Long userId);
 }

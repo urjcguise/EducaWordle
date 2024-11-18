@@ -3,7 +3,7 @@ import { NewUser } from '../models/new-user';
 import { Observer } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
-import { UserService } from '../service/user.service';
+import { CompetitionService } from '../service/competition.service';
 
 @Component({
   selector: 'app-new-student',
@@ -20,7 +20,7 @@ export class NewStudentComponent implements OnInit{
   password!: string;
   errMsj!: string;
 
-  constructor(private router: Router, private authService: AuthService, private userService: UserService) {}
+  constructor(private router: Router, private authService: AuthService, private competitionService: CompetitionService) {}
   
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
@@ -34,7 +34,7 @@ export class NewStudentComponent implements OnInit{
     const observer: Observer<any> = {
       next: (userId) => {
         console.log('Cuenta creada exitosamente');
-        this.userService.createUser(this.competitionId, userId).subscribe({
+        this.competitionService.createUser(this.competitionId, userId).subscribe({
           next: () => console.log('Usuario vinculado a la competición exitosamente'),
           error: (err) => console.error('Error al vincular al usuario:', err)
         });
