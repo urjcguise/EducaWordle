@@ -21,11 +21,17 @@ public class UserService {
     public Optional<User> getByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
+    public Optional<User> getById(Long id) {
+       return userRepository.findById(id);
+    }
     public boolean existsByUserName(String userName) {
         return userRepository.existsByUsername(userName);
     }
     public boolean existsByEmail(String email) {
-        return userRepository.existsByUsername(email);
+        return userRepository.existsByEmail(email);
+    }
+    public boolean existsById(Long id) {
+        return userRepository.existsById(id);
     }
     public void save(User user) {
         userRepository.save(user);

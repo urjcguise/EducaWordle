@@ -1,0 +1,11 @@
+<div class="student-list">
+    <h1>Alumnos participando</h1>
+    <button class="btn btn-primary btn-sm ml-3" (click)="addStudent()">
+        Añadir Alumno
+    </button>
+    <ul>
+        <li *ngFor="let student of students" class="contest-item d-flex align-items-center">
+            <span class="student-name">{{ student.username }}</span>
+        </li>
+    </ul>
+</div>

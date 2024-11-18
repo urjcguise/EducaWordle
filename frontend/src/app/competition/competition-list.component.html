@@ -7,6 +7,10 @@
         <i class="far fa-eye"></i>
         Ver Concursos
       </button>
+      <button class="btn btn-primary btn-sm ml-3" (click)="viewStudents(competition.competitionName, competition.id)">
+        <i class="far fa-user"></i>
+        Ver Alumnos
+      </button>
       <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
         <i class="far fa-trash-alt"></i>
         Borrar Competición

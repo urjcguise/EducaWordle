@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Competition } from '../models/competition';
 import { Contest } from '../models/contest';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +28,9 @@ export class CompetitionService {
 
   public deleteCompetition(id: number): Observable<Contest> {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteCompetition/' + id);
+  }
+
+  public getStudentsByCompetition(id: number): Observable<User[]> {
+    return this.httpClient.get<User[]>(this.apiUrl + 'getStudents/' + id);
   }
 }

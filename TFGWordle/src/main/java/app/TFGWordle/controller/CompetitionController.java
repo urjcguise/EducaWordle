@@ -2,11 +2,13 @@ package app.TFGWordle.controller;
 
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
+import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
+import app.TFGWordle.service.ParticipationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,13 +31,15 @@ public class CompetitionController {
     private final CompetitionService competitionService;
     private final ContestService contestService;
     private final UserService userService;
+    private final ParticipationService participationService;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public CompetitionController(CompetitionService competitionService, ContestService contestService, UserService userService) {
+    public CompetitionController(CompetitionService competitionService, ContestService contestService, UserService userService, ParticipationService participationService) {
         this.competitionService = competitionService;
         this.contestService = contestService;
         this.userService = userService;
+        this.participationService = participationService;
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
@@ -88,4 +92,31 @@ public class CompetitionController {
         return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
     }
 
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getStudents/{competitionId}")
+    public ResponseEntity<List<User>> getStudents(@PathVariable Long competitionId) {
+        if (participationService.existByid(competitionId)) {
+            return ResponseEntity.ok(participationService.findStudentsByCompetition(competitionId));
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PostMapping("/linkStudentToCompetition/{competitionId}/{userId}")
+    public ResponseEntity<?> linkStudent(@PathVariable Long competitionId, @PathVariable Long userId ) {
+        if (competitionService.existsCompetition(competitionId) && userService.existsById(userId)) {
+            Competition competition = competitionService.getCompetitionById(competitionId);
+            User user = userService.getById(userId).get();
+            Participation newParticipation = new Participation(user, competition);
+
+            competition.getParticipations().add(newParticipation);
+            user.getParticipations().add(newParticipation);
+
+            participationService.save(newParticipation);
+            return new ResponseEntity<>(Map.of("message", "Alumno asignado correctamente"), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Competición o usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+    }
 }

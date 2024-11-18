@@ -89,6 +89,6 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-        return new ResponseEntity<>(Map.of("message", "usuario guardado"), HttpStatus.CREATED);
+        return new ResponseEntity<>(user.getId(), HttpStatus.CREATED);
     }
 }

@@ -30,7 +30,7 @@ export class CompetitionListComponent implements OnInit {
   }
 
   viewContests(competitionName: string, competitionId: number): void {
-    this.router.navigate(['/' + competitionName + '/concursos'], { state: {competitionId }});
+    this.router.navigate(['/' + competitionName + '/concursos'], { state: {competitionId} });
   }
 
   deleteCompetition(id: number): void {
@@ -44,5 +44,9 @@ export class CompetitionListComponent implements OnInit {
         error: (err) => console.error('Error al eliminar la competición:', err)
       });
     }
+  }
+
+  viewStudents(competitionName: string, competitionId: number): void {
+    this.router.navigate(['/' + competitionName + '/alumnos'], { state: {competitionId} });
   }
 }
