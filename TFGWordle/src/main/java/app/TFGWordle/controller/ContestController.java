@@ -41,6 +41,7 @@ public class ContestController {
     public ResponseEntity<Contest> createContest(@RequestBody Contest contest, @PathVariable Long competitionId) {
         if (contestService.existsContest(contest.getContestName()))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        
         Competition competition = competitionService.getCompetitionById(competitionId);
         contest.setCompetition(competition);
         contest.setUseDictionary(false);
@@ -49,9 +50,12 @@ public class ContestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR')|| hasRole('STUDENT')")
     @GetMapping("/{competitionName}/contests")
     public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
+        if (!competitionService.existsCompetitionByName(competitionName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         Competition competition = competitionService.getCompetitionByName(competitionName);
         List<Contest> contests = contestService.getContestsByCompetition(competition);
         return ResponseEntity.ok(contests);
@@ -72,8 +76,8 @@ public class ContestController {
     public ResponseEntity<?> updateContest(@PathVariable String contestName, @RequestBody Contest contest) {
         if (!contestService.existsContest(contestName))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
-        Contest oldContest = contestService.getByName(contestName);
 
+        Contest oldContest = contestService.getByName(contestName);
         contest.setCompetition(oldContest.getCompetition());
 
         return ResponseEntity.ok(contestService.save(contest));
@@ -82,6 +86,9 @@ public class ContestController {
     @PreAuthorize("hasRole('PROFESSOR')")
     @GetMapping("/{contestName}/contest")
     public ResponseEntity<Contest> getContestByName(@PathVariable String contestName) {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
         Contest contest = contestService.getByName(contestName);
         return ResponseEntity.ok(contest);
     }

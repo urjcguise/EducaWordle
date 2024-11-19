@@ -26,6 +26,10 @@
     <div *ngIf="!noCompetitions">
       <li *ngFor="let competition of competitions" class="competition-item">
         <span>{{ competition.competitionName }}</span>
+        <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
+          <i class="far fa-eye"></i>
+          Ver Concursos
+        </button>
       </li>
     </div>
   </div>

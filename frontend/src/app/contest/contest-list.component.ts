@@ -13,8 +13,11 @@ export class ContestListComponent implements OnInit {
 
   contests: Contest[] = [];
   competitionName!: string;
-  isProfessor = false;
   competitionId!: number;
+
+  noContest = true;
+  isProfessor = false;
+  isStudent = false;
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) { }
 
@@ -27,12 +30,23 @@ export class ContestListComponent implements OnInit {
     this.loadContests();
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.isProfessor = true;
+    if (this.tokenService.getAuthorities().includes("ROLE_STUDENT"))
+      this.isStudent = true;
   }
 
   loadContests(): void {
     this.contestService.getContestsByCompetition(this.competitionName).subscribe({
       next: (data) => {
-        this.contests = data;
+        if (data.length == 0)
+          this.noContest = true;
+        else {
+          this.contests = data.map(contest => ({
+            ...contest,
+            startDate: new Date(contest.startDate),
+            endDate: new Date(contest.endDate)
+          }));
+          this.noContest = false;
+        }
       },
       error: (error) => {
         console.error('Error consiguiendo los concursos', error);
@@ -63,5 +77,17 @@ export class ContestListComponent implements OnInit {
 
   navigateToCreateContest(): void {
     this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
+  }
+
+  getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
+    const now = new Date();
+  
+    if (now < startDate) {
+      return 'upcoming';
+    } else if (now >= startDate && now <= endDate) {
+      return 'ongoing';
+    } else {
+      return 'finished';
+    }
   }
 }
