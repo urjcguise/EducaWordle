@@ -36,6 +36,12 @@ export class ContestComponent implements OnInit {
       startDate: new Date(this.contestForm.value.startDate),
       endDate: new Date(this.contestForm.value.endDate)     
     };
+
+    if (newContest.startDate >= newContest.endDate) {
+      alert('La fecha de inicio es posterior a la de finalización');
+      return;
+    }
+
     this.contestService.createContest(newContest, this.competitionId).subscribe({
       next: () => {
         alert('Concurso creado con éxito');

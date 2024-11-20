@@ -33,7 +33,6 @@ export class NewStudentComponent implements OnInit{
     this.newUser = new NewUser(this.userName, this.email, this.password, roles);
     const observer: Observer<any> = {
       next: (userId) => {
-        console.log('Cuenta creada exitosamente');
         this.competitionService.createUser(this.competitionId, userId).subscribe({
           next: () => console.log('Usuario vinculado a la competición exitosamente'),
           error: (err) => console.error('Error al vincular al usuario:', err)
@@ -44,7 +43,7 @@ export class NewStudentComponent implements OnInit{
         console.error('Error al crear la cuenta:', this.errMsj);
       },
       complete: () => {
-        console.log('Registro completado.');
+        alert('Usuario creado correctamente');
       }
     };
 
