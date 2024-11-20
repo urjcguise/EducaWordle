@@ -95,7 +95,7 @@ public class CompetitionController {
     @PreAuthorize("hasRole('PROFESSOR')")
     @GetMapping("/getStudents/{competitionId}")
     public ResponseEntity<List<User>> getStudents(@PathVariable Long competitionId) {
-        if (participationService.existByid(competitionId)) {
+        if (competitionService.existsCompetition(competitionId)) {
             return ResponseEntity.ok(participationService.findStudentsByCompetition(competitionId));
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
