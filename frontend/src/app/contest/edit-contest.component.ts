@@ -99,10 +99,12 @@ export class EditContestComponent {
 
   updateContest() {
 
-    if (this.wordles.length == 1 && this.wordles[0] == "") {
-      alert('Debes introducir como mínimo un wordle');
-      return;
-    }
+    for (const word of this.wordles) {
+      if (word == "") {
+          alert('No se puede guardar un wordle vacío');
+          return;
+      }
+    }  
 
     const updatedContest: Contest = {
       ...this.contest,
