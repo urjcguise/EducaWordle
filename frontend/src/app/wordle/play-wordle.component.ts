@@ -1,20 +1,13 @@
-import {Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import { Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren } from '@angular/core';
 
-import {WORDS} from './words';
+import { WORDS } from './words'; // Archivo como diccionario
+import { WordleService } from '../service/wordle.service';
+import { Wordle } from '../models/wordle';
+import { ContestService } from '../service/contest.service';
+import { Contest } from '../models/contest';
+import { Router } from '@angular/router';
 
 
-const WORD_LENGTH = 5;
-
-const NUM_TRIES = 6;
-
-// Letter map.
-const LETTERS = (() => {
-  const ret: {[key: string]: boolean} = {};
-  for (let charCode = 97; charCode < 97 + 26; charCode++) {
-    ret[String.fromCharCode(charCode)] = true;
-  }
-  return ret;
-})();
 
 interface Try {
   letters: Letter[];
@@ -34,15 +27,15 @@ enum LetterState {
 
 @Component({
   selector: 'wordle',
-  templateUrl: './wordle.component.html',
-  styleUrls: ['./wordle.component.css'],
+  templateUrl: './play-wordle.component.html',
+  styleUrls: ['./play-wordle.component.css'],
 })
 export class PlayWordleComponent {
   @ViewChildren('tryContainer') tryContainers!: QueryList<ElementRef>;
 
   readonly tries: Try[] = [];
-
   readonly LetterState = LetterState;
+  readonly NUM_TRIES = 6; // Número de intentos permitido
 
   readonly keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -50,52 +43,116 @@ export class PlayWordleComponent {
     ['Enviar', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
   ];
 
-  readonly curLetterStates: {[key: string]: LetterState} = {};
-
+  readonly curLetterStates: { [key: string]: LetterState } = {};
   infoMsg = '';
-
   fadeOutInfoMessage = false;
 
   private curLetterIndex = 0;
-
-  private numSubmittedTries = 0;
-
+  private targetWords: string[] = []; // Lista de palabras objetivo
   private targetWord = '';
+  private targetWordLetterCounts: { [letter: string]: number } = {};
 
-  private won = false;
+  numSubmittedTries = 0;
+  currentWordleIndex = 0; // Índice de la palabra actual
+  won = false;
+  hasMoreWords = true;
 
-  private targetWordLetterCounts: {[letter: string]: number} = {};
+  wordleList: Wordle[] = [];
+  contest!: Contest;
 
-  constructor() {
-    for (let i = 0; i < NUM_TRIES; i++) {
+  dictionary: string[] = [];
+
+  constructor(private wordleService: WordleService, private contestService: ContestService) {
+    this.wordleService.getWordles(history.state.contestName).subscribe({
+      next: (wrdl) => {
+        this.wordleList = wrdl;
+        this.targetWords = this.wordleList.map((wordle) => wordle.word); // Cargar todas las palabras
+        if (this.targetWords.length > 0) {
+          this.setTargetWord();
+        }
+      },
+      error: (error) => {
+        console.error('Error consiguiendo los wordle', error);
+      },
+    });
+
+    this.contestService.getContestByName(history.state.contestName).subscribe({
+      next: (cont) => {
+        this.contest = cont;
+        this.initializeDictionary();
+      },
+      error: (error) => {
+        console.error('Error consiguiendo el concurso', error);
+      },
+    });
+
+    for (let i = 0; i < this.NUM_TRIES; i++) {
       const letters: Letter[] = [];
-      for (let j = 0; j < WORD_LENGTH; j++) {
-        letters.push({text: '', state: LetterState.PENDING});
+      for (let j = 0; j < 5; j++) {
+        letters.push({ text: '', state: LetterState.PENDING });
       }
-      this.tries.push({letters});
+      this.tries.push({ letters });
     }
+  }
 
-    const numWords = WORDS.length;
-    while (true) {
-      const index = Math.floor(Math.random() * numWords);
-      const word = WORDS[index];
-      if (word.length === WORD_LENGTH) {
-        this.targetWord = word.toLowerCase();
-        break;
-      }
+  private initializeDictionary() {
+    if (this.contest.useExternalFile) {
+      this.loadExternalFile(this.contest.fileRoute).then((fileWords) => {
+        this.dictionary = fileWords;
+      });
+    } else if (this.contest.useDictionary) {
+      this.dictionary = WORDS;
     }
-    // Eliminar luego, esto es para saber la palabra
-    console.log('target word: ', this.targetWord);
+  }
 
-    // Obtain letters in the word
-    for (const letter of this.targetWord) {
-      const count = this.targetWordLetterCounts[letter];
-      if (count == null) {
-        this.targetWordLetterCounts[letter] = 0;
+  private async loadExternalFile(fileRoute: string): Promise<string[]> {
+    try {
+      const response = await fetch(fileRoute);
+      if (response.ok) {
+        const fileContent = await response.text();
+        return fileContent
+          .split('\n')
+          .map((word) => word.trim().toUpperCase())
+          .filter((word) => word.length > 0);
+      } else {
+        this.showInfoMessage('Error al cargar el archivo externo');
+        return [];
       }
-      this.targetWordLetterCounts[letter]++;
+    } catch (error) {
+      console.error('Error leyendo el archivo externo:', error);
+      this.showInfoMessage('No se pudo leer el archivo externo');
+      return [];
     }
-    console.log(this.targetWordLetterCounts);
+  }
+
+  private setTargetWord() {
+    if (this.currentWordleIndex < this.targetWords.length) {
+      this.resetKeyboard();
+      this.targetWord = this.targetWords[this.currentWordleIndex].toLowerCase();
+      this.targetWordLetterCounts = {};
+      for (const letter of this.targetWord) {
+        this.targetWordLetterCounts[letter] = (this.targetWordLetterCounts[letter] || 0) + 1;
+      }
+
+      // Ajustar longitud dinámica de intentos
+      for (let tryData of this.tries) {
+        tryData.letters = Array.from({ length: this.targetWord.length }, () => ({
+          text: '',
+          state: LetterState.PENDING,
+        }));
+      }
+
+      console.log('Palabra objetivo:', this.targetWord);
+    } else {
+      this.showInfoMessage('¡Has completado todas las palabras!');
+      this.won = true;
+    }
+  }
+
+  resetKeyboard() {
+    for (const key in this.curLetterStates) {
+      delete this.curLetterStates[key];
+    }
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -103,7 +160,6 @@ export class PlayWordleComponent {
     this.handleClickKey(event.key);
   }
 
-  // Returns the classes for the given keyboard key based on its state.
   getKeyClass(key: string): string {
     const state = this.curLetterStates[key.toLowerCase()];
     switch (state) {
@@ -119,140 +175,119 @@ export class PlayWordleComponent {
   }
 
   handleClickKey(key: string) {
-    if (this.won) {
-      return;
-    }
+    if (this.won) return;
 
-    if (LETTERS[key.toLowerCase()]) {
-      if (this.curLetterIndex < (this.numSubmittedTries + 1) * WORD_LENGTH) {
+    if (key.length === 1 && /^[a-zñ]$/i.test(key)) {
+      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.targetWord.length) {
         this.setLetter(key);
         this.curLetterIndex++;
       }
-    }
-    
-    else if (key === 'Backspace') {
-      if (this.curLetterIndex > this.numSubmittedTries * WORD_LENGTH) {
+    } else if (key === 'Backspace') {
+      if (this.curLetterIndex > this.numSubmittedTries * this.targetWord.length) {
         this.curLetterIndex--;
         this.setLetter('');
       }
-    }
-    
-    else if (key === 'Enviar' || key === "Enter") {
+    } else if (key === 'Enviar' || key === 'Enter') {
       this.checkCurrentTry();
     }
   }
 
   private setLetter(letter: string) {
-    const tryIndex = Math.floor(this.curLetterIndex / WORD_LENGTH);
-    const letterIndex = this.curLetterIndex - tryIndex * WORD_LENGTH;
+    const tryIndex = Math.floor(this.curLetterIndex / this.targetWord.length);
+    const letterIndex = this.curLetterIndex % this.targetWord.length;
     this.tries[tryIndex].letters[letterIndex].text = letter;
   }
 
   private async checkCurrentTry() {
     const curTry = this.tries[this.numSubmittedTries];
-    if (curTry.letters.some(letter => letter.text === '')) {
+    if (curTry.letters.some((letter) => letter.text === '')) {
       this.showInfoMessage('No hay suficientes letras');
       return;
     }
 
-    const wordFromCurTry =
-        curTry.letters.map(letter => letter.text).join('').toUpperCase();
-    if (!WORDS.includes(wordFromCurTry)) {
-      this.showInfoMessage('La palabra no está en la lista');
-      // Shake the row
-      const tryContainer =
-          this.tryContainers.get(this.numSubmittedTries)?.nativeElement as
-          HTMLElement;
+    const wordFromCurTry = curTry.letters.map((letter) => letter.text).join('').toUpperCase();
+    if (this.contest.useDictionary && !this.dictionary.includes(wordFromCurTry)) {
+      this.showInfoMessage('La palabra no está en el diccionario');
+      const tryContainer = this.tryContainers.get(this.numSubmittedTries)?.nativeElement as HTMLElement;
       tryContainer.classList.add('shake');
-      setTimeout(() => {
-        tryContainer.classList.remove('shake');
-      }, 500);
+      setTimeout(() => tryContainer.classList.remove('shake'), 500);
       return;
     }
 
-    // Check if the current try matches the target word and stores the check results.
-    const targetWordLetterCounts = {...this.targetWordLetterCounts};
+    const targetWordLetterCounts = { ...this.targetWordLetterCounts };
     const states: LetterState[] = [];
-    for (let i = 0; i < WORD_LENGTH; i++) {
+
+    for (let i = 0; i < this.targetWord.length; i++) {
       const expected = this.targetWord[i];
-      const curLetter = curTry.letters[i];
-      const got = curLetter.text.toLowerCase();
-      let state = LetterState.WRONG;
+      const got = curTry.letters[i].text.toLowerCase();
 
       if (expected === got && targetWordLetterCounts[got] > 0) {
-        targetWordLetterCounts[expected]--;
-        state = LetterState.FULL_MATCH;
-      } else if (this.targetWord.includes(got) && targetWordLetterCounts[got] > 0) {
-        targetWordLetterCounts[got]--
-        state = LetterState.PARTIAL_MATCH;
+        states[i] = LetterState.FULL_MATCH;
+        targetWordLetterCounts[got]--;
+      } else {
+        states[i] = LetterState.PENDING;
       }
-      states.push(state);
     }
-    // Esto se puede borrar
-    console.log(states);
 
-    // Animate
-    const tryContainer = this.tryContainers.get(this.numSubmittedTries)?.nativeElement as HTMLElement;
-    const letterEles = tryContainer.querySelectorAll('.letter-container');
-    for (let i = 0; i < letterEles.length; i++) {
-      const curLetterEle = letterEles[i];
-      curLetterEle.classList.add('fold');
-      await this.wait(75);
+    for (let i = 0; i < this.targetWord.length; i++) {
+      const got = curTry.letters[i].text.toLowerCase();
+      if (states[i] === LetterState.PENDING && this.targetWord.includes(got) && targetWordLetterCounts[got] > 0) {
+        states[i] = LetterState.PARTIAL_MATCH;
+        targetWordLetterCounts[got]--;
+      }
+    }
+
+    for (let i = 0; i < this.targetWord.length; i++) {
+      if (states[i] === LetterState.PENDING) {
+        states[i] = LetterState.WRONG;
+      }
+    }
+
+    for (let i = 0; i < this.targetWord.length; i++) {
       curTry.letters[i].state = states[i];
-      curLetterEle.classList.remove('fold');
-      await this.wait(75);
-    }
-
-    // Upload keyboard state
-    for (let i = 0; i < WORD_LENGTH; i++) {
-      const curLetter = curTry.letters[i];
-      const got = curLetter.text.toLowerCase();
-      const curStoredState = this.curLetterStates[got];
-      const targetState = states[i];
-
-      if (curStoredState == null || targetState > curStoredState) {
-        this.curLetterStates[got] = targetState;
+      const key = curTry.letters[i].text.toLowerCase();
+      const currentStoredState = this.curLetterStates[key];
+      if (currentStoredState == null || states[i] > currentStoredState) {
+        this.curLetterStates[key] = states[i];
       }
     }
 
     this.numSubmittedTries++;
-
-    // Check if all letters are correct
-    if (states.every(state => state === LetterState.FULL_MATCH)) {
+    if (states.every((state) => state === LetterState.FULL_MATCH)) {
       this.showInfoMessage('¡CORRECTO!');
       this.won = true;
-      for (let i = 0; i < letterEles.length; i++) {
-        const curLetterEle = letterEles[i];
-        curLetterEle.classList.add('bounce');
-        await this.wait(160);
-      }
+      this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
       return;
     }
 
-    // Show correct answer.
-    if (this.numSubmittedTries === NUM_TRIES) {
-      this.showInfoMessage(this.targetWord.toUpperCase(), false);
+    if (this.numSubmittedTries === this.NUM_TRIES) {
+      this.showInfoMessage(`La palabra era: ${this.targetWord.toUpperCase()}`);
+      this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
     }
   }
 
-  private showInfoMessage(msg: string, hide = true) {
-    this.infoMsg = msg;
-    if (hide) {
-      setTimeout(() => {
-        this.fadeOutInfoMessage = true;
-        setTimeout(() => {
-          this.infoMsg = '';
-          this.fadeOutInfoMessage = false;
-        }, 500);
-      }, 2000);
+  handleNextWord() {
+    this.numSubmittedTries = 0;
+    this.curLetterIndex = 0;
+    this.won = false;
+
+    if (this.currentWordleIndex + 1 < this.targetWords.length) {
+      this.currentWordleIndex++;
+      this.setTargetWord();
+    } else {
+      this.hasMoreWords = false;
+      this.showInfoMessage('¡Has completado todas las palabras!');
     }
   }
 
-  private async wait(ms: number) {
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, ms);
-    })
+  private showInfoMessage(message: string, autoDismiss: boolean = true) {
+    this.infoMsg = message;
+    this.fadeOutInfoMessage = false;
+
+    if (autoDismiss) {
+      setTimeout(() => (this.fadeOutInfoMessage = true), 1500);
+      setTimeout(() => (this.infoMsg = ''), 2000);
+    }
   }
 }
+

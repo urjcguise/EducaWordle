@@ -28,7 +28,7 @@
 
             <div *ngIf="isStudent">
               <button *ngIf="getContestState(contest.startDate, contest.endDate) === 'ongoing'"
-                class="btn btn-success btn-sm ml-2">
+                class="btn btn-success btn-sm ml-2" (click)="navigateToPlayWordle(contest.contestName, 0)">
                 <i class="fas fa-play"></i>
                 Comenzar
               </button>

@@ -83,7 +83,7 @@ public class ContestController {
         return ResponseEntity.ok(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
     @GetMapping("/{contestName}/contest")
     public ResponseEntity<Contest> getContestByName(@PathVariable String contestName) {
         if (!contestService.existsContest(contestName))

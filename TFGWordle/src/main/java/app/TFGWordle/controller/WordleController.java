@@ -54,7 +54,7 @@ public class WordleController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
     @GetMapping("/getWordles/{contestName}")
     public ResponseEntity<List<Wordle>> getWordles(@PathVariable String contestName) {
 

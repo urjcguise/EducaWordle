@@ -4,6 +4,10 @@
             <div class="title"> Wordle </div>
         </div>
     
+        <div class="progress-container">
+            <span>Palabra {{currentWordleIndex + 1}} de {{wordleList.length}}</span>
+        </div>
+
         <div class="main">
             <div class="try-container" *ngFor="let try of tries" #tryContainer>
                 <div class="letter-container" *ngFor="let letter of try.letters"
@@ -32,6 +36,15 @@
             </div>
         </div>
     
+        <div *ngIf="hasMoreWords && won" class="next-word-button-container">
+            <button (click)="handleNextWord()" class="next-word-button">Siguiente palabra</button>
+        </div>
+        
+        <div *ngIf="!hasMoreWords && won" class="completion-message">
+            ¡Has completado todas las palabras!
+        </div>
+        
+
         <div class="info-msg"
             [class.show]="infoMsg !== ''"
             [class.fade-out]="fadeOutInfoMessage">

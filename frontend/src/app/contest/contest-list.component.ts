@@ -79,6 +79,10 @@ export class ContestListComponent implements OnInit {
     this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
   }
 
+  navigateToPlayWordle(contestName: string, wordleIndex: number): void {
+    this.router.navigate(['/wordle'], { state: {contestName, wordleIndex}} );
+  }
+
   getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
     const now = new Date();
   
