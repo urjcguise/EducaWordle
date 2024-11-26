@@ -44,8 +44,20 @@
     </ul>
   </div>
 
+  <h2>Próximos concursos</h2>
+  <ul>
+    <li *ngFor="let contest of contests" class="contest-item d-flex align-items-center">
+      <div *ngIf="getContestState(contest.startDate, contest.endDate) === 'upcoming'">
+        <span class="contest-name">{{ contest.contestName }}</span>
+        <div class="contest-details d-flex align-items-center">
+          <span class="contest-date">{{ contest.startDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span class="contest-date">{{ contest.endDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
 
-  <div *ngIf="noContest">
-    <h4>No hay concursos todavía</h4>
-  </div>
+<div *ngIf="noContest">
+  <h4>No hay concursos todavía</h4>
 </div>
