@@ -2,20 +2,15 @@ package app.TFGWordle.controller;
 
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
-import app.TFGWordle.model.Wordle;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
-import app.TFGWordle.service.WordleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,14 +21,12 @@ public class ContestController {
 
     private final ContestService contestService;
     private final CompetitionService competitionService;
-    private final WordleService wordleService;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public ContestController(ContestService contestService, CompetitionService competitionService, WordleService wordleService) {
+    public ContestController(ContestService contestService, CompetitionService competitionService) {
         this.contestService = contestService;
         this.competitionService = competitionService;
-        this.wordleService = wordleService;
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
@@ -91,5 +84,15 @@ public class ContestController {
 
         Contest contest = contestService.getByName(contestName);
         return ResponseEntity.ok(contest);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PostMapping("/copyContest/{oldContestName}")
+    public ResponseEntity<Contest> copyContest(@RequestBody Contest newContest, @PathVariable String oldContestName) {
+        if (contestService.existsContest(newContest.getContestName()))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+        newContest.setCompetition(contestService.getByName(oldContestName).getCompetition());
+        return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(newContest));
     }
 }

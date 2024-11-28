@@ -17,12 +17,17 @@
 
             <div *ngIf="isProfessor">
               <button class="btn btn-danger btn-sm ml-2" (click)="deleteContest(contest.contestName)">
-                <i class="far fa-trash-alt"></i>
+                <i class="fas fa-trash-alt"></i>
                 Borrar
               </button>
-              <button class="btn btn-warning btn-sm ml-2" (click)="navigateToEditWordle(contest.contestName)">
+              <button *ngIf="getContestState(contest.startDate, contest.endDate) !== 'finished'"
+                class="btn btn-warning btn-sm ml-2" (click)="navigateToEditWordle(contest.contestName)">
                 <i class="fas fa-clipboard-check"></i>
                 Editar
+              </button>
+              <button class="btn btn-success btn-sm ml-2" (click)="copyContest(contest)">
+                <i class="fas fa-copy"></i>
+                Copiar
               </button>
             </div>
 
@@ -44,18 +49,20 @@
     </ul>
   </div>
 
-  <h2>Próximos concursos</h2>
-  <ul>
-    <li *ngFor="let contest of contests" class="contest-item d-flex align-items-center">
-      <div *ngIf="getContestState(contest.startDate, contest.endDate) === 'upcoming'">
-        <span class="contest-name">{{ contest.contestName }}</span>
-        <div class="contest-details d-flex align-items-center">
-          <span class="contest-date">{{ contest.startDate | date: 'dd/MM/yyyy HH:mm' }}</span>
-          <span class="contest-date">{{ contest.endDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+  <div *ngIf="isStudent">
+    <h2>Próximos concursos</h2>
+    <ul>
+      <li *ngFor="let contest of contests" class="contest-item d-flex align-items-center">
+        <div *ngIf="getContestState(contest.startDate, contest.endDate) === 'upcoming'">
+          <span class="contest-name">{{ contest.contestName }}</span>
+          <div class="contest-details d-flex align-items-center">
+            <span class="contest-date">{{ contest.startDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <span class="contest-date">{{ contest.endDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
         </div>
-      </div>
-    </li>
-  </ul>
+      </li>
+    </ul>
+  </div>
 </div>
 
 <div *ngIf="noContest">

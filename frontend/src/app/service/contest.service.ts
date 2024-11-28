@@ -7,10 +7,10 @@ import { Contest } from '../models/contest';
   providedIn: 'root'
 })
 export class ContestService {
-  
+
   private apiUrl = 'http://localhost:9090/api/contests/';
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
   public createContest(contest: Contest, competitionId: number): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + 'newContest/' + competitionId, contest);
@@ -25,10 +25,14 @@ export class ContestService {
   }
 
   public editContest(contestName: string, updatedContest: Contest) {
-    return this.httpClient.post<any>(this.apiUrl + "editContest/" + contestName, updatedContest);
+    return this.httpClient.post<any>(this.apiUrl + 'editContest/' + contestName, updatedContest);
   }
 
   public getContestByName(contestName: string) {
     return this.httpClient.get<Contest>(this.apiUrl + contestName + '/contest');
+  }
+
+  public copyContest(newContest: Contest, oldContestName: string): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestName, newContest);
   }
 }

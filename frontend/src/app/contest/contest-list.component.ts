@@ -3,6 +3,7 @@ import { Contest } from '../models/contest';
 import { ContestService } from '../service/contest.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
+import { WordleService } from '../service/wordle.service';
 
 @Component({
   selector: 'app-contest-list',
@@ -19,7 +20,7 @@ export class ContestListComponent implements OnInit {
   isProfessor = false;
   isStudent = false;
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) { }
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) { }
 
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
@@ -59,7 +60,7 @@ export class ContestListComponent implements OnInit {
     if (confirmDelete) {
       this.contestService.deleteContest(contestName).subscribe({
         next: () => {
-          alert('Concurso eliminada con éxito.');
+          alert('Concurso eliminado con éxito.');
           this.loadContests();
         },
         error: (err) => console.error('Error al eliminar la concurso:', err)
@@ -80,18 +81,56 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToPlayWordle(contestName: string, wordleIndex: number): void {
-    this.router.navigate(['/wordle'], { state: {contestName, wordleIndex}} );
+    this.router.navigate(['/wordle'], { state: { contestName, wordleIndex } });
   }
 
   getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
     const now = new Date();
-  
-    if (now < startDate) {
+
+    if (startDate == null && endDate == null) {
+      return 'upcoming';
+    } else if (now < startDate) {
       return 'upcoming';
     } else if (now >= startDate && now <= endDate) {
       return 'ongoing';
     } else {
       return 'finished';
     }
+  }
+
+  copyContest(oldContest: Contest): void {
+
+    const now = new Date(); 
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(now.getFullYear() + 1);
+
+    const newContest = {
+      contestName: oldContest.contestName + "_copia",
+      competition: oldContest.competition,
+      startDate: now,
+      endDate: oneYearLater,
+      useDictionary: oldContest.useDictionary,
+      useExternalFile: oldContest.useExternalFile,
+      fileRoute: oldContest.fileRoute,
+      wordles: []
+    };
+
+    this.contestService.copyContest(newContest, oldContest.contestName).subscribe({
+      next: () => {
+        const wordStrings: string[] = oldContest.wordles.map(wordle => wordle.word);
+        this.wordleService.saveWordles(wordStrings, newContest.contestName).subscribe({
+          next: () => {
+            alert("Concurso copiado correctamente");
+          },
+          error: (error) => {
+            console.error('Error guardando los wordle', error);
+          }
+        });
+        this.loadContests();
+      },
+      error: (error) => {
+        console.error('Error copiando el concurso', error);
+      }
+    });
   }
 }
