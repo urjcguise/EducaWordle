@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { Contest } from '../models/contest';
+import { WordleState } from '../models/wordle-state';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,25 @@ export class ContestService {
 
   public copyContest(newContest: Contest, oldContestName: string): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestName, newContest);
+  }
+
+  public createContestState(contestName: string, userName: string, wordleState: WordleState): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'newContestState/' + contestName + '/' + userName, wordleState).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 409) {
+          console.log('El estado del concurso ya existe. No se creará nuevamente.');
+          return EMPTY; 
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  public getContestState(contestName: string, userName: string) {
+    return this.httpClient.get<WordleState>(this.apiUrl + 'getContestState/' + contestName + '/' + userName);
+  }
+
+  public updateContestState(contestName: string, userName: string, wordleState: WordleState) {
+    return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestName + '/' + userName, wordleState);
   }
 }

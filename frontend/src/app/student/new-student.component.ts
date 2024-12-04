@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NewUser } from '../models/new-user';
 import { Observer } from 'rxjs';
-import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { CompetitionService } from '../service/competition.service';
 
@@ -20,7 +19,7 @@ export class NewStudentComponent implements OnInit{
   password!: string;
   errMsj!: string;
 
-  constructor(private router: Router, private authService: AuthService, private competitionService: CompetitionService) {}
+  constructor(private authService: AuthService, private competitionService: CompetitionService) {}
   
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;

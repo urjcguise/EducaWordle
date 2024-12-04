@@ -6,6 +6,7 @@ import app.TFGWordle.repository.ContestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContestService {
@@ -32,7 +33,15 @@ public class ContestService {
         return contestRepository.findByName(contestName).get();
     }
 
+    public Optional<Contest> getById(Long id) {
+        return contestRepository.findById(id);
+    }
+
     public void deleteContest(Long id) {
         contestRepository.deleteById(id);
+    }
+
+    public Boolean existById(Long id) {
+        return contestRepository.existsById(id);
     }
 }

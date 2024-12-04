@@ -1,12 +1,11 @@
-import { Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren } from '@angular/core';
-
-import { WORDS } from './words'; // Archivo como diccionario
+import { Component, ElementRef, HostListener, QueryList, ViewChildren } from '@angular/core';
+import { WORDS } from './words';
 import { WordleService } from '../service/wordle.service';
 import { Wordle } from '../models/wordle';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
-import { Router } from '@angular/router';
-
+import { TokenService } from '../service/token.service';
+import { Game, State, WordleState } from '../models/wordle-state';
 
 
 interface Try {
@@ -62,14 +61,19 @@ export class PlayWordleComponent {
 
   dictionary: string[] = [];
 
-  constructor(private wordleService: WordleService, private contestService: ContestService) {
+  games: Game[] = [];
+
+  wordleState!: WordleState;
+
+  constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService) {
     this.wordleService.getWordles(history.state.contestName).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
-        this.targetWords = this.wordleList.map((wordle) => wordle.word); // Cargar todas las palabras
+        this.targetWords = this.wordleList.map((wordle) => wordle.word);
         if (this.targetWords.length > 0) {
           this.setTargetWord();
         }
+        this.initializeState();
       },
       error: (error) => {
         console.error('Error consiguiendo los wordle', error);
@@ -93,6 +97,27 @@ export class PlayWordleComponent {
       }
       this.tries.push({ letters });
     }
+
+
+  }
+
+  private initializeState() {
+
+    this.wordleList.forEach((item) => {
+      const newGame = new Game(item.word); 
+      this.games.push(newGame); 
+    });
+    
+    this.wordleState = new WordleState(this.wordleList.length, this.games);
+
+    this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
+      next: () => {
+        console.log('Estado del concurso creado correctamente');
+      },
+      error: (error) => {
+        console.error('Error creando el estado del concurso', error);
+      },
+    });
   }
 
   private initializeDictionary() {
@@ -252,18 +277,26 @@ export class PlayWordleComponent {
       }
     }
 
+    
+
     this.numSubmittedTries++;
     if (states.every((state) => state === LetterState.FULL_MATCH)) {
-      this.showInfoMessage('¡CORRECTO!');
+      this.showInfoMessage('¡CORRECTO!');      
       this.won = true;
       this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
+      this.updateContestState();
       return;
     }
 
     if (this.numSubmittedTries === this.NUM_TRIES) {
       this.showInfoMessage(`La palabra era: ${this.targetWord.toUpperCase()}`);
       this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
+      this.won = true;
+      this.updateContestState();
+      return;
     }
+
+    this.updateContestState();
   }
 
   handleNextWord() {
@@ -289,5 +322,38 @@ export class PlayWordleComponent {
       setTimeout(() => (this.infoMsg = ''), 2000);
     }
   }
+
+  private updateContestState(): void {
+    const currentGame = this.wordleState.games[this.currentWordleIndex];
+  
+    currentGame.finished = this.won;
+    currentGame.tryCount = this.numSubmittedTries;
+  
+    const newState = new State();
+    Object.values(this.curLetterStates).forEach((state) => {
+      switch (state) {
+        case LetterState.FULL_MATCH:
+          newState.good += 1;
+          break;
+        case LetterState.PARTIAL_MATCH:
+          newState.halfGood += 1;
+          break;
+        default:
+          newState.wrong += 1;
+          break;
+      }
+    });
+    currentGame.state = newState;
+
+    this.contestService.updateContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
+      next: () => {
+        console.log('Estado del concurso actualizado correctamente');
+      },
+      error: (error) => {
+        console.error('Error actualizando el estado del concurso', error);
+      },
+    });
+  }
+  
 }
 

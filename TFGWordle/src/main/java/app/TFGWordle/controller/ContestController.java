@@ -1,10 +1,17 @@
 package app.TFGWordle.controller;
 
+import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
+import app.TFGWordle.model.ContestState;
+import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
+import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
+import app.TFGWordle.service.ContestStateService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,12 +28,18 @@ public class ContestController {
 
     private final ContestService contestService;
     private final CompetitionService competitionService;
+    private final UserService userService;
+    private final ContestStateService contestStateService;
+    private final ObjectMapper objectMapper;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public ContestController(ContestService contestService, CompetitionService competitionService) {
+    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, ContestStateService contestStateService, ObjectMapper objectMapper) {
         this.contestService = contestService;
         this.competitionService = competitionService;
+        this.userService = userService;
+        this.contestStateService = contestStateService;
+        this.objectMapper = objectMapper;
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
@@ -94,5 +107,68 @@ public class ContestController {
 
         newContest.setCompetition(contestService.getByName(oldContestName).getCompetition());
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(newContest));
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @PostMapping("/newContestState/{contestName}/{userName}")
+    public ResponseEntity<?> createContestState(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleState wordleState) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        User user = userService.getByUserName(userName).get();
+        Contest contest = contestService.getByName(contestName);
+
+        if (contestStateService.existsState(contest.getId(), user.getId()))
+            return new ResponseEntity<>("Concurso ya existente", HttpStatus.CONFLICT);
+
+        ContestState newContestState = new ContestState(contest, user);
+
+        try {
+            JsonNode jsonNode = objectMapper.valueToTree(wordleState);
+            newContestState.setState(jsonNode);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(contestStateService.save(newContestState));
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getContestState/{contestName}/{userName}")
+    public ResponseEntity<WordleState> getContestState(@PathVariable String contestName, @PathVariable String userName) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        User user = userService.getByUserName(userName).get();
+        Contest contest = contestService.getByName(contestName);
+
+        if (!contestStateService.existsState(contest.getId(), user.getId()))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return ResponseEntity.ok(contestStateService.getState(contest.getId(), user.getId()));
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @PostMapping("/updateContestState/{contestName}/{userName}")
+    public ResponseEntity<?> updateContestState(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleState wordleState) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        User user = userService.getByUserName(userName).get();
+        Contest contest = contestService.getByName(contestName);
+        ContestState contestState = contestStateService.getContestState(contest.getId(), user.getId());
+
+        try {
+            JsonNode jsonNode = objectMapper.valueToTree(wordleState);
+            contestState.setState(jsonNode);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(contestStateService.save(contestState));
     }
 }
