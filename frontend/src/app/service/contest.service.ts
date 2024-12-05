@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
+import { UserState } from '../models/user-state';
 
 @Injectable({
   providedIn: 'root'
@@ -55,5 +56,9 @@ export class ContestService {
 
   public updateContestState(contestName: string, userName: string, wordleState: WordleState) {
     return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestName + '/' + userName, wordleState);
+  }
+
+  public getUserAndState(contestName: string) {
+    return this.httpClient.get<UserState[]>(this.apiUrl + 'getUserAndContestState/' + contestName);
   }
 }

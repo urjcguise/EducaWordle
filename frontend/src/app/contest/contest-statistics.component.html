@@ -1,0 +1,18 @@
+<div class="contest-list">
+    <h2>Estadísticas del concurso</h2>
+  
+    <ul class="users-list">
+      <li *ngFor="let data of usersWithStates" class="user-item">
+        <span class="user-name">Nombre: {{ data.userName }}</span>
+        <ul class="states-list">
+          <li *ngFor="let state of data.state" class="state-item">
+            <span class="state-title">Estado:</span>
+            <span class="state-good">Bien: {{ state.good }}</span>
+            <span class="state-half-good">Medio bien: {{ state.halfGood }}</span>
+            <span class="state-wrong">Mal: {{ state.wrong }}</span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  

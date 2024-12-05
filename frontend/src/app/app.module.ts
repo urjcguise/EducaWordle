@@ -11,7 +11,6 @@ import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
 import { IndexComponent } from './index/index.component';
 import { MenuComponent } from './menu/menu.component';
-import { WordleComponent } from './wordle/wordle.component';
 import { interceptorProvider } from './interceptors/prod-interceptor.service';
 import { CompetitionComponent } from './competition/competition.component';
 import { CompetitionListComponent } from './competition/competition-list.component';
@@ -21,6 +20,7 @@ import { EditContestComponent } from './contest/edit-contest.component';
 import { PlayWordleComponent } from './wordle/play-wordle.component';
 import { StudentListComponent } from './student/student-list.component';
 import { NewStudentComponent } from './student/new-student.component';
+import { ContestStatisticsComponent } from './contest/contest-statistics.component';
 
 
 @NgModule({
@@ -30,7 +30,6 @@ import { NewStudentComponent } from './student/new-student.component';
     RegisterComponent,
     IndexComponent,
     MenuComponent,
-    WordleComponent,
     CompetitionComponent,
     CompetitionListComponent,
     ContestComponent,
@@ -38,7 +37,8 @@ import { NewStudentComponent } from './student/new-student.component';
     EditContestComponent,
     PlayWordleComponent,
     StudentListComponent,
-    NewStudentComponent
+    NewStudentComponent,
+    ContestStatisticsComponent
   ],
   imports: [
     BrowserModule,

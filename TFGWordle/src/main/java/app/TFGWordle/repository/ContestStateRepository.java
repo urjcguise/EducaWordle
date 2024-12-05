@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ContestStateRepository extends JpaRepository<ContestState, Long> {
 
@@ -16,6 +18,10 @@ public interface ContestStateRepository extends JpaRepository<ContestState, Long
     @Query("SELECT e.state FROM ContestState e WHERE e.contest.id = :contestId AND e.user.id = :userId")
     WordleState getState(@Param("contestId") Long contestId, @Param("userId") Long userId);
 
-    @Query("SELECT p FROM ContestState p WHERE p.contest.id = :contestId AND p.user.id = :userId")
+    @Query("SELECT cs FROM ContestState cs WHERE cs.contest.id = :contestId AND cs.user.id = :userId")
     ContestState findByContestIdAndUserId(@Param("contestId") Long contestId, @Param("userId") Long userId);
+
+    @Query("SELECT cs FROM ContestState cs WHERE cs.contest.id = :contestId")
+    List<ContestState> findByContestId(@Param("contestId") Long contestId);
+
 }

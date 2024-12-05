@@ -6,6 +6,8 @@ import app.TFGWordle.repository.ContestStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ContestStateService {
 
@@ -26,5 +28,9 @@ public class ContestStateService {
 
     public ContestState getContestState(Long contestId, Long userId) {
         return contestStateRepository.findByContestIdAndUserId(contestId, userId);
+    }
+
+    public List<ContestState> getByContest(Long contestId) {
+        return contestStateRepository.findByContestId(contestId);
     }
 }

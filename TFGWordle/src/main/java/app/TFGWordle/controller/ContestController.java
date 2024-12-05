@@ -1,5 +1,6 @@
 package app.TFGWordle.controller;
 
+import app.TFGWordle.dto.UserState;
 import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
@@ -10,6 +11,7 @@ import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
 import app.TFGWordle.service.ContestStateService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -170,5 +174,24 @@ public class ContestController {
             return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(contestStateService.save(contestState));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getUserAndContestState/{contestName}")
+    public ResponseEntity<List<UserState>> getUserAndContestState(@PathVariable String contestName) throws JsonProcessingException {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+
+        List<ContestState> contestStates = contestStateService.getByContest(contest.getId());
+
+        List<UserState> toReturn = new ArrayList<>();
+        for (ContestState contestState : contestStates) {
+            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getState());
+            toReturn.add(toAdd);
+        }
+
+        return ResponseEntity.ok(toReturn);
     }
 }

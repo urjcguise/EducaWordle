@@ -22,7 +22,7 @@ export class ContestListComponent implements OnInit {
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.competitionId = history.state.competitionId;
     this.competitionName = this.route.snapshot.paramMap.get('competitionName')!;
     if (!this.competitionName) {
@@ -35,7 +35,7 @@ export class ContestListComponent implements OnInit {
       this.isStudent = true;
   }
 
-  loadContests(): void {
+  loadContests() {
     this.contestService.getContestsByCompetition(this.competitionName).subscribe({
       next: (data) => {
         if (data.length == 0)
@@ -76,12 +76,16 @@ export class ContestListComponent implements OnInit {
     }
   }
 
-  navigateToCreateContest(): void {
+  navigateToCreateContest() {
     this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
   }
 
-  navigateToPlayWordle(contestName: string, wordleIndex: number): void {
+  navigateToPlayWordle(contestName: string, wordleIndex: number) {
     this.router.navigate(['/wordle'], { state: { contestName, wordleIndex } });
+  }
+
+  navigateToWatchStatistics(contestName: string) {
+    this.router.navigate([`/${contestName}/verEstadisticas`]);
   }
 
   getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
@@ -98,9 +102,9 @@ export class ContestListComponent implements OnInit {
     }
   }
 
-  copyContest(oldContest: Contest): void {
+  copyContest(oldContest: Contest) {
 
-    const now = new Date(); 
+    const now = new Date();
     const oneYearLater = new Date();
     oneYearLater.setFullYear(now.getFullYear() + 1);
 
