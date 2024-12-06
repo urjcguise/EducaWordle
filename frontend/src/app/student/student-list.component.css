@@ -1,0 +1,24 @@
+.container {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .nav-tabs .nav-link {
+    cursor: pointer;
+  }
+  
+  .tab-content {
+    border: 1px solid #dee2e6;
+    border-top: none;
+    padding: 1rem;
+    background-color: #f8f9fa;
+  }
+  
+  .mt-3 {
+    margin-top: 1rem;
+  }
+  
+  .mt-4 {
+    margin-top: 1.5rem;
+  }
+  

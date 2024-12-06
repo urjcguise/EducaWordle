@@ -14,6 +14,10 @@ export class StudentListComponent implements OnInit {
   students: User[] = [];
   competitionId!: number;
 
+  selectedFile: File | null = null;
+
+  currentTab: string = 'add-student';
+
   constructor(private competitionService: CompetitionService, private userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
@@ -29,6 +33,29 @@ export class StudentListComponent implements OnInit {
   }
 
   addStudent(): void {
-    this.router.navigate(['/' + '/nuevoAlumno'], { state: {competitionId: this.competitionId} });
+    this.router.navigate(['/nuevoAlumno'], { state: {competitionId: this.competitionId} });
+  }
+
+  setTab(tab: string) {
+    this.currentTab = tab;
+  }
+
+  addStudentExcel() {
+    if (!this.selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile!);
+
+    this.userService.addByExcel(this.competitionId, formData).subscribe({
+      next: () => {
+        console.log('Alumnos creados correctamente');
+      },
+      error: (error) => {
+        console.error('Error creando los alumnos', error);
+      }
+    });
+  }
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
   }
 }

@@ -15,4 +15,8 @@ export class UserService {
     public getCompetitionsByUserName(name: string): Observable<Competition[]> {
       return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + name);
     }
+
+    addByExcel(competitionId: number, formData: FormData) {
+      return this.httpClient.post<any>(this.apiUrl + 'addStudentsByExcel/' + competitionId, formData);
+    }
   }
