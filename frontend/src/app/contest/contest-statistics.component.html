@@ -1,18 +1,31 @@
 <div class="contest-list">
-    <h2>Estadísticas del concurso</h2>
-  
+  <h2>Estadísticas del concurso</h2>
+
+  <div *ngFor="let wordleData of wordlesWithStates" class="wordle-section">
+    <h3>Wordle: {{ wordleData.wordle }}</h3>
+
     <ul class="users-list">
-      <li *ngFor="let data of usersWithStates" class="user-item">
-        <span class="user-name">Nombre: {{ data.userName }}</span>
+      <li *ngFor="let user of wordleData.users" class="user-item">
+        <span class="user-name">Nombre: {{ user.userName }}</span>
         <ul class="states-list">
-          <li *ngFor="let state of data.state" class="state-item">
+          <li class="state-item">
             <span class="state-title">Estado:</span>
-            <span class="state-good">Bien: {{ state.good }}</span>
-            <span class="state-half-good">Medio bien: {{ state.halfGood }}</span>
-            <span class="state-wrong">Mal: {{ state.wrong }}</span>
+            <span class="state-good">Bien: {{ user.state.good }}</span>
+            <span class="state-half-good">Medio bien: {{ user.state.halfGood }}</span>
+            <span class="state-wrong">Mal: {{ user.state.wrong }}</span>
           </li>
         </ul>
       </li>
     </ul>
+
+    <div style="display: block; width: 400px; margin: 20px auto;">
+      <canvas baseChart [type]="'pie'" [datasets]="wordleData.pieChartDatasets" [labels]="pieChartLabels"
+        [options]="pieChartOptions" [plugins]="pieChartPlugins" [legend]="pieChartLegend">
+      </canvas>
+    </div>
+
+    <div class="average-try-count">
+      <p>Media de intentos: {{ wordleData.averageTryCount | number:'1.1-2' }}</p>
+    </div>
   </div>
-  
+</div>

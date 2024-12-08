@@ -1,6 +1,6 @@
 import { WordleState } from "./wordle-state";
 
 export interface UserState {
-    userName: string;
-    state: WordleState;
-  }
+  userName: string;
+  state: WordleState;
+}

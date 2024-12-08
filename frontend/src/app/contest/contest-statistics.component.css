@@ -1,83 +1,79 @@
-/* Estilo general para el contenedor */
 .contest-list {
-    max-width: 600px;
-    margin: 20px auto;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Título */
-  .contest-list h2 {
-    text-align: center;
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  /* Lista de usuarios */
-  .users-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  /* Cada usuario */
-  .user-item {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Nombre del usuario */
-  .user-name {
-    font-weight: bold;
-    color: #444;
-    margin-bottom: 10px;
-    display: block;
-  }
-  
-  /* Lista de estados */
-  .states-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 10px 0 0;
-  }
-  
-  /* Cada estado */
-  .state-item {
-    margin-top: 5px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  /* Título del estado */
-  .state-title {
-    font-weight: bold;
-    color: #555;
-    margin-right: 10px;
-  }
-  
-  /* Estado: Bien */
-  .state-good {
-    color: #28a745; /* Verde */
-    font-weight: bold;
-  }
-  
-  /* Estado: Medio bien */
-  .state-half-good {
-    color: #ffc107; /* Amarillo */
-    font-weight: bold;
-  }
-  
-  /* Estado: Mal */
-  .state-wrong {
-    color: #dc3545; /* Rojo */
-    font-weight: bold;
-  }
-  
+  max-width: 600px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+}
+
+.contest-list h2 {
+  text-align: center;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.users-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-item {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-name {
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.states-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+
+.state-item {
+  margin-top: 5px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.state-title {
+  font-weight: bold;
+  color: #555;
+  margin-right: 10px;
+}
+
+.state-good {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.state-half-good {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.state-wrong {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.average-try-count {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #555;
+}
