@@ -69,14 +69,15 @@ public class UserController {
 
                 for (Row row : sheet) {
                     if (row.getRowNum() == 0) continue;
-
-                    if (isRowEmpty(row)) {
-                        continue;
-                    }
+                    if (isRowEmpty(row)) continue;
 
                     String name = row.getCell(0).getStringCellValue();
                     String email = row.getCell(1).getStringCellValue();
                     String password = row.getCell(2).getStringCellValue();
+
+                    if (userService.existsByUserName(name) || userService.existsByEmail(email)) {
+                        continue;
+                    }
 
                     User newUser = new User(name, email, passwordEncoder.encode(password));
 
