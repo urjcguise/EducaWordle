@@ -1,1 +1,0 @@
-export const WORDS = ['ASD', 'HOLA', 'AGILE', 'QWERT', 'MIGUEL', 'AAAAAAA', 'PALABRA'];

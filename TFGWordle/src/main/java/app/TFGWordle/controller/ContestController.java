@@ -5,12 +5,14 @@ import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Contest;
 import app.TFGWordle.model.ContestState;
+import app.TFGWordle.model.DictionaryExternal;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
 import app.TFGWordle.service.ContestStateService;
+import app.TFGWordle.service.DictionaryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,15 +36,17 @@ public class ContestController {
     private final CompetitionService competitionService;
     private final UserService userService;
     private final ContestStateService contestStateService;
+    private final DictionaryService dictionaryService;
     private final ObjectMapper objectMapper;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, ContestStateService contestStateService, ObjectMapper objectMapper) {
+    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, ContestStateService contestStateService, DictionaryService dictionaryService, ObjectMapper objectMapper) {
         this.contestService = contestService;
         this.competitionService = competitionService;
         this.userService = userService;
         this.contestStateService = contestStateService;
+        this.dictionaryService = dictionaryService;
         this.objectMapper = objectMapper;
     }
 
@@ -56,7 +60,6 @@ public class ContestController {
         contest.setCompetition(competition);
         contest.setUseDictionary(false);
         contest.setUseExternalFile(false);
-        contest.setFileRoute("");
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
@@ -193,5 +196,39 @@ public class ContestController {
         }
 
         return ResponseEntity.ok(toReturn);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/existsInDictionary/{word}")
+    public ResponseEntity<Boolean> existsInDictionary(@PathVariable String word) {
+        return ResponseEntity.ok(dictionaryService.existsInGlobalDictionary(word));
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/existsInExternalDictionary/{contestName}/{wordle}")
+    public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable String contestName, @PathVariable String wordle) {
+        if(!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+        return ResponseEntity.ok(dictionaryService.existsInExternalDictionary(wordle, contest.getId()));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PostMapping("/saveExternalDictionary/{contestName}")
+    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable String contestName, @RequestBody List<String> words) {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+        Contest contestToLink = contestService.getByName(contestName);
+
+        List<DictionaryExternal> toSave = new ArrayList<>();
+        for (String word : words) {
+            DictionaryExternal wordToSave = new DictionaryExternal(word);
+            wordToSave.setContest(contestToLink);
+            toSave.add(wordToSave);
+        }
+
+        return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
     }
 }

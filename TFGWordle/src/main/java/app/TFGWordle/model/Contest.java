@@ -19,7 +19,6 @@ public class Contest {
     private Date endDate;
     private Boolean useDictionary;
     private Boolean useExternalFile;
-    private String fileRoute;
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
@@ -32,14 +31,13 @@ public class Contest {
 
     public Contest() {}
 
-    public Contest(String name, Competition competition, Date startDate, Date endDate, Boolean useDictionary, Boolean useExternalFile, String fileRoute) {
+    public Contest(String name, Competition competition, Date startDate, Date endDate, Boolean useDictionary, Boolean useExternalFile) {
         this.name = name;
         this.competition = competition;
         this.startDate = startDate;
         this.endDate = endDate;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
-        this.fileRoute = fileRoute;
     }
 
     public void setId(Long id) {
@@ -88,14 +86,6 @@ public class Contest {
 
     public void setUseExternalFile(Boolean useExternalFile) {
         this.useExternalFile = useExternalFile;
-    }
-
-    public String getFileRoute() {
-        return fileRoute;
-    }
-
-    public void setFileRoute(String fileRoute) {
-        this.fileRoute = fileRoute;
     }
 
     public Competition getCompetition() {

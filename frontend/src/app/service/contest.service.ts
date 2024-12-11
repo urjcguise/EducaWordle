@@ -61,4 +61,16 @@ export class ContestService {
   public getUserAndState(contestName: string) {
     return this.httpClient.get<UserState[]>(this.apiUrl + 'getUserAndContestState/' + contestName);
   }
+
+  public existsInDictionary(word: string) {
+    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInDictionary/' + word);
+  }
+
+  public existsInExternalDictionary(word: string, contestName: string) {
+    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInExternalDictionary/' + contestName + '/' + word);
+  }
+
+  public saveExternalDictionary(words: string[], contestName: string) {
+    return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestName, words);
+  }
 }

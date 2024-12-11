@@ -17,7 +17,6 @@ export class EditContestComponent {
   contestName = "";
   dictionary: boolean = false;
   file: boolean = false;
-  fileRoute = "";
   wordles: string[] = [];
 
   formattedStartDate: string = "";
@@ -40,7 +39,6 @@ export class EditContestComponent {
         this.contest = data;
         this.dictionary = data.useDictionary || false;
         this.file = data.useExternalFile || false;
-        this.fileRoute = data.fileRoute || "";
         this.formattedStartDate = this.formatDateForInput(this.contest.startDate);
         this.formattedEndDate = this.formatDateForInput(this.contest.endDate);
       },
@@ -91,9 +89,22 @@ export class EditContestComponent {
 
   selectFile(event: any) {
     const file: File = event.target.files[0];
+    var toSave: string[] = [];
     if (file) {
-      this.fileRoute = file.name; // Se asigna solo el nombre
-      this.contest.fileRoute = this.fileRoute;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result as string;
+        toSave.push(...content.split('\n').map(line => line.trim()).filter(line => line !== ""));
+        this.contestService.saveExternalDictionary(toSave, this.contestName).subscribe({
+          next: () => {
+            console.log("Palabras guardadas correctamente en el diccionario");
+          },
+          error: (e) => {
+            console.log("Error guardando las palabras del diccionario: ", e);
+          }
+        });
+      }
+      reader.readAsText(file);
     }
   }
 
@@ -113,7 +124,6 @@ export class EditContestComponent {
       endDate: new Date(this.formattedEndDate),
       useDictionary: this.dictionary,
       useExternalFile: this.file,
-      fileRoute: this.fileRoute,
       wordles: []
     };
     this.contestService.editContest(this.contestName, updatedContest).subscribe({

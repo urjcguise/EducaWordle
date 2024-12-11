@@ -1,11 +1,11 @@
 import { Component, ElementRef, HostListener, QueryList, ViewChildren } from '@angular/core';
-import { WORDS } from './words';
 import { WordleService } from '../service/wordle.service';
 import { Wordle } from '../models/wordle';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
 import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
+import { error } from 'console';
 
 
 interface Try {
@@ -59,8 +59,6 @@ export class PlayWordleComponent {
   wordleList: Wordle[] = [];
   contest!: Contest;
 
-  dictionary: string[] = [];
-
   games: Game[] = [];
 
   wordleState!: WordleState;
@@ -83,7 +81,6 @@ export class PlayWordleComponent {
     this.contestService.getContestByName(history.state.contestName).subscribe({
       next: (cont) => {
         this.contest = cont;
-        this.initializeDictionary();
       },
       error: (error) => {
         console.error('Error consiguiendo el concurso', error);
@@ -104,10 +101,10 @@ export class PlayWordleComponent {
   private initializeState() {
 
     this.wordleList.forEach((item) => {
-      const newGame = new Game(item.word); 
-      this.games.push(newGame); 
+      const newGame = new Game(item.word);
+      this.games.push(newGame);
     });
-    
+
     this.wordleState = new WordleState(this.wordleList.length, this.games);
 
     this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
@@ -118,16 +115,6 @@ export class PlayWordleComponent {
         console.error('Error creando el estado del concurso', error);
       },
     });
-  }
-
-  private initializeDictionary() {
-    if (this.contest.useExternalFile) {
-      this.loadExternalFile(this.contest.fileRoute).then((fileWords) => {
-        this.dictionary = fileWords;
-      });
-    } else if (this.contest.useDictionary) {
-      this.dictionary = WORDS;
-    }
   }
 
   private async loadExternalFile(fileRoute: string): Promise<string[]> {
@@ -159,7 +146,6 @@ export class PlayWordleComponent {
         this.targetWordLetterCounts[letter] = (this.targetWordLetterCounts[letter] || 0) + 1;
       }
 
-      // Ajustar longitud dinámica de intentos
       for (let tryData of this.tries) {
         tryData.letters = Array.from({ length: this.targetWord.length }, () => ({
           text: '',
@@ -223,19 +209,47 @@ export class PlayWordleComponent {
     this.tries[tryIndex].letters[letterIndex].text = letter;
   }
 
-  private async checkCurrentTry() {
+  private checkCurrentTry() {
     const curTry = this.tries[this.numSubmittedTries];
-    if (curTry.letters.some((letter) => letter.text === '')) {
-      this.showInfoMessage('No hay suficientes letras');
+    const wordFromCurTry = curTry.letters.map((letter) => letter.text).join('').toUpperCase();
+
+    if (this.contest.useDictionary) {
+      const checkDictionary = this.contest.useExternalFile
+        ? () => this.contestService.existsInExternalDictionary(wordFromCurTry, this.contest.contestName)
+        : () => this.contestService.existsInDictionary(wordFromCurTry);
+
+      checkDictionary().subscribe({
+        next: (exists) => this.handleDictionaryCheckResult(exists, curTry),
+        error: (e) => {
+          console.log("Error comprobando si existe la palabra", e);
+          this.continueGameLogic(true, curTry);
+        }
+      });
+    } else {
+      this.continueGameLogic(true, curTry);
+    }
+  }
+
+  private handleDictionaryCheckResult(exists: Boolean, curTry: any) {
+    if (!exists) {
+      this.showInfoMessage('La palabra no está en el diccionario');
+      this.shakeTryContainer(this.numSubmittedTries);
+      this.continueGameLogic(false, curTry);
       return;
     }
+    this.continueGameLogic(true, curTry);
+  }
 
-    const wordFromCurTry = curTry.letters.map((letter) => letter.text).join('').toUpperCase();
-    if (this.contest.useDictionary && !this.dictionary.includes(wordFromCurTry)) {
-      this.showInfoMessage('La palabra no está en el diccionario');
-      const tryContainer = this.tryContainers.get(this.numSubmittedTries)?.nativeElement as HTMLElement;
+  private shakeTryContainer(tryIndex: number) {
+    const tryContainer = this.tryContainers.get(tryIndex)?.nativeElement as HTMLElement;
+    if (tryContainer) {
       tryContainer.classList.add('shake');
       setTimeout(() => tryContainer.classList.remove('shake'), 500);
+    }
+  }
+
+  private continueGameLogic(continueGame: boolean, curTry: any) {
+    if (!continueGame) {
       return;
     }
 
@@ -277,11 +291,9 @@ export class PlayWordleComponent {
       }
     }
 
-    
-
     this.numSubmittedTries++;
     if (states.every((state) => state === LetterState.FULL_MATCH)) {
-      this.showInfoMessage('¡CORRECTO!');      
+      this.showInfoMessage('¡CORRECTO!');
       this.won = true;
       this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
       this.updateContestState();
@@ -298,6 +310,7 @@ export class PlayWordleComponent {
 
     this.updateContestState();
   }
+
 
   handleNextWord() {
     this.numSubmittedTries = 0;
@@ -325,10 +338,10 @@ export class PlayWordleComponent {
 
   private updateContestState(): void {
     const currentGame = this.wordleState.games[this.currentWordleIndex];
-  
+
     currentGame.finished = this.won;
     currentGame.tryCount = this.numSubmittedTries;
-  
+
     const newState = new State();
     Object.values(this.curLetterStates).forEach((state) => {
       switch (state) {
@@ -354,6 +367,5 @@ export class PlayWordleComponent {
       },
     });
   }
-  
-}
 
+}
