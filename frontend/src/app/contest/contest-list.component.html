@@ -33,6 +33,10 @@
                 <i class="fas fa-chart-line"></i>
                 Ver datos
               </button>
+              <button class="btn btn-primary btn-sm ml-2" (click)="navigateToRanking(contest.contestName)">
+                <i class="fas fa-trophy"></i>
+                Ver ranking
+              </button>
             </div>
 
             <div *ngIf="isStudent">

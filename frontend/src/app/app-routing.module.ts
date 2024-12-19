@@ -13,6 +13,7 @@ import { PlayWordleComponent } from './wordle/play-wordle.component';
 import { StudentListComponent } from './student/student-list.component';
 import { NewStudentComponent } from './student/new-student.component';
 import { ContestStatisticsComponent } from './contest/contest-statistics.component';
+import { ContestRankingComponent } from './contest/contest-ranking.component';
 
 const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -26,7 +27,8 @@ const routes: Routes = [
   {path: ':contestName/editar', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: ':competitionName/alumnos', component: StudentListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: 'nuevoAlumno', component: NewStudentComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
-  {path: ':contestName/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor'] }}
+  {path: ':contestName/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
+  {path: ':contestName/verRanking', component: ContestRankingComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student'] }}
 ];
 
 @NgModule({

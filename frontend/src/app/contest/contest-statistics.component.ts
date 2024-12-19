@@ -23,6 +23,7 @@ export class ContestStatisticsComponent implements OnInit {
     studentsNotFinished: number;
     totalTryCount: number;
     averageTryCount: number;
+    averageTime: number;
     pieChartDatasets: { data: number[] }[];
   }[] = [];
 
@@ -51,6 +52,7 @@ export class ContestStatisticsComponent implements OnInit {
           studentsNotFinished: 0,
           totalTryCount: 0,
           averageTryCount: 0,
+          averageTime: 0,
           pieChartDatasets: [
             {
               data: [0, 0],
@@ -82,6 +84,7 @@ export class ContestStatisticsComponent implements OnInit {
               if (game.finished) {
                 wordleData.studentsFinished++;
                 wordleData.totalTryCount += game.tryCount;
+                wordleData.averageTime = ((wordleData.averageTime * (wordleData.studentsFinished - 1)) + game.timeNeeded) / wordleData.studentsFinished;
               } else {
                 wordleData.studentsNotFinished++;
               }
@@ -104,6 +107,12 @@ export class ContestStatisticsComponent implements OnInit {
         console.error('Error consiguiendo los usuarios y sus estados', error);
       },
     });
+  }
+
+  convertTime(seconds: number) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 }
 

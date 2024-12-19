@@ -88,6 +88,10 @@ export class ContestListComponent implements OnInit {
     this.router.navigate([`/${contestName}/verEstadisticas`]);
   }
 
+  navigateToRanking(contestName: string) {
+    this.router.navigate([`/${contestName}/verRanking`]);
+  }
+
   getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
     const now = new Date();
 

@@ -17,15 +17,18 @@
         </ul>
       </li>
     </ul>
-
+    <!--
     <div style="display: block; width: 400px; margin: 20px auto;">
       <canvas baseChart [type]="'pie'" [datasets]="wordleData.pieChartDatasets" [labels]="pieChartLabels"
         [options]="pieChartOptions" [plugins]="pieChartPlugins" [legend]="pieChartLegend">
       </canvas>
     </div>
-
+-->
     <div class="average-try-count">
-      <p>Media de intentos: {{ wordleData.averageTryCount | number:'1.1-2' }}</p>
+      <p>Promedio de intentos: {{ wordleData.averageTryCount | number:'1.1-2' }}</p>
+    </div>
+    <div class="average-time">
+      <p>Promedio de tiempo: {{ convertTime(wordleData.averageTime) }}</p>
     </div>
   </div>
 </div>
