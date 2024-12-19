@@ -5,7 +5,7 @@ import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
 import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
-import { error } from 'console';
+import { differenceInSeconds, format } from 'date-fns';
 
 
 interface Try {
@@ -34,7 +34,7 @@ export class PlayWordleComponent {
 
   readonly tries: Try[] = [];
   readonly LetterState = LetterState;
-  readonly NUM_TRIES = 6; // Número de intentos permitido
+  readonly NUM_TRIES = 6;
 
   readonly keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -47,12 +47,12 @@ export class PlayWordleComponent {
   fadeOutInfoMessage = false;
 
   private curLetterIndex = 0;
-  private targetWords: string[] = []; // Lista de palabras objetivo
+  private targetWords: string[] = [];
   private targetWord = '';
   private targetWordLetterCounts: { [letter: string]: number } = {};
 
   numSubmittedTries = 0;
-  currentWordleIndex = 0; // Índice de la palabra actual
+  currentWordleIndex = 0;
   won = false;
   hasMoreWords = true;
 
@@ -95,7 +95,6 @@ export class PlayWordleComponent {
       this.tries.push({ letters });
     }
 
-
   }
 
   private initializeState() {
@@ -105,8 +104,8 @@ export class PlayWordleComponent {
       this.games.push(newGame);
     });
 
+    this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     this.wordleState = new WordleState(this.wordleList.length, this.games);
-
     this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
@@ -115,26 +114,6 @@ export class PlayWordleComponent {
         console.error('Error creando el estado del concurso', error);
       },
     });
-  }
-
-  private async loadExternalFile(fileRoute: string): Promise<string[]> {
-    try {
-      const response = await fetch(fileRoute);
-      if (response.ok) {
-        const fileContent = await response.text();
-        return fileContent
-          .split('\n')
-          .map((word) => word.trim().toUpperCase())
-          .filter((word) => word.length > 0);
-      } else {
-        this.showInfoMessage('Error al cargar el archivo externo');
-        return [];
-      }
-    } catch (error) {
-      console.error('Error leyendo el archivo externo:', error);
-      this.showInfoMessage('No se pudo leer el archivo externo');
-      return [];
-    }
   }
 
   private setTargetWord() {
@@ -293,6 +272,9 @@ export class PlayWordleComponent {
 
     this.numSubmittedTries++;
     if (states.every((state) => state === LetterState.FULL_MATCH)) {
+      const currentGame = this.wordleState.games[this.currentWordleIndex];
+      currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+      currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
       this.showInfoMessage('¡CORRECTO!');
       this.won = true;
       this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
@@ -313,17 +295,19 @@ export class PlayWordleComponent {
 
 
   handleNextWord() {
-    this.numSubmittedTries = 0;
-    this.curLetterIndex = 0;
-    this.won = false;
-
     if (this.currentWordleIndex + 1 < this.targetWords.length) {
+      this.wordleState.games[this.currentWordleIndex + 1].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+      this.updateContestState();
       this.currentWordleIndex++;
       this.setTargetWord();
     } else {
       this.hasMoreWords = false;
       this.showInfoMessage('¡Has completado todas las palabras!');
     }
+
+    this.numSubmittedTries = 0;
+    this.curLetterIndex = 0;
+    this.won = false;
   }
 
   private showInfoMessage(message: string, autoDismiss: boolean = true) {

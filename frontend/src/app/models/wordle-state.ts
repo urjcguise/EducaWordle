@@ -13,12 +13,18 @@ export class Game {
   finished: boolean;
   tryCount: number;
   state: State;
+  startTime: string;
+  finishTime: string;
+  timeNeeded: number;
 
-  constructor(wordle: string = '', finished: boolean = false, tryCount: number = 0, state: State = new State()) {
+  constructor(wordle: string = '', finished: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0) {
     this.wordle = wordle;
     this.finished = finished;
     this.tryCount = tryCount;
     this.state = state;
+    this.startTime = startTime;
+    this.finishTime = finishTime;
+    this.timeNeeded = timeNeeded;
   }
 }
 

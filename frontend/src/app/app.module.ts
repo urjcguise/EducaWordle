@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
-import { NgChartsModule } from 'ng2-charts';
+//import { NgChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login.component';
@@ -22,6 +22,7 @@ import { PlayWordleComponent } from './wordle/play-wordle.component';
 import { StudentListComponent } from './student/student-list.component';
 import { NewStudentComponent } from './student/new-student.component';
 import { ContestStatisticsComponent } from './contest/contest-statistics.component';
+import { ContestRankingComponent } from './contest/contest-ranking.component';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { ContestStatisticsComponent } from './contest/contest-statistics.compone
     PlayWordleComponent,
     StudentListComponent,
     NewStudentComponent,
-    ContestStatisticsComponent
+    ContestStatisticsComponent,
+    ContestRankingComponent
   ],
   imports: [
     BrowserModule,
@@ -47,8 +49,8 @@ import { ContestStatisticsComponent } from './contest/contest-statistics.compone
     FormsModule,
     HttpClientModule,
     CommonModule,
-    ReactiveFormsModule,
-    NgChartsModule
+    ReactiveFormsModule
+    //,NgChartsModule
   ],
   providers: [interceptorProvider],
   bootstrap: [AppComponent]

@@ -1,5 +1,6 @@
 package app.TFGWordle.dto;
 
+import java.util.Date;
 import java.util.List;
 
 public class WordleState {
@@ -26,6 +27,9 @@ public class WordleState {
         private String wordle;
         private boolean finished;
         private int tryCount;
+        private String startTime;
+        private String finishTime;
+        private int timeNeeded;
         private State state;
 
         public String getWordle() {
@@ -50,6 +54,30 @@ public class WordleState {
 
         public void setTryCount(int tryCount) {
             this.tryCount = tryCount;
+        }
+
+        public String getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(String startTime) {
+            this.startTime = startTime;
+        }
+
+        public String getFinishTime() {
+            return finishTime;
+        }
+
+        public void setFinishTime(String finishTime) {
+            this.finishTime = finishTime;
+        }
+
+        public int getTimeNeeded() {
+            return timeNeeded;
+        }
+
+        public void setTimeNeeded(int timeNeeded) {
+            this.timeNeeded = timeNeeded;
         }
 
         public State getState() {

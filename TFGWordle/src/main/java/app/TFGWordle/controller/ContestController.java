@@ -169,7 +169,6 @@ public class ContestController {
         User user = userService.getByUserName(userName).get();
         Contest contest = contestService.getByName(contestName);
         ContestState contestState = contestStateService.getContestState(contest.getId(), user.getId());
-
         try {
             JsonNode jsonNode = objectMapper.valueToTree(wordleState);
             contestState.setState(jsonNode);

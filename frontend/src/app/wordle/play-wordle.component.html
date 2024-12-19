@@ -3,7 +3,7 @@
         <div class="title-container">
             <div class="title"> Wordle </div>
         </div>
-    
+
         <div class="progress-container">
             <span>Palabra {{currentWordleIndex + 1}} de {{wordleList.length}}</span>
         </div>
@@ -13,21 +13,18 @@
                 <div class="letter-container" *ngFor="let letter of try.letters"
                     [class.match]="letter.state === LetterState.FULL_MATCH"
                     [class.partial]="letter.state === LetterState.PARTIAL_MATCH"
-                    [class.wrong]="letter.state === LetterState.WRONG"
-                    [class.has-text]="letter.text !== ''">
+                    [class.wrong]="letter.state === LetterState.WRONG" [class.has-text]="letter.text !== ''">
                     {{letter.text}}
                 </div>
             </div>
         </div>
-    
+
         <div class="keyboard-container">
-            <div [class]="['row' + i, 'row'].join(' ')"
-                *ngFor="let row of keyboardRows; let i = index">
-                <div *ngFor="let key of row" [class]="getKeyClass(key)"
-                    [class.enter]="key === 'Enviar'"
-                        (click)="handleClickKey(key)">
+            <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRows; let i = index">
+                <div *ngFor="let key of row" [class]="getKeyClass(key)" [class.enter]="key === 'Enviar'"
+                    (click)="handleClickKey(key)">
                     <div *ngIf="key !== 'Backspace'; else backspace">
-                      {{key}}
+                        {{key}}
                     </div>
                     <ng-template #backspace>
                         <div class="backspace-icon">⌫</div>
@@ -35,19 +32,16 @@
                 </div>
             </div>
         </div>
-    
+
         <div *ngIf="hasMoreWords && won" class="next-word-button-container">
             <button (click)="handleNextWord()" class="next-word-button">Siguiente palabra</button>
         </div>
-        
+
         <div *ngIf="!hasMoreWords && won" class="completion-message">
             ¡Has completado todas las palabras!
         </div>
-        
 
-        <div class="info-msg"
-            [class.show]="infoMsg !== ''"
-            [class.fade-out]="fadeOutInfoMessage">
+        <div class="info-msg" [class.show]="infoMsg !== ''" [class.fade-out]="fadeOutInfoMessage">
             {{infoMsg}}
         </div>
     </div>

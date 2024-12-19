@@ -25,6 +25,7 @@ public class ContestState {
     @JsonIgnore
     private User user;
 
+    @Column(name = "state", length = 500)
     private String state;
 
     public ContestState() {}
