@@ -4,6 +4,7 @@ import { ContestService } from '../service/contest.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { WordleService } from '../service/wordle.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-contest-list',
@@ -13,10 +14,11 @@ import { WordleService } from '../service/wordle.service';
 export class ContestListComponent implements OnInit {
 
   contests: Contest[] = [];
+  contestsWithState: { contest: Contest; state: 'upcoming' | 'ongoing' | 'finished' }[] = [];
   competitionName!: string;
   competitionId!: number;
 
-  noContest = true;
+  noContests = true;
   isProfessor = false;
   isStudent = false;
 
@@ -35,18 +37,29 @@ export class ContestListComponent implements OnInit {
       this.isStudent = true;
   }
 
-  loadContests() {
+  async loadContests() {
     this.contestService.getContestsByCompetition(this.competitionName).subscribe({
-      next: (data) => {
-        if (data.length == 0)
-          this.noContest = true;
-        else {
+      next: async (data) => {
+        if (data.length == 0) {
+          this.noContests = true;
+        } else {
+          // Procesa los concursos y calcula los estados
           this.contests = data.map(contest => ({
             ...contest,
             startDate: new Date(contest.startDate),
             endDate: new Date(contest.endDate)
           }));
-          this.noContest = false;
+
+          // Espera a que todas las promesas se resuelvan
+          const contestsWithStatePromises = this.contests.map(async (contest) => ({
+            contest,
+            state: await this.getContestState(contest) // Espera el estado de cada concurso
+          }));
+
+          // Resuelve todas las promesas antes de asignar a contestsWithState
+          this.contestsWithState = await Promise.all(contestsWithStatePromises);
+
+          this.noContests = false;
         }
       },
       error: (error) => {
@@ -54,6 +67,7 @@ export class ContestListComponent implements OnInit {
       }
     });
   }
+
 
   deleteContest(contestName: string) {
     const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta concurso?');
@@ -92,19 +106,36 @@ export class ContestListComponent implements OnInit {
     this.router.navigate([`/${contestName}/verRanking`]);
   }
 
-  getContestState(startDate: Date, endDate: Date): 'upcoming' | 'ongoing' | 'finished' {
+  getContestState(contest: Contest): Promise<'upcoming' | 'ongoing' | 'finished'> {
     const now = new Date();
 
-    if (startDate == null && endDate == null) {
-      return 'upcoming';
-    } else if (now < startDate) {
-      return 'upcoming';
-    } else if (now >= startDate && now <= endDate) {
-      return 'ongoing';
+    if (contest.startDate == null && contest.endDate == null) {
+      return Promise.resolve('upcoming');
+    } else if (now < contest.startDate) {
+      return Promise.resolve('upcoming');
+    } else if (now >= contest.startDate && now <= contest.endDate) {
+      if (this.isStudent) {
+        return firstValueFrom(this.contestService.getContestState(contest.contestName, this.tokenService.getUserName()!))
+          .then((state) => {
+            for (const game of state.games) {
+              if (!game.finished) {
+                return 'ongoing';
+              }
+            }
+            return 'finished';
+          })
+          .catch((e) => {
+            console.error("Error obteniendo el estado", e);
+            return 'ongoing';
+          });
+      }
+      return Promise.resolve('ongoing');
     } else {
-      return 'finished';
+      return Promise.resolve('finished');
     }
   }
+
+
 
   copyContest(oldContest: Contest) {
 
