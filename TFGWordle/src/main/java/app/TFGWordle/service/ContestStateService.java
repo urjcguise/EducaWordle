@@ -51,4 +51,12 @@ public class ContestStateService {
     public List<ContestState> getByContest(Long contestId) {
         return contestStateRepository.findByContestId(contestId);
     }
+
+    public boolean existsByContest(Long contestId) {
+        return contestStateRepository.existsByContestId(contestId);
+    }
+
+    public void deleteById(Long id) {
+        contestStateRepository.deleteById(id);
+    }
 }

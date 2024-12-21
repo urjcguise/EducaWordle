@@ -23,4 +23,6 @@ public interface ContestStateRepository extends JpaRepository<ContestState, Long
     @Query("SELECT cs FROM ContestState cs WHERE cs.contest.id = :contestId")
     List<ContestState> findByContestId(@Param("contestId") Long contestId);
 
+    @Query("SELECT COUNT(e) > 0 FROM ContestState e WHERE e.contest.id = :contestId")
+    boolean existsByContestId(@Param("contestId") Long contestId);
 }

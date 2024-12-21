@@ -80,6 +80,12 @@ public class ContestController {
         if (!contestService.existsContest(contestName))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
         Contest contest = contestService.getByName(contestName);
+        if (contestStateService.existsByContest(contest.getId())) {
+            List<ContestState> contestState = contestStateService.getByContest(contest.getId());
+            for (ContestState cs : contestState) {
+                contestStateService.deleteById(cs.getId());
+            }
+        }
         contestService.deleteContest(contest.getId());
         return ResponseEntity.ok(Map.of("message", "Concurso eliminada"));
     }
@@ -178,7 +184,7 @@ public class ContestController {
         return ResponseEntity.ok(contestStateService.save(contestState));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
     @GetMapping("/getUserAndContestState/{contestName}")
     public ResponseEntity<List<UserState>> getUserAndContestState(@PathVariable String contestName) throws JsonProcessingException {
         if (!contestService.existsContest(contestName))
