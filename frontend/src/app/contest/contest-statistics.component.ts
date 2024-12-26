@@ -3,7 +3,6 @@ import { Game, State } from '../models/wordle-state';
 import { ContestService } from '../service/contest.service';
 import { ActivatedRoute } from '@angular/router';
 import { UserState } from '../models/user-state';
-import { ChartOptions } from 'chart.js';
 import { Wordle } from '../models/wordle';
 
 @Component({
@@ -15,24 +14,32 @@ export class ContestStatisticsComponent implements OnInit {
   contestName!: string;
 
   wordlesInContest: string[] = [];
-  usersWithStates: { userName: string; state: any[] }[] = [];
-  wordlesWithStates: {
+
+  totalStudents: number = 0;
+
+  wordlesData: {
     wordle: string;
-    users: { userName: string; state: any }[];
-    studentsFinished: number;
-    studentsNotFinished: number;
-    totalTryCount: number;
+    success: number;
+    trying: number;
+    wrong: number;
     averageTryCount: number;
     averageTime: number;
-    pieChartDatasets: { data: number[] }[];
+    totalTimeAccumulated: number;
   }[] = [];
 
-  public pieChartOptions: ChartOptions<'pie'> = {
-    responsive: true,
-  };
-  public pieChartLabels: string[] = ['Finalizados', 'No finalizados'];
-  public pieChartLegend = true;
-  public pieChartPlugins = [];
+  wordleStudents: {
+    wordle: string;
+    students: {
+      name: string;
+      email: string;
+      totalTries: number;
+      startTime: string;
+      endTime: string;
+      totalTime: number;
+      lastWordle: string;
+      finished: boolean;
+    }[];
+  }[] = [];
 
   constructor(private contestService: ContestService, private route: ActivatedRoute) { }
 
@@ -44,62 +51,84 @@ export class ContestStatisticsComponent implements OnInit {
         contest.wordles.forEach((w: Wordle) => {
           this.wordlesInContest.push(w.word);
         });
-
-        this.wordlesWithStates = this.wordlesInContest.map((wordle) => ({
-          wordle,
-          users: [],
-          studentsFinished: 0,
-          studentsNotFinished: 0,
-          totalTryCount: 0,
-          averageTryCount: 0,
-          averageTime: 0,
-          pieChartDatasets: [
-            {
-              data: [0, 0],
-            },
-          ],
-        }));
       },
       error: (error) => {
         console.error('El concurso no existe', error);
       },
     });
 
+    this.contestService.getWordlesInContest(this.contestName).subscribe({
+      next: (wordles) => {
+        wordles.forEach((wordle) => {
+          this.wordlesData.push({
+            wordle: wordle.word,
+            success: 0,
+            trying: 0,
+            wrong: 0,
+            averageTryCount: 0,
+            averageTime: 0,
+            totalTimeAccumulated: 0
+          });
+          this.wordleStudents.push({
+            wordle: wordle.word,
+            students: []
+          });
+        });
+      },
+      error: (error) => {
+        console.error('Error obteniendo los wordles', error);
+      }
+    });
+
     this.contestService.getUserAndState(this.contestName).subscribe({
       next: (data) => {
-        this.usersWithStates = data.map((elem: UserState) => ({
-          userName: elem.userName,
-          state: elem.state.games.map((game: Game) => game.state),
-        }));
+        this.totalStudents = data.length;
 
         data.forEach((userState: UserState) => {
+          const userName = userState.userName;
+          const email = userState.email;
+          let endTime = "";
+          let totalTime = 0;
+
           userState.state.games.forEach((game: Game) => {
-            const wordleData = this.wordlesWithStates.find((w) => w.wordle === game.wordle);
-            if (wordleData) {
-              wordleData.users.push({
-                userName: userState.userName,
-                state: game.state,
-              });
+            const wordleDataItem = this.wordlesData.find((data) => data.wordle === game.wordle);
+            const wordleStudentsItem = this.wordleStudents.find((data) => data.wordle === game.wordle);
 
-              if (game.finished) {
-                wordleData.studentsFinished++;
-                wordleData.totalTryCount += game.tryCount;
-                wordleData.averageTime = ((wordleData.averageTime * (wordleData.studentsFinished - 1)) + game.timeNeeded) / wordleData.studentsFinished;
-              } else {
-                wordleData.studentsNotFinished++;
-              }
-
-              wordleData.averageTryCount =
-                wordleData.studentsFinished > 0
-                  ? wordleData.totalTryCount / wordleData.studentsFinished
-                  : 0;
-
-              wordleData.pieChartDatasets = [
-                {
-                  data: [wordleData.studentsFinished, wordleData.studentsNotFinished],
-                },
-              ];
+            if (!wordleDataItem || !wordleStudentsItem) {
+              console.error(`No se encontró el wordle para ${game.wordle}`);
+              return;
             }
+
+            if (game.finished) {
+              if (game.won)
+                wordleDataItem.success += 1;
+              else
+                wordleDataItem.wrong += 1;
+              endTime = game.finishTime;
+              totalTime = game.timeNeeded;
+              wordleDataItem.totalTimeAccumulated += game.timeNeeded;
+            } else {
+              wordleDataItem.trying += 1;
+            }
+
+            wordleStudentsItem.students.push({
+              name: userName,
+              email: email,
+              totalTries: game.tryCount,
+              startTime: game.startTime,
+              endTime: endTime,
+              totalTime: totalTime,
+              lastWordle: game.lastWordle,
+              finished: game.finished,
+            });
+
+            this.wordlesData.forEach((wordleDataItem) => {
+              if (wordleDataItem.success > 0) {
+                wordleDataItem.averageTime = wordleDataItem.totalTimeAccumulated / wordleDataItem.success;
+              } else {
+                wordleDataItem.averageTime = 0;
+              }
+            });
           });
         });
       },
@@ -113,6 +142,10 @@ export class ContestStatisticsComponent implements OnInit {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  convertPercentage(total: number) {
+    return (total / this.totalStudents) * 100;
   }
 }
 

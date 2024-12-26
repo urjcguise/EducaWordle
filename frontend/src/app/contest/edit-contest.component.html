@@ -6,12 +6,7 @@
     </div>
 
     <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex">
-        <input
-            type="text"
-            placeholder="Nuevo Wordle"
-            [(ngModel)]="wordles[i]"
-            class="wordle-input"
-        />
+        <input type="text" placeholder="Nuevo Wordle" [(ngModel)]="wordles[i]" class="wordle-input" />
         <button type="button" class="delete-wordle-button" (click)="removeWordle(i)">
             🗑️
         </button>
@@ -21,23 +16,25 @@
     </button>
 
     <div>
+        <label for="numTries">Número de intentos</label>
+        <select name="tries" id="numTries" [(ngModel)]="numTries">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+    </div>
+    
+
+    <div>
         <label for="startDateTime">Fecha y hora de inicio:</label>
-        <input
-            type="datetime-local"
-            id="startDateTime"
-            [(ngModel)]="formattedStartDate"
-            class="date-input"
-        />
+        <input type="datetime-local" id="startDateTime" [(ngModel)]="formattedStartDate" class="date-input" />
     </div>
 
     <div>
         <label for="endDateTime">Fecha y hora de fin:</label>
-        <input
-            type="datetime-local"
-            id="endDateTime"
-            [(ngModel)]="formattedEndDate"
-            class="date-input"
-        />
+        <input type="datetime-local" id="endDateTime" [(ngModel)]="formattedEndDate" class="date-input" />
     </div>
 
     <div class="checkbox-group">

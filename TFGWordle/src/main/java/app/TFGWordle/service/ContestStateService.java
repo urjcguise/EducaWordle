@@ -31,7 +31,7 @@ public class ContestStateService {
     public WordleState getState(Long contestId, Long userId) {
         Object result = contestStateRepository.getState(contestId, userId);
 
-        if (result instanceof String) {
+        if (result != null) {
             try {
                 JsonNode jsonNode = objectMapper.readTree((String) result);
                 return objectMapper.treeToValue(jsonNode, WordleState.class);

@@ -34,7 +34,7 @@ export class ContestComponent implements OnInit {
     const newContest: Contest = {
       ...this.contestForm.value,
       startDate: new Date(this.contestForm.value.startDate),
-      endDate: new Date(this.contestForm.value.endDate)     
+      endDate: new Date(this.contestForm.value.endDate)
     };
 
     if (newContest.startDate >= newContest.endDate) {

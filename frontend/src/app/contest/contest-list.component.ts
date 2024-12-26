@@ -148,6 +148,7 @@ export class ContestListComponent implements OnInit {
       competition: oldContest.competition,
       startDate: now,
       endDate: oneYearLater,
+      numTries: oldContest.numTries,
       useDictionary: oldContest.useDictionary,
       useExternalFile: oldContest.useExternalFile,
       fileRoute: oldContest.fileRoute,

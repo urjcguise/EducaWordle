@@ -59,7 +59,7 @@ export class ContestRankingComponent implements OnInit {
           numRightGuess++;
           time += Number(game.timeNeeded);
         }
-        tries = [game.tryCount, 6];
+        tries = [game.tryCount, this.contest.numTries];
         totalRightGuess += game.tryCount;
       });
       this.studentsRanking.push({

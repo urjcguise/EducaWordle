@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div *ngIf="hasMoreWords && won" class="next-word-button-container">
+        <div *ngIf="hasMoreWords && finished" class="next-word-button-container">
             <button (click)="handleNextWord()" class="next-word-button">Siguiente palabra</button>
         </div>
 

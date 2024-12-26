@@ -1,34 +1,61 @@
 <div class="contest-list">
   <h2>Estadísticas del concurso</h2>
 
-  <div *ngFor="let wordleData of wordlesWithStates" class="wordle-section">
-    <h3>Wordle: {{ wordleData.wordle }}</h3>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th colspan="6" class="table-title">Resumen</th>
+      </tr>
+      <tr>
+        <th>Palabra</th>
+        <th>Aciertos</th>
+        <th>Intentando</th>
+        <th>Fallada</th>
+        <th>Promedio de intentos</th>
+        <th>Promedio de tiempo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let wordle of wordlesData">
+        <td>{{ wordle.wordle }}</td>
+        <td>{{ convertPercentage(wordle.success) }}%</td>
+        <td>{{ convertPercentage(wordle.trying) }}%</td>
+        <td>{{ convertPercentage(wordle.wrong) }}%</td>
+        <td>{{ wordle.averageTryCount }}</td>
+        <td>{{ convertTime(wordle.averageTime) }}</td>
+      </tr>
+    </tbody>
+  </table>
 
-    <ul class="users-list">
-      <li *ngFor="let user of wordleData.users" class="user-item">
-        <span class="user-name">Nombre: {{ user.userName }}</span>
-        <ul class="states-list">
-          <li class="state-item">
-            <span class="state-title">Estado:</span>
-            <span class="state-good">Bien: {{ user.state.good }}</span>
-            <span class="state-half-good">Medio bien: {{ user.state.halfGood }}</span>
-            <span class="state-wrong">Mal: {{ user.state.wrong }}</span>
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <!--
-    <div style="display: block; width: 400px; margin: 20px auto;">
-      <canvas baseChart [type]="'pie'" [datasets]="wordleData.pieChartDatasets" [labels]="pieChartLabels"
-        [options]="pieChartOptions" [plugins]="pieChartPlugins" [legend]="pieChartLegend">
-      </canvas>
-    </div>
--->
-    <div class="average-try-count">
-      <p>Promedio de intentos: {{ wordleData.averageTryCount | number:'1.1-2' }}</p>
-    </div>
-    <div class="average-time">
-      <p>Promedio de tiempo: {{ convertTime(wordleData.averageTime) }}</p>
-    </div>
+  <div *ngFor="let wordle of wordleStudents">
+    <table class="details-table">
+      <thead>
+        <tr>
+          <th colspan="8" class="table-title">Palabra: {{ wordle.wordle }}</th>
+        </tr>
+        <tr>
+          <th>Alumno</th>
+          <th>Correo</th>
+          <th>Intentos</th>
+          <th>Tiempo inicio</th>
+          <th>Tiempo fin</th>
+          <th>Tiempo total</th>
+          <th>Última palabra</th>
+          <th>Terminado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of wordle.students">
+          <td>{{ student.name }}</td>
+          <td>{{ student.email }}</td>
+          <td>{{ student.totalTries }}</td>
+          <td>{{ student.startTime }}</td>
+          <td>{{ student.endTime }}</td>
+          <td>{{ convertTime(student.totalTime) }}</td>
+          <td>{{ student.lastWordle }}</td>
+          <td>{{ student.finished ? 'Sí' : 'No'}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

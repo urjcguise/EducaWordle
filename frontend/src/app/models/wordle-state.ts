@@ -11,20 +11,24 @@ export class WordleState {
 export class Game {
   wordle: string;
   finished: boolean;
+  won: boolean;
   tryCount: number;
   state: State;
   startTime: string;
   finishTime: string;
   timeNeeded: number;
+  lastWordle: string;
 
-  constructor(wordle: string = '', finished: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0) {
+  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "") {
     this.wordle = wordle;
     this.finished = finished;
+    this.won = won;
     this.tryCount = tryCount;
     this.state = state;
     this.startTime = startTime;
     this.finishTime = finishTime;
     this.timeNeeded = timeNeeded;
+    this.lastWordle = lastWordle;
   }
 }
 

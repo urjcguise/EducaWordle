@@ -17,6 +17,7 @@ public class Contest {
     private String name;
     private Date startDate;
     private Date endDate;
+    private int numTries;
     private Boolean useDictionary;
     private Boolean useExternalFile;
 
@@ -31,11 +32,12 @@ public class Contest {
 
     public Contest() {}
 
-    public Contest(String name, Competition competition, Date startDate, Date endDate, Boolean useDictionary, Boolean useExternalFile) {
+    public Contest(String name, Competition competition, Date startDate, Date endDate, int numTries, Boolean useDictionary, Boolean useExternalFile) {
         this.name = name;
         this.competition = competition;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
     }
@@ -70,6 +72,14 @@ public class Contest {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public int getNumTries() {
+        return numTries;
+    }
+
+    public void setNumTries(int numTries) {
+        this.numTries = numTries;
     }
 
     public Boolean getUseDictionary() {

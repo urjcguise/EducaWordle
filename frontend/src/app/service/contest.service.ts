@@ -4,6 +4,7 @@ import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
 import { UserState } from '../models/user-state';
+import { Wordle } from '../models/wordle';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,7 @@ export class ContestService {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 409) {
           console.log('El estado del concurso ya existe. No se creará nuevamente.');
-          return EMPTY; 
+          return EMPTY;
         }
         return throwError(() => error);
       })
@@ -72,5 +73,9 @@ export class ContestService {
 
   public saveExternalDictionary(words: string[], contestName: string) {
     return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestName, words);
+  }
+
+  public getWordlesInContest(contestName: string) {
+    return this.httpClient.get<Wordle[]>(this.apiUrl + 'getWordles/' + contestName);
   }
 }

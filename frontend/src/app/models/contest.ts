@@ -6,6 +6,7 @@ export class Contest {
     competition!: Competition;
     startDate!: Date;
     endDate!: Date;
+    numTries!: number;
     useDictionary!: boolean;
     useExternalFile!: boolean;
     fileRoute!: string;
@@ -14,6 +15,7 @@ export class Contest {
     constructor(contestName: string,
         startDate: Date,
         endDate: Date,
+        numTries: number,
         useDictionary: boolean,
         useExternalFile: boolean,
         fileRoute: string,
@@ -22,6 +24,7 @@ export class Contest {
         this.contestName = contestName;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
         this.fileRoute = fileRoute;

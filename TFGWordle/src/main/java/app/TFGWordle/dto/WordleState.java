@@ -26,11 +26,13 @@ public class WordleState {
     public static class Game {
         private String wordle;
         private boolean finished;
+        private boolean won;
         private int tryCount;
         private String startTime;
         private String finishTime;
         private int timeNeeded;
         private State state;
+        private String lastWordle;
 
         public String getWordle() {
             return wordle;
@@ -46,6 +48,14 @@ public class WordleState {
 
         public void setFinished(boolean finished) {
             this.finished = finished;
+        }
+
+        public boolean isWon() {
+            return won;
+        }
+
+        public void setWon(boolean won) {
+            this.won = won;
         }
 
         public int getTryCount() {
@@ -86,6 +96,14 @@ public class WordleState {
 
         public void setState(State state) {
             this.state = state;
+        }
+
+        public String getLastWordle() {
+            return lastWordle;
+        }
+
+        public void setLastWordle(String lastWordle) {
+            this.lastWordle = lastWordle;
         }
 
         public static class State {

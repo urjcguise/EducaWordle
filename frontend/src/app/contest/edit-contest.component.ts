@@ -13,11 +13,12 @@ import { Competition } from '../models/competition';
 })
 export class EditContestComponent {
   
-  contest: Contest = new Contest("", new Date(), new Date(), false, false, "", new Competition(""), []);
+  contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, "", new Competition(""), []);
   contestName = "";
   dictionary: boolean = false;
   file: boolean = false;
   wordles: string[] = [];
+  numTries: number = 0;
 
   formattedStartDate: string = "";
   formattedEndDate: string = "";
@@ -39,6 +40,7 @@ export class EditContestComponent {
         this.contest = data;
         this.dictionary = data.useDictionary || false;
         this.file = data.useExternalFile || false;
+        this.numTries = data.numTries;
         this.formattedStartDate = this.formatDateForInput(this.contest.startDate);
         this.formattedEndDate = this.formatDateForInput(this.contest.endDate);
       },

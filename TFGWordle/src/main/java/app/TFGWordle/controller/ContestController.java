@@ -2,17 +2,11 @@ package app.TFGWordle.controller;
 
 import app.TFGWordle.dto.UserState;
 import app.TFGWordle.dto.WordleState;
-import app.TFGWordle.model.Competition;
-import app.TFGWordle.model.Contest;
-import app.TFGWordle.model.ContestState;
-import app.TFGWordle.model.DictionaryExternal;
+import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
-import app.TFGWordle.service.CompetitionService;
-import app.TFGWordle.service.ContestService;
-import app.TFGWordle.service.ContestStateService;
-import app.TFGWordle.service.DictionaryService;
+import app.TFGWordle.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,16 +29,18 @@ public class ContestController {
     private final ContestService contestService;
     private final CompetitionService competitionService;
     private final UserService userService;
+    private final WordleService wordleService;
     private final ContestStateService contestStateService;
     private final DictionaryService dictionaryService;
     private final ObjectMapper objectMapper;
 
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, ContestStateService contestStateService, DictionaryService dictionaryService, ObjectMapper objectMapper) {
+    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, WordleService wordleService, ContestStateService contestStateService, DictionaryService dictionaryService, ObjectMapper objectMapper) {
         this.contestService = contestService;
         this.competitionService = competitionService;
         this.userService = userService;
+        this.wordleService = wordleService;
         this.contestStateService = contestStateService;
         this.dictionaryService = dictionaryService;
         this.objectMapper = objectMapper;
@@ -58,6 +54,7 @@ public class ContestController {
 
         Competition competition = competitionService.getCompetitionById(competitionId);
         contest.setCompetition(competition);
+        contest.setNumTries(3);
         contest.setUseDictionary(false);
         contest.setUseExternalFile(false);
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
@@ -196,7 +193,7 @@ public class ContestController {
 
         List<UserState> toReturn = new ArrayList<>();
         for (ContestState contestState : contestStates) {
-            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getState());
+            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(), contestState.getState());
             toReturn.add(toAdd);
         }
 
@@ -235,5 +232,15 @@ public class ContestController {
         }
 
         return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getWordles/{contestName}")
+    public ResponseEntity<List<Wordle>> getWordles(@PathVariable String contestName) {
+        if(!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+        return ResponseEntity.ok(wordleService.findByContestId(contest.getId()));
     }
 }
