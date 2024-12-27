@@ -21,8 +21,8 @@
         <td>{{ convertPercentage(wordle.success) }}%</td>
         <td>{{ convertPercentage(wordle.trying) }}%</td>
         <td>{{ convertPercentage(wordle.wrong) }}%</td>
-        <td>{{ wordle.averageTryCount }}</td>
-        <td>{{ convertTime(wordle.averageTime) }}</td>
+        <td>{{ convertTries(wordle.totalTriesAccumulated) }}</td>
+        <td>{{ convertTime(wordle.totalTimeAccumulated) }}</td>
       </tr>
     </tbody>
   </table>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Game, State } from '../models/wordle-state';
+import { Game } from '../models/wordle-state';
 import { ContestService } from '../service/contest.service';
 import { ActivatedRoute } from '@angular/router';
 import { UserState } from '../models/user-state';
@@ -23,6 +23,7 @@ export class ContestStatisticsComponent implements OnInit {
     trying: number;
     wrong: number;
     averageTryCount: number;
+    totalTriesAccumulated: number;
     averageTime: number;
     totalTimeAccumulated: number;
   }[] = [];
@@ -66,6 +67,7 @@ export class ContestStatisticsComponent implements OnInit {
             trying: 0,
             wrong: 0,
             averageTryCount: 0,
+            totalTriesAccumulated: 0,
             averageTime: 0,
             totalTimeAccumulated: 0
           });
@@ -106,6 +108,7 @@ export class ContestStatisticsComponent implements OnInit {
                 wordleDataItem.wrong += 1;
               endTime = game.finishTime;
               totalTime = game.timeNeeded;
+              wordleDataItem.totalTriesAccumulated += game.tryCount;
               wordleDataItem.totalTimeAccumulated += game.timeNeeded;
             } else {
               wordleDataItem.trying += 1;
@@ -121,14 +124,6 @@ export class ContestStatisticsComponent implements OnInit {
               lastWordle: game.lastWordle,
               finished: game.finished,
             });
-
-            this.wordlesData.forEach((wordleDataItem) => {
-              if (wordleDataItem.success > 0) {
-                wordleDataItem.averageTime = wordleDataItem.totalTimeAccumulated / wordleDataItem.success;
-              } else {
-                wordleDataItem.averageTime = 0;
-              }
-            });
           });
         });
       },
@@ -139,13 +134,18 @@ export class ContestStatisticsComponent implements OnInit {
   }
 
   convertTime(seconds: number) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
+    const average = seconds / this.totalStudents;
+    const minutes = Math.floor(average / 60);
+    const remainingSeconds = Math.floor(average % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
   convertPercentage(total: number) {
     return (total / this.totalStudents) * 100;
+  }
+
+  convertTries(totalTries: number) {
+    return (totalTries / this.totalStudents);
   }
 }
 
