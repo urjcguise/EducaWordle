@@ -34,7 +34,6 @@ export class PlayWordleComponent {
 
   readonly tries: Try[] = [];
   readonly LetterState = LetterState;
-  readonly NUM_TRIES = 6;
 
   readonly keyboardRows = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -65,6 +64,8 @@ export class PlayWordleComponent {
 
   wordleState!: WordleState;
 
+  numTries!: number;
+
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService) {
     this.wordleService.getWordles(history.state.contestName).subscribe({
       next: (wrdl) => {
@@ -83,20 +84,20 @@ export class PlayWordleComponent {
     this.contestService.getContestByName(history.state.contestName).subscribe({
       next: (cont) => {
         this.contest = cont;
+        this.numTries = cont.numTries;
+
+        for (let i = 0; i < this.numTries; i++) {
+          const letters: Letter[] = [];
+          for (let j = 0; j < this.targetWord.length; j++) {
+            letters.push({ text: '', state: LetterState.PENDING });
+          }
+          this.tries.push({ letters });
+        }
       },
       error: (error) => {
         console.error('Error consiguiendo el concurso', error);
       },
     });
-
-    for (let i = 0; i < this.NUM_TRIES; i++) {
-      const letters: Letter[] = [];
-      for (let j = 0; j < 5; j++) {
-        letters.push({ text: '', state: LetterState.PENDING });
-      }
-      this.tries.push({ letters });
-    }
-
   }
 
   private initializeState() {
@@ -300,7 +301,7 @@ export class PlayWordleComponent {
       return;
     }
 
-    if (this.numSubmittedTries === this.NUM_TRIES) {
+    if (this.numSubmittedTries === this.numTries) {
       const currentGame = this.wordleState.games[this.currentWordleIndex];
       currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
       currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
@@ -375,5 +376,4 @@ export class PlayWordleComponent {
       },
     });
   }
-
 }
