@@ -18,8 +18,9 @@ export class Game {
   finishTime: string;
   timeNeeded: number;
   lastWordle: string;
+  timeGuess: string;
 
-  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "") {
+  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "", timeGuess: string ="") {
     this.wordle = wordle;
     this.finished = finished;
     this.won = won;
@@ -29,6 +30,7 @@ export class Game {
     this.finishTime = finishTime;
     this.timeNeeded = timeNeeded;
     this.lastWordle = lastWordle;
+    this.timeGuess = timeGuess;
   }
 }
 

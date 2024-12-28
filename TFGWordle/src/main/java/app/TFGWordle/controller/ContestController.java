@@ -234,7 +234,7 @@ public class ContestController {
         return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
     @GetMapping("/getWordles/{contestName}")
     public ResponseEntity<List<Wordle>> getWordles(@PathVariable String contestName) {
         if(!contestService.existsContest(contestName))

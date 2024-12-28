@@ -1,6 +1,5 @@
 package app.TFGWordle.dto;
 
-import java.util.Date;
 import java.util.List;
 
 public class WordleState {
@@ -33,6 +32,7 @@ public class WordleState {
         private int timeNeeded;
         private State state;
         private String lastWordle;
+        private String timeGuess;
 
         public String getWordle() {
             return wordle;
@@ -104,6 +104,14 @@ public class WordleState {
 
         public void setLastWordle(String lastWordle) {
             this.lastWordle = lastWordle;
+        }
+
+        public String getTimeGuess() {
+            return timeGuess;
+        }
+
+        public void setTimeGuess(String timeGuess) {
+            this.timeGuess = timeGuess;
         }
 
         public static class State {

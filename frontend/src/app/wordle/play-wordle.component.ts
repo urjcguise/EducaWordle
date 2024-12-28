@@ -350,6 +350,7 @@ export class PlayWordleComponent {
     currentGame.won = this.won;
     currentGame.tryCount = this.numSubmittedTries;
     currentGame.lastWordle = this.lastWordle;
+    currentGame.timeGuess = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
     const newState = new State();
     Object.values(this.curLetterStates).forEach((state) => {

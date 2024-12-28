@@ -27,35 +27,67 @@
     </tbody>
   </table>
 
-  <div *ngFor="let wordle of wordleStudents">
-    <table class="details-table">
-      <thead>
-        <tr>
-          <th colspan="8" class="table-title">Palabra: {{ wordle.wordle }}</th>
-        </tr>
-        <tr>
-          <th>Alumno</th>
-          <th>Correo</th>
-          <th>Intentos</th>
-          <th>Tiempo inicio</th>
-          <th>Tiempo fin</th>
-          <th>Tiempo total</th>
-          <th>Última palabra</th>
-          <th>Terminado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let student of wordle.students">
-          <td>{{ student.name }}</td>
-          <td>{{ student.email }}</td>
-          <td>{{ student.totalTries }}</td>
-          <td>{{ student.startTime }}</td>
-          <td>{{ student.endTime }}</td>
-          <td>{{ convertTime(student.totalTime) }}</td>
-          <td>{{ student.lastWordle }}</td>
-          <td>{{ student.finished ? 'Sí' : 'No'}}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div *ngIf="isProfessor">
+    <div *ngFor="let wordle of wordleStudents">
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th colspan="8" class="table-title">Palabra: {{ wordle.wordle }}</th>
+          </tr>
+          <tr>
+            <th>Alumno</th>
+            <th>Correo</th>
+            <th>Intentos</th>
+            <th>Tiempo inicio</th>
+            <th>Tiempo fin</th>
+            <th>Tiempo total</th>
+            <th>Última palabra</th>
+            <th>Terminado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of wordle.students">
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.totalTries }}</td>
+            <td>{{ student.startTime }}</td>
+            <td>{{ student.endTime }}</td>
+            <td>{{ convertTime(student.totalTime) }}</td>
+            <td>{{ student.lastWordle }}</td>
+            <td>{{ student.finished ? 'Sí' : 'No'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="isStudent">
+    <div *ngFor="let wordle of studentInformation">
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th colspan="8" class="table-title">Palabra: {{ wordle.wordle }}</th>
+          </tr>
+          <tr>
+            <th>Número intento</th>
+            <th>Tiempo</th>
+            <th>Palabra</th>
+            <th>Correctas</th>
+            <th>Mal colocadas</th>
+            <th>Erróneas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let info of wordle.info">
+            <td>{{ info.nunTry }}</td>
+            <td>{{ info.time }}</td>
+            <td>{{ info.lastWord }}</td>
+            <td>{{ info.correct }}</td>
+            <td>{{ info.wrongPlace }}</td>
+            <td>{{ info.wrong }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
