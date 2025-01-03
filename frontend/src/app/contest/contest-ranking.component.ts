@@ -29,9 +29,8 @@ export class ContestRankingComponent implements OnInit {
     this.contestService.getContestByName(this.contestName).subscribe({
       next: (contest) => {
         this.contest = contest;
-        this.contestService.getUserAndState(this.contest.contestName).subscribe({
+        this.contestService.getAllUserState(this.contest.contestName).subscribe({
           next: (userState) => {
-            console.log(userState);
             this.obtainRanking(userState);
           },
           error: (error) => {
@@ -56,7 +55,8 @@ export class ContestRankingComponent implements OnInit {
       var tries: number[] = [];
       user.state.games.forEach((game) => {
         if (game.finished) {
-          numRightGuess++;
+          if (game.won)
+            numRightGuess++;
           time += Number(game.timeNeeded);
         }
         tries = [game.tryCount, this.contest.numTries];

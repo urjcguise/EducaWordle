@@ -2,6 +2,7 @@ package app.TFGWordle.controller;
 
 import app.TFGWordle.dto.UserState;
 import app.TFGWordle.dto.WordleState;
+import app.TFGWordle.dto.WordleStateLog;
 import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
@@ -73,18 +74,22 @@ public class ContestController {
 
     @PreAuthorize("hasRole('PROFESSOR')")
     @DeleteMapping("/deleteContest/{contestName}")
-    public ResponseEntity<?> deleteCompetition(@PathVariable("contestName") String contestName) {
+    public ResponseEntity<?> deleteContest(@PathVariable("contestName") String contestName) {
         if (!contestService.existsContest(contestName))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
         Contest contest = contestService.getByName(contestName);
         if (contestStateService.existsByContest(contest.getId())) {
-            List<ContestState> contestState = contestStateService.getByContest(contest.getId());
+            List<ContestState> contestState = contestStateService.getAllByContest(contest.getId());
+            List<ContestStateLog> contestStateLogs = contestStateService.getLogsByContestId(contest.getId());
             for (ContestState cs : contestState) {
                 contestStateService.deleteById(cs.getId());
             }
+            for (ContestStateLog cs : contestStateLogs) {
+                contestStateService.deleteByLogId(cs.getId());
+            }
         }
         contestService.deleteContest(contest.getId());
-        return ResponseEntity.ok(Map.of("message", "Concurso eliminada"));
+        return ResponseEntity.ok(Map.of("message", "Concurso eliminado"));
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
@@ -131,7 +136,7 @@ public class ContestController {
         Contest contest = contestService.getByName(contestName);
 
         if (contestStateService.existsState(contest.getId(), user.getId()))
-            return new ResponseEntity<>("Concurso ya existente", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Estado ya creado", HttpStatus.CONFLICT);
 
         ContestState newContestState = new ContestState(contest, user);
 
@@ -181,19 +186,88 @@ public class ContestController {
         return ResponseEntity.ok(contestStateService.save(contestState));
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
+    @PostMapping("/createContestLog/{contestName}/{userName}")
+    public ResponseEntity<?> createContestLog(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        User user = userService.getByUserName(userName).get();
+        Contest contest = contestService.getByName(contestName);
+
+        ContestStateLog contestStateLog = new ContestStateLog(contest, user);
+        try {
+            JsonNode jsonNode = objectMapper.valueToTree(wordleStateLog);
+            contestStateLog.setState(jsonNode);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        contestStateService.saveLog(contestStateLog);
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
-    @GetMapping("/getUserAndContestState/{contestName}")
-    public ResponseEntity<List<UserState>> getUserAndContestState(@PathVariable String contestName) throws JsonProcessingException {
+    @GetMapping("/getAllContestState/{contestName}")
+    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable String contestName) throws JsonProcessingException {
         if (!contestService.existsContest(contestName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Contest contest = contestService.getByName(contestName);
 
-        List<ContestState> contestStates = contestStateService.getByContest(contest.getId());
+        List<ContestState> contestStates = contestStateService.getAllByContest(contest.getId());
 
         List<UserState> toReturn = new ArrayList<>();
         for (ContestState contestState : contestStates) {
             UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(), contestState.getState());
+            toReturn.add(toAdd);
+        }
+
+        return ResponseEntity.ok(toReturn);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getAllContestStateLogs/{contestName}")
+    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable String contestName) throws JsonProcessingException {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+
+        List<String> contestStateLogs = contestStateService.getAllLogsByContest(contest.getId());
+
+        if (contestStateLogs.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<WordleStateLog> toReturn = new ArrayList<>();
+        for (String csLog : contestStateLogs) {
+            WordleStateLog toAdd = contestStateService.getStateLog(csLog);
+            toReturn.add(toAdd);
+        }
+
+        return ResponseEntity.ok(toReturn);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getAllUserContestStateLogs/{contestName}/{userName}")
+    public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable String contestName, @PathVariable String userName) throws JsonProcessingException {
+        if (!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+        User user = userService.getByUserName(userName).get();
+
+        List<String> contestStatesLogs = contestStateService.getAllLogsByContestAndUser(contest.getId(), user.getId());
+
+        if (contestStatesLogs.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<WordleStateLog> toReturn = new ArrayList<>();
+        for (String csLog : contestStatesLogs) {
+            WordleStateLog toAdd = contestStateService.getStateLog(csLog);
             toReturn.add(toAdd);
         }
 

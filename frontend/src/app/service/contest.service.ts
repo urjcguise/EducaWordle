@@ -5,6 +5,7 @@ import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
 import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
+import { WordleStateLog } from '../models/wordle-state-log';
 
 @Injectable({
   providedIn: 'root'
@@ -59,8 +60,20 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestName + '/' + userName, wordleState);
   }
 
-  public getUserAndState(contestName: string) {
-    return this.httpClient.get<UserState[]>(this.apiUrl + 'getUserAndContestState/' + contestName);
+  public createContestLog(contestName: string, userName: string, contestLog: WordleStateLog) {
+    return this.httpClient.post<any>(this.apiUrl + 'createContestLog/' + contestName + '/' + userName, contestLog);
+  }
+
+  public getAllUserState(contestName: string) {
+    return this.httpClient.get<UserState[]>(this.apiUrl + 'getAllContestState/' + contestName);
+  }
+
+  public getAllUserStateLog(contestName: string, userName: string) {
+    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllUserContestStateLogs/' + contestName + '/' + userName);
+  }
+
+  public getAllStateLog(contestName: string) {
+    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllContestStateLogs/' + contestName);
   }
 
   public existsInDictionary(word: string) {

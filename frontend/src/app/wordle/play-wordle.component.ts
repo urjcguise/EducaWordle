@@ -6,6 +6,7 @@ import { Contest } from '../models/contest';
 import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
 import { differenceInSeconds, format } from 'date-fns';
+import { WordleStateLog } from '../models/wordle-state-log';
 
 
 interface Try {
@@ -63,6 +64,7 @@ export class PlayWordleComponent {
   games: Game[] = [];
 
   wordleState!: WordleState;
+  wordleStateLog!: WordleStateLog;
 
   numTries!: number;
 
@@ -109,6 +111,7 @@ export class PlayWordleComponent {
 
     this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     this.wordleState = new WordleState(this.wordleList.length, this.games);
+    //this.wordleStateLog = new WordleStateLog();
     this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
@@ -122,6 +125,7 @@ export class PlayWordleComponent {
   private setTargetWord() {
     if (this.currentWordleIndex < this.targetWords.length) {
       this.resetKeyboard();
+      this.won = false;
       this.targetWord = this.targetWords[this.currentWordleIndex].toLowerCase();
       this.targetWordLetterCounts = {};
       for (const letter of this.targetWord) {
@@ -298,6 +302,7 @@ export class PlayWordleComponent {
       this.won = true;
       this.hasMoreWords = this.currentWordleIndex < this.wordleList.length - 1;
       this.updateContestState();
+      this.uploadNewLog();
       return;
     }
 
@@ -310,10 +315,12 @@ export class PlayWordleComponent {
       this.finished = true;
       this.won = false;
       this.updateContestState();
+      this.uploadNewLog();
       return;
     }
 
     this.updateContestState();
+    this.uploadNewLog();
   }
 
 
@@ -374,6 +381,40 @@ export class PlayWordleComponent {
       },
       error: (error) => {
         console.error('Error actualizando el estado del concurso', error);
+      },
+    });
+  }
+
+  private uploadNewLog(): void {
+    const counts = Object.values(this.curLetterStates).reduce(
+      (acc, value) => {
+        if (value === LetterState.WRONG) acc.wrong++;
+        else if (value === LetterState.PARTIAL_MATCH) acc.partialMatch++;
+        else if (value === LetterState.FULL_MATCH) acc.fullMatch++;
+        return acc;
+      },
+      { wrong: 0, partialMatch: 0, fullMatch: 0 } 
+    );
+    
+    this.wordleStateLog = {
+      userName: this.tokenService.getUserName()!,
+      email: '',
+      dateLog: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+      wordleToGuess: this.targetWord,
+      wordleInserted: this.lastWordle,
+      numTry:  this.numSubmittedTries,
+      wordlePosition: this.currentWordleIndex + 1,
+      correct: counts.fullMatch,
+      wrongPosition:  counts.partialMatch,
+      wrong: counts.wrong,
+      state: this.won
+    };
+    this.contestService.createContestLog(this.contest.contestName, this.tokenService.getUserName()!, this.wordleStateLog).subscribe({
+      next: () => {
+        console.log('Creado nuevo log correctamente');
+      },
+      error: (error) => {
+        console.error('Error creando el nuevo log del concurso', error);
       },
     });
   }

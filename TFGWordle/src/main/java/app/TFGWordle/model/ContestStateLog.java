@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "contestState")
-public class ContestState {
+@Table(name = "contestStateLog")
+public class ContestStateLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne
@@ -28,19 +28,20 @@ public class ContestState {
     @Column(name = "state", length = 700)
     private String state;
 
-    public ContestState() {}
+    public ContestStateLog() {
+    }
 
-    public ContestState(Contest contest, User user) {
+    public ContestStateLog(Contest contest, User user) {
         this.contest = contest;
         this.user = user;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Contest getContest() {

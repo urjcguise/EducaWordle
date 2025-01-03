@@ -59,6 +59,35 @@
         </tbody>
       </table>
     </div>
+    <table class="details-table">
+      <thead>
+        <tr>
+          <th colspan="8" class="table-title">Logs</th>
+        </tr>
+        <tr>
+          <th>Alumno</th>
+          <th>Correo</th>
+          <th>Marca de tiempo</th>
+          <th>Palabra a adivinar</th>
+          <th>Posición palabra</th>
+          <th>Intento palabra</th>
+          <th>Intento</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of studentsLog">
+          <td>{{ log.student }}</td>
+          <td>{{ log.email }}</td>
+          <td>{{ log.time }}</td>
+          <td>{{ log.wordleToGuess }}</td>
+          <td>{{ log.wordlePosition }}</td>
+          <td>{{ log.wordleInserted }}</td>
+          <td>{{ log.try }}</td>
+          <td>{{ log.state ? 'Correcta' : 'Incorrecta'}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div *ngIf="isStudent">

@@ -4,6 +4,8 @@ import { ContestService } from '../service/contest.service';
 import { ActivatedRoute } from '@angular/router';
 import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
+import { TokenService } from '../service/token.service';
+import { WordleStateLog } from '../models/wordle-state-log';
 
 @Component({
   selector: 'app-contest-statistics',
@@ -12,6 +14,8 @@ import { Wordle } from '../models/wordle';
 })
 export class ContestStatisticsComponent implements OnInit {
   contestName!: string;
+  isProfessor: boolean = false;
+  isStudent: boolean = false;
 
   wordlesInContest: string[] = [];
 
@@ -42,10 +46,35 @@ export class ContestStatisticsComponent implements OnInit {
     }[];
   }[] = [];
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute) { }
+  studentInformation: {
+    wordle: string;
+    info: {
+      nunTry: number;
+      time: string;
+      lastWord: string;
+      correct: number;
+      wrongPlace: number;
+      wrong: number;
+    }[];
+  }[] = [];
+
+  studentsLog: {
+    student: string;
+    email: string;
+    time: string;
+    wordleToGuess: string;
+    wordlePosition: number;
+    wordleInserted: string;
+    try: number;
+    state: boolean;
+  }[] = [];
+
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService) { }
 
   ngOnInit(): void {
     this.contestName = this.route.snapshot.paramMap.get('contestName')!;
+    this.isProfessor = this.tokenService.getAuthorities().includes("ROLE_PROFESSOR");
+    this.isStudent = this.tokenService.getAuthorities().includes("ROLE_STUDENT");
 
     this.contestService.getContestByName(this.contestName).subscribe({
       next: (contest) => {
@@ -75,6 +104,10 @@ export class ContestStatisticsComponent implements OnInit {
             wordle: wordle.word,
             students: []
           });
+          this.studentInformation.push({
+            wordle: wordle.word,
+            info: []
+          });
         });
       },
       error: (error) => {
@@ -82,7 +115,7 @@ export class ContestStatisticsComponent implements OnInit {
       }
     });
 
-    this.contestService.getUserAndState(this.contestName).subscribe({
+    this.contestService.getAllUserState(this.contestName).subscribe({
       next: (data) => {
         this.totalStudents = data.length;
 
@@ -91,7 +124,6 @@ export class ContestStatisticsComponent implements OnInit {
           const email = userState.email;
           let endTime = "";
           let totalTime = 0;
-
           userState.state.games.forEach((game: Game) => {
             const wordleDataItem = this.wordlesData.find((data) => data.wordle === game.wordle);
             const wordleStudentsItem = this.wordleStudents.find((data) => data.wordle === game.wordle);
@@ -122,15 +154,62 @@ export class ContestStatisticsComponent implements OnInit {
               endTime: endTime,
               totalTime: totalTime,
               lastWordle: game.lastWordle,
-              finished: game.finished,
+              finished: game.finished
             });
           });
         });
       },
       error: (error) => {
         console.error('Error consiguiendo los usuarios y sus estados', error);
-      },
+      }
     });
+
+    if (this.isStudent) {
+      this.contestService.getAllUserStateLog(this.contestName, this.tokenService.getUserName()!).subscribe({
+        next: (logs) => {
+          logs.forEach((log: WordleStateLog) => {
+            const studentInfoItem = this.studentInformation.find((logs) => logs.wordle.toLowerCase() === log.wordleToGuess);
+            if (!studentInfoItem) {
+              console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
+              return;
+            }
+            studentInfoItem.info.push({
+              nunTry: log.numTry,
+              time: log.dateLog,
+              lastWord: log.wordleInserted,
+              correct: log.correct,
+              wrongPlace: log.wrongPosition,
+              wrong: log.wrong
+            });
+          });
+        },
+        error: (e) => {
+          console.error('Error obteniendo los logs', e);
+        }
+      });
+    }
+
+    if (this.isProfessor) {
+      this.contestService.getAllStateLog(this.contestName).subscribe({
+        next: (logs) => {
+          logs.forEach((log: WordleStateLog) => {
+            this.studentsLog.push({
+              student: log.userName,
+              email: log.email,
+              time: log.dateLog,
+              wordleToGuess: log.wordleToGuess,
+              wordlePosition: log.wordlePosition,
+              wordleInserted: log.wordleInserted,
+              try: log.numTry,
+              state: log.state
+            });
+          });
+        },
+        error: (e) => {
+          console.error('Error obteniendo los logs', e);
+        }
+      });
+    }
   }
 
   convertTime(seconds: number) {
@@ -140,12 +219,12 @@ export class ContestStatisticsComponent implements OnInit {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  convertPercentage(total: number) {
-    return (total / this.totalStudents) * 100;
+  convertPercentage(total: number): number {
+    return parseFloat(((total / this.totalStudents) * 100).toFixed(2));
   }
 
   convertTries(totalTries: number) {
-    return (totalTries / this.totalStudents);
+    return parseFloat((totalTries / this.totalStudents).toFixed(2));
   }
 }
 

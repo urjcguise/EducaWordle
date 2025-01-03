@@ -27,7 +27,7 @@ const routes: Routes = [
   {path: ':contestName/editar', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: ':competitionName/alumnos', component: StudentListComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
   {path: 'nuevoAlumno', component: NewStudentComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
-  {path: ':contestName/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor'] }},
+  {path: ':contestName/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student'] }},
   {path: ':contestName/verRanking', component: ContestRankingComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student'] }}
 ];
 
