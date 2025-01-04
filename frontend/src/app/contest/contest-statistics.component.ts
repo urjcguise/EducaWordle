@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Game } from '../models/wordle-state';
 import { ContestService } from '../service/contest.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
 import { TokenService } from '../service/token.service';
@@ -69,7 +69,15 @@ export class ContestStatisticsComponent implements OnInit {
     state: boolean;
   }[] = [];
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService) { }
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['' + history.state.competitionName + '/concursos']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.contestName = this.route.snapshot.paramMap.get('contestName')!;
@@ -203,6 +211,12 @@ export class ContestStatisticsComponent implements OnInit {
               try: log.numTry,
               state: log.state
             });
+          });
+          this.studentsLog.sort((a, b) => {
+            const dateA = new Date(a.time).getTime();
+            const dateB = new Date(b.time).getTime();
+
+            return dateA - dateB;
           });
         },
         error: (e) => {

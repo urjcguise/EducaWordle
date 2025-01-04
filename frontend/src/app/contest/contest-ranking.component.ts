@@ -78,6 +78,34 @@ export class ContestRankingComponent implements OnInit {
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
+
+  onSortChange(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.sortStudentsRanking(selectedValue);
+  }
+
+  sortStudentsRanking(sortOption: string) {
+    switch (sortOption) {
+      case 'moreSuccess':
+        this.studentsRanking.sort((a, b) => b.rightGuess - a.rightGuess);
+        break;
+
+      case 'lessSuccess':
+        this.studentsRanking.sort((a, b) => a.rightGuess - b.rightGuess);
+        break;
+
+      case 'quicker':
+        this.studentsRanking.sort((a, b) => a.totalTime - b.totalTime);
+        break;
+
+      case 'slowest':
+        this.studentsRanking.sort((a, b) => b.totalTime - a.totalTime);
+        break;
+
+      default:
+        console.warn('Opción de ordenación no válida');
+    }
+  }
 }
 
 

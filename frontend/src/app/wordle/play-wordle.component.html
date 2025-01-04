@@ -39,6 +39,7 @@
 
         <div *ngIf="!hasMoreWords && won" class="completion-message">
             ¡Has completado todas las palabras!
+            <button (click)="navigateToStatistics()" class="navigate-statistics-button">Ver estadísticas</button>
         </div>
 
         <div class="info-msg" [class.show]="infoMsg !== ''" [class.fade-out]="fadeOutInfoMessage">

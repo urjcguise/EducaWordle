@@ -7,6 +7,7 @@ import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
 import { differenceInSeconds, format } from 'date-fns';
 import { WordleStateLog } from '../models/wordle-state-log';
+import { NavigationStart, Router } from '@angular/router';
 
 
 interface Try {
@@ -68,7 +69,7 @@ export class PlayWordleComponent {
 
   numTries!: number;
 
-  constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService) {
+  constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router) {
     this.wordleService.getWordles(history.state.contestName).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
@@ -111,7 +112,6 @@ export class PlayWordleComponent {
 
     this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     this.wordleState = new WordleState(this.wordleList.length, this.games);
-    //this.wordleStateLog = new WordleStateLog();
     this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
@@ -393,19 +393,19 @@ export class PlayWordleComponent {
         else if (value === LetterState.FULL_MATCH) acc.fullMatch++;
         return acc;
       },
-      { wrong: 0, partialMatch: 0, fullMatch: 0 } 
+      { wrong: 0, partialMatch: 0, fullMatch: 0 }
     );
-    
+
     this.wordleStateLog = {
       userName: this.tokenService.getUserName()!,
       email: '',
       dateLog: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
       wordleToGuess: this.targetWord,
       wordleInserted: this.lastWordle,
-      numTry:  this.numSubmittedTries,
+      numTry: this.numSubmittedTries,
       wordlePosition: this.currentWordleIndex + 1,
       correct: counts.fullMatch,
-      wrongPosition:  counts.partialMatch,
+      wrongPosition: counts.partialMatch,
       wrong: counts.wrong,
       state: this.won
     };
@@ -417,5 +417,9 @@ export class PlayWordleComponent {
         console.error('Error creando el nuevo log del concurso', error);
       },
     });
+  }
+
+  navigateToStatistics() {
+    this.router.navigate(['/' + this.contest.contestName + '/verEstadisticas'], { state: {competitionName: history.state.competitionName} });
   }
 }

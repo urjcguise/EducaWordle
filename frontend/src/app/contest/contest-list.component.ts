@@ -43,20 +43,17 @@ export class ContestListComponent implements OnInit {
         if (data.length == 0) {
           this.noContests = true;
         } else {
-          // Procesa los concursos y calcula los estados
           this.contests = data.map(contest => ({
             ...contest,
             startDate: new Date(contest.startDate),
             endDate: new Date(contest.endDate)
           }));
 
-          // Espera a que todas las promesas se resuelvan
           const contestsWithStatePromises = this.contests.map(async (contest) => ({
             contest,
-            state: await this.getContestState(contest) // Espera el estado de cada concurso
+            state: await this.getContestState(contest)
           }));
 
-          // Resuelve todas las promesas antes de asignar a contestsWithState
           this.contestsWithState = await Promise.all(contestsWithStatePromises);
 
           this.noContests = false;
@@ -95,7 +92,8 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToPlayWordle(contestName: string, wordleIndex: number) {
-    this.router.navigate(['/wordle'], { state: { contestName, wordleIndex } });
+    // El wordleIndex está por si se realiza la funcionalidad que se resuelvan los wordle de manera aleatoria
+    this.router.navigate(['/wordle'], { state: { contestName, wordleIndex, competitionName: this.competitionName } });
   }
 
   navigateToWatchStatistics(contestName: string) {

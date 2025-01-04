@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
-//import { NgChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login.component';
@@ -50,7 +49,6 @@ import { ContestRankingComponent } from './contest/contest-ranking.component';
     HttpClientModule,
     CommonModule,
     ReactiveFormsModule
-    //,NgChartsModule
   ],
   providers: [interceptorProvider],
   bootstrap: [AppComponent]
