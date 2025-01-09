@@ -97,7 +97,8 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToWatchStatistics(contestName: string) {
-    this.router.navigate([`/${contestName}/verEstadisticas`]);
+    console.log(this.competitionName)
+    this.router.navigate([`/${contestName}/verEstadisticas`], { state: {competitionName: this.competitionName} });
   }
 
   navigateToRanking(contestName: string) {

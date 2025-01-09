@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Game } from '../models/wordle-state';
 import { ContestService } from '../service/contest.service';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
@@ -6,14 +6,18 @@ import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
 import { TokenService } from '../service/token.service';
 import { WordleStateLog } from '../models/wordle-state-log';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-contest-statistics',
   templateUrl: './contest-statistics.component.html',
   styleUrls: ['./contest-statistics.component.css']
 })
-export class ContestStatisticsComponent implements OnInit {
+export class ContestStatisticsComponent implements OnInit, OnDestroy {
+  private subscription: Subscription = new Subscription;
+
   contestName!: string;
+  competitionName!: string;
   isProfessor: boolean = false;
   isStudent: boolean = false;
 
@@ -70,10 +74,11 @@ export class ContestStatisticsComponent implements OnInit {
   }[] = [];
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router) {
+    this.competitionName = history.state.competitionName;
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['' + history.state.competitionName + '/concursos']);
+          this.router.navigate([this.competitionName + '/concursos']);
         }
       }
     });
@@ -218,12 +223,52 @@ export class ContestStatisticsComponent implements OnInit {
 
             return dateA - dateB;
           });
+
+          this.subscription = interval(5000).subscribe(() => {
+            this.getLogs();
+          })
         },
         error: (e) => {
           console.error('Error obteniendo los logs', e);
         }
       });
     }
+  }
+
+  getLogs() {
+    this.contestService.getAllStateLog(this.contestName).subscribe({
+      next: (logs) => {
+        const updatedLogs = logs.map((log: WordleStateLog) => ({
+          student: log.userName,
+          email: log.email,
+          time: log.dateLog,
+          wordleToGuess: log.wordleToGuess,
+          wordlePosition: log.wordlePosition,
+          wordleInserted: log.wordleInserted,
+          try: log.numTry,
+          state: log.state
+        }));
+
+        this.studentsLog.length = 0; 
+        this.studentsLog.push(...updatedLogs);
+
+        this.studentsLog.sort((a, b) => {
+          const dateA = new Date(a.time).getTime();
+          const dateB = new Date(b.time).getTime();
+
+          return dateA - dateB;
+        });
+      },
+      error: (e) => {
+        console.error('Error obteniendo los logs', e);
+      }
+    });
+  }
+
+
+  ngOnDestroy(): void {
+    if (this.subscription)
+      this.subscription.unsubscribe();
   }
 
   convertTime(seconds: number) {
