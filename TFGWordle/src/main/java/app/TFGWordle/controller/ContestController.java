@@ -11,13 +11,21 @@ import app.TFGWordle.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -316,5 +324,65 @@ public class ContestController {
 
         Contest contest = contestService.getByName(contestName);
         return ResponseEntity.ok(wordleService.findByContestId(contest.getId()));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/getLogsInExcel/{contestName}")
+    public ResponseEntity<Resource> getLogsInExcel(@PathVariable String contestName) {
+        if(!contestService.existsContest(contestName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getByName(contestName);
+
+        List<String> logs = contestStateService.getAllLogsByContest(contest.getId());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        writeDataToExcel(logs, out);
+        ByteArrayResource resource = new ByteArrayResource(out.toByteArray());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=logs.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    private void writeDataToExcel(List<String> logs, ByteArrayOutputStream out) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Logs");
+
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Alumno", "Correo", "Tiempo", "Palabra adivinar", "Posición palabra", "Intento palabra", "Intento", "Estado"};
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                CellStyle cellStyle = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                cellStyle.setFont(font);
+                cell.setCellStyle(cellStyle);
+            }
+
+            int rowNum = 1;
+            for (String log : logs) {
+                WordleStateLog wsl = contestStateService.getStateLog(log);
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(wsl.getUserName());
+                row.createCell(1).setCellValue(wsl.getEmail());
+                row.createCell(2).setCellValue(wsl.getDateLog());
+                row.createCell(3).setCellValue(wsl.getWordleToGuess());
+                row.createCell(4).setCellValue(wsl.getWordlePosition());
+                row.createCell(5).setCellValue(wsl.getWordleInserted());
+                row.createCell(6).setCellValue(wsl.getNumTry());
+                row.createCell(7).setCellValue(wsl.isState() ? "Correcta" : "Incorrecta");
+            }
+
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

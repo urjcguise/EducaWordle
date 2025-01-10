@@ -91,4 +91,10 @@ export class ContestService {
   public getWordlesInContest(contestName: string) {
     return this.httpClient.get<Wordle[]>(this.apiUrl + 'getWordles/' + contestName);
   }
+
+  public getLogsInExcel(contestName: string) {
+    return this.httpClient.get(this.apiUrl + 'getLogsInExcel/' + contestName, {
+      responseType: 'blob' 
+  });
+  }
 }

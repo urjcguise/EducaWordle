@@ -249,7 +249,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
           state: log.state
         }));
 
-        this.studentsLog.length = 0; 
+        this.studentsLog.length = 0;
         this.studentsLog.push(...updatedLogs);
 
         this.studentsLog.sort((a, b) => {
@@ -284,6 +284,23 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
 
   convertTries(totalTries: number) {
     return parseFloat((totalTries / this.totalStudents).toFixed(2));
+  }
+
+  exportToExcel() {
+    this.contestService.getLogsInExcel(this.contestName).subscribe({
+      next: (docu) => {
+        const blob = new Blob([docu], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'logs.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (e) => {
+        console.error('Error obteniendo el Excel para su descarga', e);
+      }
+    })
   }
 }
 
