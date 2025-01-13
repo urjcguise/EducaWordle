@@ -9,7 +9,7 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class CompetitionService {
-  
+
   private apiUrl = 'http://localhost:9090/api/competitions/';
 
   constructor(private httpClient: HttpClient) { }
@@ -36,5 +36,9 @@ export class CompetitionService {
 
   public createUser(competitionId: number, userId: number): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + 'linkStudentToCompetition/' + competitionId + '/' + userId, null);
+  }
+
+  public addByExcel(competitionId: number, formData: FormData) {
+    return this.httpClient.post<any>(this.apiUrl + 'addStudentsByExcel/' + competitionId, formData);
   }
 }

@@ -17,10 +17,6 @@ export class UserService {
       return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + name);
     }
 
-    public addByExcel(competitionId: number, formData: FormData) {
-      return this.httpClient.post<any>(this.apiUrl + 'addStudentsByExcel/' + competitionId, formData);
-    }
-
     public getAllProfessors() {
       return this.httpClient.get<User[]>(this.apiUrl + 'getAllProfessors');
     }

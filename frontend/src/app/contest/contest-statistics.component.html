@@ -27,7 +27,7 @@
     </tbody>
   </table>
 
-  <div *ngIf="isProfessor">
+  <div *ngIf="isProfessor || isAdmin">
     <div *ngFor="let wordle of wordleStudents">
       <table class="details-table">
         <thead>

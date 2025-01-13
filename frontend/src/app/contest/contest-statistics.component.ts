@@ -20,6 +20,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   competitionName!: string;
   isProfessor: boolean = false;
   isStudent: boolean = false;
+  isAdmin: boolean = false;
 
   wordlesInContest: string[] = [];
 
@@ -88,6 +89,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     this.contestName = this.route.snapshot.paramMap.get('contestName')!;
     this.isProfessor = this.tokenService.getAuthorities().includes("ROLE_PROFESSOR");
     this.isStudent = this.tokenService.getAuthorities().includes("ROLE_STUDENT");
+    this.isAdmin = this.tokenService.getAuthorities().includes("ROLE_ADMIN");
 
     this.contestService.getContestByName(this.contestName).subscribe({
       next: (contest) => {
@@ -202,7 +204,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.isProfessor) {
+    if (this.isProfessor || this.isAdmin) {
       this.contestService.getAllStateLog(this.contestName).subscribe({
         next: (logs) => {
           logs.forEach((log: WordleStateLog) => {
@@ -265,7 +267,6 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnDestroy(): void {
     if (this.subscription)
       this.subscription.unsubscribe();
@@ -303,5 +304,3 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     })
   }
 }
-
-

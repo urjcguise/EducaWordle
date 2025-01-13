@@ -94,7 +94,7 @@ export class ContestService {
 
   public getLogsInExcel(contestName: string) {
     return this.httpClient.get(this.apiUrl + 'getLogsInExcel/' + contestName, {
-      responseType: 'blob' 
-  });
+      responseType: 'blob'
+    });
   }
 }

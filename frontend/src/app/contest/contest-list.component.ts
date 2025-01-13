@@ -21,6 +21,7 @@ export class ContestListComponent implements OnInit {
   noContests = true;
   isProfessor = false;
   isStudent = false;
+  isAdmin = false;
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) { }
 
@@ -35,6 +36,8 @@ export class ContestListComponent implements OnInit {
       this.isProfessor = true;
     if (this.tokenService.getAuthorities().includes("ROLE_STUDENT"))
       this.isStudent = true;
+    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+      this.isAdmin = true;
   }
 
   async loadContests() {
@@ -65,7 +68,6 @@ export class ContestListComponent implements OnInit {
     });
   }
 
-
   deleteContest(contestName: string) {
     const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta concurso?');
     if (confirmDelete) {
@@ -83,7 +85,7 @@ export class ContestListComponent implements OnInit {
     if (this.competitionId != null) {
       this.router.navigate([`/${contestName}/editar`]);
     } else {
-      console.error("competitionId no está definido. Verifica su inicialización.");
+      console.error("El id de la competición no está definido. Verifica su inicialización.");
     }
   }
 
@@ -98,7 +100,7 @@ export class ContestListComponent implements OnInit {
 
   navigateToWatchStatistics(contestName: string) {
     console.log(this.competitionName)
-    this.router.navigate([`/${contestName}/verEstadisticas`], { state: {competitionName: this.competitionName} });
+    this.router.navigate([`/${contestName}/verEstadisticas`], { state: { competitionName: this.competitionName } });
   }
 
   navigateToRanking(contestName: string) {

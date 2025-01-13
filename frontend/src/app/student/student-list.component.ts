@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user';
 import { CompetitionService } from '../service/competition.service';
-import { UserService } from '../service/user.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -18,7 +17,7 @@ export class StudentListComponent implements OnInit {
 
   currentTab: string = 'add-student';
 
-  constructor(private competitionService: CompetitionService, private userService: UserService, private router: Router) { }
+  constructor(private competitionService: CompetitionService, private router: Router) { }
 
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
@@ -33,7 +32,7 @@ export class StudentListComponent implements OnInit {
   }
 
   addStudent(): void {
-    this.router.navigate(['/nuevoAlumno'], { state: {competitionId: this.competitionId} });
+    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId } });
   }
 
   setTab(tab: string) {
@@ -46,7 +45,7 @@ export class StudentListComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', this.selectedFile!);
 
-    this.userService.addByExcel(this.competitionId, formData).subscribe({
+    this.competitionService.addByExcel(this.competitionId, formData).subscribe({
       next: () => {
         console.log('Alumnos creados correctamente');
       },

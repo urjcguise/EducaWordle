@@ -12,7 +12,7 @@ import { Competition } from '../models/competition';
   styleUrls: ['./edit-contest.component.css']
 })
 export class EditContestComponent {
-  
+
   contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, "", new Competition(""), []);
   contestName = "";
   dictionary: boolean = false;
@@ -81,7 +81,7 @@ export class EditContestComponent {
     this.dictionary = value;
     this.contest.useDictionary = value;
     if (!value) {
-      this.file = false; 
+      this.file = false;
     }
   }
 
@@ -111,13 +111,12 @@ export class EditContestComponent {
   }
 
   updateContest() {
-
     for (const word of this.wordles) {
       if (word == "") {
-          alert('No se puede guardar un wordle vacío');
-          return;
+        alert('No se puede guardar un wordle vacío');
+        return;
       }
-    }  
+    }
 
     const updatedContest: Contest = {
       ...this.contest,
@@ -133,7 +132,7 @@ export class EditContestComponent {
         if (this.wordles.length > 0)
           this.saveWordles();
         else
-        alert('Concurso guardado con éxito');
+          alert('Concurso guardado con éxito');
       },
       error: (err) => console.error('Error al editar concurso', err)
     });
@@ -150,10 +149,9 @@ export class EditContestComponent {
 
   trackByIndex(index: number, item: any): number {
     return index;
-  }  
+  }
 
   removeWordle(index: number) {
     this.wordles.splice(index, 1);
-}
-
+  }
 }

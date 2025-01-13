@@ -56,7 +56,7 @@ public class ContestController {
         this.objectMapper = objectMapper;
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newContest/{competitionId}")
     public ResponseEntity<Contest> createContest(@RequestBody Contest contest, @PathVariable Long competitionId) {
         if (contestService.existsContest(contest.getContestName()))
@@ -70,7 +70,7 @@ public class ContestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')|| hasRole('STUDENT')")
+    @PreAuthorize("hasRole('PROFESSOR')|| hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/{competitionName}/contests")
     public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
         if (!competitionService.existsCompetitionByName(competitionName))
@@ -81,7 +81,7 @@ public class ContestController {
         return ResponseEntity.ok(contests);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @DeleteMapping("/deleteContest/{contestName}")
     public ResponseEntity<?> deleteContest(@PathVariable("contestName") String contestName) {
         if (!contestService.existsContest(contestName))
@@ -101,7 +101,7 @@ public class ContestController {
         return ResponseEntity.ok(Map.of("message", "Concurso eliminado"));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/editContest/{contestName}")
     public ResponseEntity<?> updateContest(@PathVariable String contestName, @RequestBody Contest contest) {
         if (!contestService.existsContest(contestName))
@@ -113,7 +113,7 @@ public class ContestController {
         return ResponseEntity.ok(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/{contestName}/contest")
     public ResponseEntity<Contest> getContestByName(@PathVariable String contestName) {
         if (!contestService.existsContest(contestName))
@@ -123,7 +123,7 @@ public class ContestController {
         return ResponseEntity.ok(contest);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/copyContest/{oldContestName}")
     public ResponseEntity<Contest> copyContest(@RequestBody Contest newContest, @PathVariable String oldContestName) {
         if (contestService.existsContest(newContest.getContestName()))
@@ -217,7 +217,7 @@ public class ContestController {
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/getAllContestState/{contestName}")
     public ResponseEntity<List<UserState>> getAllContestState(@PathVariable String contestName) throws JsonProcessingException {
         if (!contestService.existsContest(contestName))
@@ -236,7 +236,7 @@ public class ContestController {
         return ResponseEntity.ok(toReturn);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getAllContestStateLogs/{contestName}")
     public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable String contestName) throws JsonProcessingException {
         if (!contestService.existsContest(contestName))
@@ -317,7 +317,7 @@ public class ContestController {
         return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/getWordles/{contestName}")
     public ResponseEntity<List<Wordle>> getWordles(@PathVariable String contestName) {
         if(!contestService.existsContest(contestName))
@@ -327,7 +327,7 @@ public class ContestController {
         return ResponseEntity.ok(wordleService.findByContestId(contest.getId()));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getLogsInExcel/{contestName}")
     public ResponseEntity<Resource> getLogsInExcel(@PathVariable String contestName) {
         if(!contestService.existsContest(contestName))

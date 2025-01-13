@@ -1,19 +1,19 @@
 <div class="contest-list">
   <h2>Concursos Disponibles</h2>
-  <div *ngIf="isProfessor">
+  <div *ngIf="isProfessor || isAdmin">
     <button class="btn btn-primary btn-sm ml-3" (click)="navigateToCreateContest()">Nuevo Concurso</button>
   </div>
 
   <div *ngIf="!noContests">
     <ul>
       <li *ngFor="let item of contestsWithState" class="contest-item d-flex align-items-center">
-        <div *ngIf="item.state !== 'upcoming' || isProfessor">
+        <div *ngIf="item.state !== 'upcoming' || isProfessor || isAdmin">
           <span class="contest-name">{{ item.contest.contestName }}</span>
           <div class="contest-details d-flex align-items-center">
             <span class="contest-date">{{ item.contest.startDate | date: 'dd/MM/yyyy HH:mm' }}</span>
             <span class="contest-date">{{ item.contest.endDate | date: 'dd/MM/yyyy HH:mm' }}</span>
 
-            <div *ngIf="isProfessor">
+            <div *ngIf="isProfessor || isAdmin">
               <button class="btn btn-danger btn-sm ml-2" (click)="deleteContest(item.contest.contestName)">
                 <i class="fas fa-trash-alt"></i>Borrar
               </button>

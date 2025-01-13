@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user';
 import { UserService } from '../service/user.service';
 import { Router } from '@angular/router';
+import { state } from '@angular/animations';
 
 @Component({
   selector: 'app-professor-list',
@@ -40,7 +41,7 @@ export class ProfessorListComponent implements OnInit {
     });
   }
 
-  navigateToWatchCompetitions(arg0: string) {
-    this.router.navigate(['/competiciones']);
+  navigateToWatchCompetitions(professorName: string) {
+    this.router.navigate(['/competiciones'], { state: {professorName} });
   }
 }

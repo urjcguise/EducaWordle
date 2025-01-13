@@ -14,6 +14,7 @@ export class CompetitionListComponent implements OnInit {
 
   isProfessor = false;
   isStudent = false;
+  isAdmin = false;
   roles: string[] = [];
 
   competitions: Competition[] = [];
@@ -33,6 +34,10 @@ export class CompetitionListComponent implements OnInit {
       } else if (rol === 'ROLE_STUDENT') {
         this.isStudent = true;
         this.loadCompetitionsStudent();
+      } else {
+        this.isAdmin = true;
+        this.professorName = history.state.professorName;
+        this.loadCompetitionsProfessor();
       }
     })
   }
