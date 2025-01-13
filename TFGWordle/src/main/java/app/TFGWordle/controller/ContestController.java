@@ -5,6 +5,7 @@ import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.dto.WordleStateLog;
 import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
+import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.*;
@@ -384,5 +385,16 @@ public class ContestController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/getaLLProfessors")
+    public ResponseEntity<List<User>> getAllProfessors() {
+        List<User> userList = userService.getAll();
+        List<User> toReturn = new ArrayList<>();
+        for (User user : userList) {
+            if (user.getRoles().contains(RolName.ROLE_ADMIN))
+                toReturn.add(user);
+        }
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 }

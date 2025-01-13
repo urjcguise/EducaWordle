@@ -19,6 +19,8 @@ export class CompetitionListComponent implements OnInit {
   competitions: Competition[] = [];
   noCompetitions = true; 
 
+  professorName: string = '';
+
   constructor(private competitionService: CompetitionService, private router: Router, private tokenService: TokenService, private userService: UserService) { }
 
   ngOnInit(): void {
@@ -26,6 +28,7 @@ export class CompetitionListComponent implements OnInit {
     this.roles.forEach(rol => {
       if (rol === 'ROLE_PROFESSOR') {
         this.isProfessor = true;
+        this.professorName = this.tokenService.getUserName()!;
         this.loadCompetitionsProfessor();
       } else if (rol === 'ROLE_STUDENT') {
         this.isStudent = true;
@@ -52,7 +55,7 @@ export class CompetitionListComponent implements OnInit {
   }
 
   loadCompetitionsProfessor(): void {
-    this.competitionService.getCompetitions().subscribe({
+    this.competitionService.getCompetitions(this.professorName).subscribe({
       next: (data) => {
         this.competitions = data;
       },

@@ -60,13 +60,11 @@ public class CompetitionController {
         return new ResponseEntity<>(Map.of("message", "Competición creada exitosamente"), HttpStatus.CREATED);
     }
 
-    @GetMapping("/getCompetitions")
-    public ResponseEntity<List<Competition>> getCompetitions() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        User professor = userService.getByUserName(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @GetMapping("/getCompetitions/{professorName}")
+    public ResponseEntity<List<Competition>> getCompetitions(@PathVariable String professorName) {
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profesor no encontrado"));
 
         List<Competition> competitions = competitionService.getCompetitionsByProfesor(professor);
         return new ResponseEntity<>(competitions, HttpStatus.OK);

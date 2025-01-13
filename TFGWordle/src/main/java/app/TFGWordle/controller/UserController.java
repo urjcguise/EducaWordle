@@ -42,6 +42,16 @@ public class UserController {
         this.competitionService = competitionService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/deleteStudentsByName/{userName}")
+    public ResponseEntity<?> deleteStudentsByName(@PathVariable String userName) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        User userToDelete = userService.getByUserName(userName).get();
+        userService.deleteUser(userToDelete);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getCompetitions/{userName}")
     public ResponseEntity<List<Competition>> getCompetition(@PathVariable String userName) {
@@ -99,6 +109,19 @@ public class UserController {
         } else {
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/getAllProfessors")
+    public ResponseEntity<List<User>> getAllProfessors() {
+        List<User> userList = userService.getAll();
+        List<User> toReturn = new ArrayList<>();
+        Rol rolProfessor = new Rol(RolName.ROLE_PROFESSOR);
+        for (User user : userList) {
+            if (user.getRoles().contains(rolProfessor))
+                toReturn.add(user);
+        }
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     private boolean isRowEmpty(Row row) {

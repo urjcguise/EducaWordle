@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,6 +40,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
                     //logger.info("Cargando detalles del usuario...");
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+                    for (GrantedAuthority authority : userDetails.getAuthorities()) {
+                        String authority1 = authority.getAuthority();
+                        logger.info("Autenticando: {}", authority1);
+                    }
+
                     //logger.info("Detalles del usuario cargados.");
 
                     //logger.info("Creando objeto de autenticación...");

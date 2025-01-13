@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Competition } from "../models/competition";
+import { User } from "../models/user";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,15 @@ export class UserService {
       return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + name);
     }
 
-    addByExcel(competitionId: number, formData: FormData) {
+    public addByExcel(competitionId: number, formData: FormData) {
       return this.httpClient.post<any>(this.apiUrl + 'addStudentsByExcel/' + competitionId, formData);
+    }
+
+    public getAllProfessors() {
+      return this.httpClient.get<User[]>(this.apiUrl + 'getAllProfessors');
+    }
+
+    public deleteUser(userName: string) {
+      return this.httpClient.post<any>(this.apiUrl + 'deleteStudentsByName/' + userName, null);
     }
   }

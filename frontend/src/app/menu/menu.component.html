@@ -10,7 +10,7 @@
           <a class="nav-link" routerLink="/login"><i class="far fa-list-alt"></i> Iniciar Sesión</a>
         </li>
         <li class="nav-item" *ngIf="!isLogged">
-          <a class="nav-link"  routerLink="/register"><i class="fas fa-plus-circle"></i> Registro</a>
+          <a class="nav-link"  routerLink="/registrar"><i class="fas fa-plus-circle"></i> Registro</a>
         </li>
         <li class="nav-item" *ngIf="isLogged" (click)="onLogOut()">
             <a class="nav-link" style="cursor: pointer;"><i class="fas fa-door-open"></i> Cerrar Sesión</a>
