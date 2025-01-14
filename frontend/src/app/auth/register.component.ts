@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
 
     this.newUser = new NewUser(this.userName, this.email, this.password, roles);
     const observer: Observer<any> = {
-      next: (data) => {
+      next: () => {
         console.log('Cuenta creada exitosamente');
         this.router.navigate(['/']);
       },

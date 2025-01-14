@@ -14,20 +14,22 @@ import { StudentListComponent } from './student/student-list.component';
 import { NewStudentComponent } from './student/new-student.component';
 import { ContestStatisticsComponent } from './contest/contest-statistics.component';
 import { ContestRankingComponent } from './contest/contest-ranking.component';
-import { ProfessorListComponent } from './professor/professor-list.component';
 import { NewProfessorComponent } from './professor/new-professor.component';
+import { UserListComponent } from './user/user-list.component';
+import { EditUserComponent } from './user/edit-user.component';
 
 const routes: Routes = [
   {path: '', component: IndexComponent},
   {path: 'login', component: LoginComponent},
   {path: 'registrar', component: RegisterComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},
-  {path: 'profesores', component: ProfessorListComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},
+  {path: 'usuarios', component: UserListComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},
   {path: 'wordle', component: PlayWordleComponent, canActivate: [guard], data: { expectedRol: ['student'] }},
   {path: 'nuevaCompeticion', component: CompetitionComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: 'competiciones', component: CompetitionListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] }},
   {path: 'nuevoConcurso', component: ContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] }},
-  {path: ':contestName/editar', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
+  {path: ':contestName/editarConcurso', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
+  {path: ':userName/editarUsuario', component: EditUserComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},
   {path: ':competitionName/alumnos', component: StudentListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: 'nuevoAlumno', component: NewStudentComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: 'nuevoProfesor', component: NewProfessorComponent, canActivate: [guard], data: { expectedRol: ['admin'] }},

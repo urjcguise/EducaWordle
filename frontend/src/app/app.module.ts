@@ -22,8 +22,9 @@ import { StudentListComponent } from './student/student-list.component';
 import { NewStudentComponent } from './student/new-student.component';
 import { ContestStatisticsComponent } from './contest/contest-statistics.component';
 import { ContestRankingComponent } from './contest/contest-ranking.component';
-import { ProfessorListComponent } from './professor/professor-list.component';
 import { NewProfessorComponent } from './professor/new-professor.component';
+import { UserListComponent } from './user/user-list.component';
+import { EditUserComponent } from './user/edit-user.component';
 
 
 @NgModule({
@@ -43,8 +44,9 @@ import { NewProfessorComponent } from './professor/new-professor.component';
     NewStudentComponent,
     ContestStatisticsComponent,
     ContestRankingComponent,
-    ProfessorListComponent,
-    NewProfessorComponent
+    NewProfessorComponent,
+    UserListComponent,
+    EditUserComponent
   ],
   imports: [
     BrowserModule,

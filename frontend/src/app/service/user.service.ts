@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Competition } from "../models/competition";
 import { User } from "../models/user";
+import { NewUser } from "../models/new-user";
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +22,19 @@ export class UserService {
       return this.httpClient.get<User[]>(this.apiUrl + 'getAllProfessors');
     }
 
+    public getAllStudents() {
+      return this.httpClient.get<User[]>(this.apiUrl + 'getAllStudents');
+    }
+
     public deleteUser(userName: string) {
       return this.httpClient.post<any>(this.apiUrl + 'deleteStudentsByName/' + userName, null);
+    }
+
+    public getUserData(userName: string) {
+      return this.httpClient.get<User>(this.apiUrl + 'getUserData/' + userName);
+    }
+
+    public updateUser(oldUserName: string, uploadUser: NewUser) {
+      return this.httpClient.post<any>(this.apiUrl + 'updateUser/' + oldUserName, uploadUser);
     }
   }
