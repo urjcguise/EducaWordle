@@ -70,12 +70,16 @@ export class CompetitionListComponent implements OnInit {
     });
   }
 
+  createCompetition() {
+    this.router.navigate(['/nuevaCompeticion'], { state: {professorName: this.professorName} });
+  }
+
   viewContests(competitionName: string, competitionId: number): void {
     this.router.navigate(['/' + competitionName + '/concursos'], { state: {competitionId} });
   }
 
   deleteCompetition(id: number): void {
-    const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta competición?');
+    const confirmDelete = confirm('¿Está seguro de que desea eliminar esta competición?');
     if (confirmDelete) {
       this.competitionService.deleteCompetition(id).subscribe({
         next: () => {

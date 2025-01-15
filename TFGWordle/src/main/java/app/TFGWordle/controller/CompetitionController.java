@@ -59,19 +59,18 @@ public class CompetitionController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/newCompetition")
-    public ResponseEntity<?> createCompetition(@RequestBody Competition competition) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    @PostMapping("/newCompetition/{professorName}")
+    public ResponseEntity<?> createCompetition(@PathVariable String professorName, @RequestBody Competition competition) {
+        if (!userService.existsByUserName(professorName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+
+        User professor = userService.getByUserName(professorName).get();
 
         if (competitionService.existsCompetitionByName(competition.getCompetitionName()))
             return new ResponseEntity<>("Nombre ya utilizado", HttpStatus.CONFLICT);
 
-        User professor = userService.getByUserName(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
-
         competition.setProfessor(professor);
-        competitionService.save(competition, professor);
+        competitionService.save(competition);
 
         return new ResponseEntity<>(Map.of("message", "Competición creada exitosamente"), HttpStatus.CREATED);
     }

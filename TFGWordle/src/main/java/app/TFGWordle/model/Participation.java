@@ -3,6 +3,8 @@ package app.TFGWordle.model;
 import app.TFGWordle.security.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "participation")
@@ -14,11 +16,13 @@ public class Participation {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private User student;
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Competition competition;
 

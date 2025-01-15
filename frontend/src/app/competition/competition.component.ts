@@ -11,8 +11,10 @@ import { Competition } from '../models/competition';
 export class CompetitionComponent {
 
   competitionForm: FormGroup;
+  professorName: string = '';
 
   constructor(private fb: FormBuilder, private competitionService: CompetitionService) {
+    this.professorName = history.state.professorName;
     this.competitionForm = this.fb.group({
       competitionName: ['', Validators.required]
     });
@@ -21,7 +23,7 @@ export class CompetitionComponent {
   onSubmit(): void {
     if (this.competitionForm.valid) {
       const newCompetition: Competition = this.competitionForm.value;
-      this.competitionService.createCompetition(newCompetition).subscribe({
+      this.competitionService.createCompetition(newCompetition, this.professorName).subscribe({
         next: (res) => {
           console.log('Competición creada:', res);
           alert('Competición creada con éxito.');

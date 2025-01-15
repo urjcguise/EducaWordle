@@ -2,6 +2,8 @@ package app.TFGWordle.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="wordle")
@@ -15,6 +17,7 @@ public class Wordle {
 
     @ManyToOne
     @JoinColumn(name = "contest_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Contest contest;
 

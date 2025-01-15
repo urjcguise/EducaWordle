@@ -27,7 +27,7 @@ export class UserService {
     }
 
     public deleteUser(userName: string) {
-      return this.httpClient.post<any>(this.apiUrl + 'deleteStudentsByName/' + userName, null);
+      return this.httpClient.post<any>(this.apiUrl + 'deleteUserByName/' + userName, null);
     }
 
     public getUserData(userName: string) {

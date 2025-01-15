@@ -64,7 +64,7 @@ public class ContestController {
 
         Competition competition = competitionService.getCompetitionById(competitionId);
         contest.setCompetition(competition);
-        contest.setNumTries(3);
+        contest.setNumTries(6);
         contest.setUseDictionary(false);
         contest.setUseExternalFile(false);
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));

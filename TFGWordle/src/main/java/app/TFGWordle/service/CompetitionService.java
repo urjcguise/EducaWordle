@@ -16,25 +16,12 @@ public class CompetitionService {
     @Autowired
     private CompetitionRepository competitionRepository;
 
-    public Competition save(Competition competition, User professor) {
-        if (isProfessor(professor)) {
-            return competitionRepository.save(competition);
-        } else {
-            throw new RuntimeException("El usuario no tiene permisos para crear la competición");
-        }
-    }
-
-    private boolean isProfessor(User user) {
-        for (Rol rol : user.getRoles()) {
-            if (rol.getRolName().name().equals("ROLE_PROFESSOR"))
-                return true;
-        }
-        return false;
+    public Competition save(Competition competition) {
+        return competitionRepository.save(competition);
     }
 
     public List<Competition> getCompetitionsByProfesor(User professor) {
         return competitionRepository.findByProfessor(professor);
-
     }
 
     public Competition getCompetitionByName(String name) {

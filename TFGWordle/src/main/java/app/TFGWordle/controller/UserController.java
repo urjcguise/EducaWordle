@@ -27,14 +27,15 @@ public class UserController {
     private final UserService userService;
     private final ParticipationService participationService;
 
+
     public UserController(UserService userService, ParticipationService participationService) {
         this.userService = userService;
         this.participationService = participationService;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/deleteStudentsByName/{userName}")
-    public ResponseEntity<?> deleteStudentsByName(@PathVariable String userName) {
+    @PostMapping("/deleteUserByName/{userName}")
+    public ResponseEntity<?> deleteUserByName(@PathVariable String userName) {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         User userToDelete = userService.getByUserName(userName).get();

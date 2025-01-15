@@ -38,16 +38,33 @@ export class UserListComponent implements OnInit {
   addProfessor() {
     this.router.navigate(['/nuevoProfesor']);
   }
-  
+
   deleteProfessor(professorName: string) {
-    this.userService.deleteUser(professorName).subscribe({
-      next: () => {
-        alert('Profesor eliminado correctamente');
-      },
-      error: (e) => {
-        console.log('Error eliminando al profesor', e);
-      }
-    });
+    const confirmDelete = confirm('¿Está seguro de que desea eliminar este profesor?');
+    if (confirmDelete) {
+      this.userService.deleteUser(professorName).subscribe({
+        next: () => {
+          alert('Profesor eliminado correctamente');
+        },
+        error: (e) => {
+          console.log('Error eliminando al profesor', e);
+        }
+      });
+    }
+  }
+
+  deleteStudent(studentName: string) {
+    const confirmDelete = confirm('¿Está seguro de que desea eliminar este alumno?');
+    if (confirmDelete) {
+      this.userService.deleteUser(studentName).subscribe({
+        next: () => {
+          alert('Alumno eliminado correctamente');
+        },
+        error: (e) => {
+          console.log('Error eliminando al alumno', e);
+        }
+      });
+    }
   }
 
   navigateToWatchCompetitions(professorName: string) {

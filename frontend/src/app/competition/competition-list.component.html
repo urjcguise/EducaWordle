@@ -1,7 +1,7 @@
 <div class="competition-list">
   <h2>Competiciones Disponibles</h2>
   <div *ngIf="isProfessor || isAdmin">
-    <button class="btn btn-primary btn-sm ml-3" routerLink="/nuevaCompeticion">
+    <button class="btn btn-primary btn-sm ml-3" (click)="createCompetition()">
       <i class="fas fa-plus-circle"></i> Comenzar competición
     </button>
     <br>

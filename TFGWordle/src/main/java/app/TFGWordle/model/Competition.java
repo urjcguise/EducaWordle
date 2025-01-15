@@ -2,6 +2,8 @@ package app.TFGWordle.model;
 
 import app.TFGWordle.security.entity.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +18,7 @@ public class Competition {
     private String name;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
     private User professor;
 
