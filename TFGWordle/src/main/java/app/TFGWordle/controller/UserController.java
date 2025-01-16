@@ -107,4 +107,12 @@ public class UserController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getUserEmail/{userName}")
+    public ResponseEntity<String> getUserEmail(@PathVariable String userName) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userService.getByUserName(userName).get().getEmail(), HttpStatus.OK);
+    }
 }

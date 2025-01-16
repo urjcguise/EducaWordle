@@ -7,7 +7,8 @@ import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
 import { differenceInSeconds, format } from 'date-fns';
 import { WordleStateLog } from '../models/wordle-state-log';
-import { NavigationStart, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { UserService } from '../service/user.service';
 
 
 interface Try {
@@ -69,7 +70,9 @@ export class PlayWordleComponent {
 
   numTries!: number;
 
-  constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router) {
+  userEmail: string = '';
+
+  constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
     this.wordleService.getWordles(history.state.contestName).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
@@ -104,6 +107,15 @@ export class PlayWordleComponent {
   }
 
   private initializeState() {
+
+    this.userService.getEmail(this.tokenService.getUserName()!).subscribe({
+      next: (email) => {
+        this.userEmail = email;
+      }, 
+      error: (e) => {
+        console.error('Error obteniendo el email', e)
+      }
+    });
 
     this.wordleList.forEach((item) => {
       const newGame = new Game(item.word);
@@ -386,6 +398,7 @@ export class PlayWordleComponent {
   }
 
   private uploadNewLog(): void {
+
     const counts = Object.values(this.curLetterStates).reduce(
       (acc, value) => {
         if (value === LetterState.WRONG) acc.wrong++;
@@ -398,7 +411,7 @@ export class PlayWordleComponent {
 
     this.wordleStateLog = {
       userName: this.tokenService.getUserName()!,
-      email: '',
+      email: this.userEmail,
       dateLog: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
       wordleToGuess: this.targetWord,
       wordleInserted: this.lastWordle,
@@ -420,6 +433,6 @@ export class PlayWordleComponent {
   }
 
   navigateToStatistics() {
-    this.router.navigate(['/' + this.contest.contestName + '/verEstadisticas'], { state: {competitionName: history.state.competitionName} });
+    this.router.navigate(['/' + this.contest.contestName + '/verEstadisticas'], { state: { competitionName: history.state.competitionName } });
   }
 }
