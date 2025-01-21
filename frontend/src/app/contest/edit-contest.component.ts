@@ -5,6 +5,7 @@ import { ContestService } from '../service/contest.service';
 import { Wordle } from '../models/wordle';
 import { WordleService } from '../service/wordle.service';
 import { Competition } from '../models/competition';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-edit-contest',
@@ -13,11 +14,14 @@ import { Competition } from '../models/competition';
 })
 export class EditContestComponent {
 
+  professorName: string = '';
+
   contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, "", new Competition(""), []);
   contestName = "";
   dictionary: boolean = false;
   file: boolean = false;
   wordles: string[] = [];
+  initialWordles: string[] = [];
   numTries: number = 0;
 
   formattedStartDate: string = "";
@@ -25,9 +29,11 @@ export class EditContestComponent {
 
   competition!: Competition;
 
-  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService) { }
+  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private tokenService: TokenService) { }
 
   ngOnInit(): void {
+    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
+      this.professorName = this.tokenService.getUserName()!;
     const contestNameParam = this.route.snapshot.paramMap.get('contestName');
     this.contestName = contestNameParam || '';
     this.loadContest();
@@ -49,12 +55,14 @@ export class EditContestComponent {
   }
 
   getWordles(): void {
-    this.wordleService.getWordles(this.contestName).subscribe({
+    this.wordleService.getWordlesByContest(this.contestName).subscribe({
       next: (data: Wordle[]) => {
         if (data && data.length > 0) {
           this.wordles = data.map((elem) => elem.word);
+          this.initialWordles = data.map((elem) => elem.word);
         } else {
           this.wordles = [''];
+          this.initialWordles = [''];
         }
       },
       error: (err) => console.error('Error al obtener Wordles', err)
@@ -139,9 +147,18 @@ export class EditContestComponent {
   }
 
   saveWordles() {
-    this.wordleService.saveWordles(this.wordles, this.contest.contestName).subscribe({
+    
+    this.wordleService.deleteWordles(this.initialWordles).subscribe({
+      next: () => {
+        console.log('Wordles eliminados con éxito');
+      },
+      error: (err) => console.error('Error al eliminar Wordles', err)
+    });
+
+    this.wordleService.saveWordles(this.wordles, this.contest.contestName, this.professorName, '').subscribe({
       next: () => {
         alert('Concurso y Wordles guardados con éxito');
+        this.initialWordles = [...this.wordles];
       },
       error: (err) => console.error('Error al editar Wordles', err)
     });

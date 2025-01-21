@@ -77,7 +77,7 @@ public class CompetitionController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getCompetitions/{professorName}")
-    public ResponseEntity<List<Competition>> getCompetitions(@PathVariable String professorName) {
+    public ResponseEntity<List<Competition>> getCompetitionsByProfessor(@PathVariable String professorName) {
         User professor = userService.getByUserName(professorName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profesor no encontrado"));
 

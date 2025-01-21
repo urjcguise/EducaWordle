@@ -60,7 +60,7 @@ export class CompetitionListComponent implements OnInit {
   }
 
   loadCompetitionsProfessor(): void {
-    this.competitionService.getCompetitions(this.professorName).subscribe({
+    this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (data) => {
         this.competitions = data;
       },

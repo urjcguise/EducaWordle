@@ -70,7 +70,7 @@ public class ContestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')|| hasRole('STUDENT') || hasRole('ADMIN')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/{competitionName}/contests")
     public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
         if (!competitionService.existsCompetitionByName(competitionName))

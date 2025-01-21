@@ -20,8 +20,8 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'newContest/' + competitionId, contest);
   }
 
-  public getContestsByCompetition(competitionName: string): Observable<any[]> {
-    return this.httpClient.get<any[]>(this.apiUrl + competitionName + '/contests');
+  public getContestsByCompetition(competitionName: string): Observable<Contest[]> {
+    return this.httpClient.get<Contest[]>(this.apiUrl + competitionName + '/contests');
   }
 
   public deleteContest(contestName: string) {

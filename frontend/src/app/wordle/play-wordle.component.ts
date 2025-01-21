@@ -73,7 +73,7 @@ export class PlayWordleComponent {
   userEmail: string = '';
 
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
-    this.wordleService.getWordles(history.state.contestName).subscribe({
+    this.wordleService.getWordlesByContest(history.state.contestName).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
         this.targetWords = this.wordleList.map((wordle) => wordle.word);

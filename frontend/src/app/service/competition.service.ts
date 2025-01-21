@@ -18,7 +18,7 @@ export class CompetitionService {
     return this.httpClient.post<any>(this.apiUrl + 'newCompetition/' + professorName, competition);
   }
 
-  public getCompetitions(professorName: string): Observable<Competition[]> {
+  public getCompetitionsByProfessor(professorName: string): Observable<Competition[]> {
     return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + professorName);
   }
 
