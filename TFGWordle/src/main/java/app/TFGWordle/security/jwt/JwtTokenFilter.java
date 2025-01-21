@@ -42,7 +42,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
                     for (GrantedAuthority authority : userDetails.getAuthorities()) {
                         String authority1 = authority.getAuthority();
-                        logger.info("Autenticando: {}", authority1);
+                        //logger.info("Autenticando: {}", authority1);
                     }
 
                     //logger.info("Detalles del usuario cargados.");

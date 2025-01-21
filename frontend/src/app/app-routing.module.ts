@@ -17,6 +17,10 @@ import { ContestRankingComponent } from './contest/contest-ranking.component';
 import { NewProfessorComponent } from './professor/new-professor.component';
 import { UserListComponent } from './user/user-list.component';
 import { EditUserComponent } from './user/edit-user.component';
+import { WordleListComponent } from './wordle/wordle-list.component';
+import { WordleComponent } from './wordle/wordle.component';
+import { EditWordleComponent } from './wordle/edit-wordle.component';
+import { FolderListComponent } from './folder/folder-list.component';
 
 const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -26,6 +30,10 @@ const routes: Routes = [
   {path: 'wordle', component: PlayWordleComponent, canActivate: [guard], data: { expectedRol: ['student'] }},
   {path: 'nuevaCompeticion', component: CompetitionComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: 'competiciones', component: CompetitionListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] }},
+  {path: 'wordles', component: WordleListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
+  {path: ':folderName/wordles', component: FolderListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
+  {path: ':professorName/nuevosWordles', component: WordleComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
+  {path: ':wordle/editarWordle', component: EditWordleComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: 'nuevoConcurso', component: ContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},
   {path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] }},
   {path: ':contestName/editarConcurso', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] }},

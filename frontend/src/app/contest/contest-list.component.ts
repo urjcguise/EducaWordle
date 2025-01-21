@@ -23,6 +23,8 @@ export class ContestListComponent implements OnInit {
   isStudent = false;
   isAdmin = false;
 
+  professorName: string = '';
+
   constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) { }
 
   ngOnInit() {
@@ -32,8 +34,10 @@ export class ContestListComponent implements OnInit {
       console.error('No se encontró la competición');
     }
     this.loadContests();
-    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
+    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR")) {
       this.isProfessor = true;
+      this.professorName = this.tokenService.getUserName()!;
+    }
     if (this.tokenService.getAuthorities().includes("ROLE_STUDENT"))
       this.isStudent = true;
     if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
@@ -136,8 +140,6 @@ export class ContestListComponent implements OnInit {
     }
   }
 
-
-
   copyContest(oldContest: Contest) {
 
     const now = new Date();
@@ -159,7 +161,7 @@ export class ContestListComponent implements OnInit {
     this.contestService.copyContest(newContest, oldContest.contestName).subscribe({
       next: () => {
         const wordStrings: string[] = oldContest.wordles.map(wordle => wordle.word);
-        this.wordleService.saveWordles(wordStrings, newContest.contestName).subscribe({
+        this.wordleService.saveWordles(wordStrings, newContest.contestName, this.professorName, '').subscribe({
           next: () => {
             alert("Concurso copiado correctamente");
           },

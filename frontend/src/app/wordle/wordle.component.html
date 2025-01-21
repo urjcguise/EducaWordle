@@ -1,0 +1,19 @@
+<div class="container">
+
+    <h1>Crear nuevos wordle</h1>
+    <h5>Se pueden crear hasta 10 wordle</h5>
+
+    <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex">
+        <input type="text" placeholder="Nuevo Wordle" [(ngModel)]="wordles[i]" class="wordle-input" />
+        <button type="button" class="delete-wordle-button" (click)="removeWordle(i)">
+            🗑️
+        </button>
+    </div>
+    <button (click)="addWordle()" [disabled]="wordles.length >= 10">
+        Añadir Wordle
+    </button>
+
+    <br>
+    <br>
+    <button (click)="createWordles()">Guardar wordles</button>
+</div>

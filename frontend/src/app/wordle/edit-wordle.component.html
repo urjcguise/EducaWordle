@@ -1,0 +1,23 @@
+<div class="wordle-container">
+    <h2>Editar Wordle</h2>
+
+    <div>
+        <input type="text" id="wordle" [(ngModel)]="wordle" class="name-input" />
+    </div>
+
+    <div *ngFor="let competition of competitionWithContest">
+        <strong>{{competition.competition.competitionName}}</strong>
+        <div *ngFor="let contest of competition.contests" class="contest-item">
+            <input 
+                type="checkbox" 
+                [checked]="isContestSelected(contest.contest)" 
+                (change)="toggleContestSelection(contest.contest)"
+            />
+            <span>{{contest.contest.contestName}}</span>
+        </div>
+    </div>
+
+    <div>
+        <button (click)="updateWordle()">Guardar wordle</button>
+    </div>
+</div>

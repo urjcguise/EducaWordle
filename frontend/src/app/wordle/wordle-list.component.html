@@ -1,0 +1,41 @@
+<div class="wordle-container">
+    <h2>Lista de Wordles</h2>
+    <div class="button-group">
+        <button *ngIf="canCreateWordle" (click)="createWordle()">Crear wordle</button>
+        <button *ngIf="canEditWordle" (click)="editWordle()">Editar wordle</button>
+        <button *ngIf="canCreateFolder" (click)="createFolderPushed()">Crear carpeta</button>
+        <div class="button-with-dropdown" *ngIf="canMoveWordle">
+            <button (click)="moveWordle()">Mover a carpeta</button>
+            <div *ngIf="dropdownVisible" class="dropdown">
+                <ul>
+                    <li *ngFor="let folder of folderOptions" (click)="selectFolderToMove(folder.name)">
+                        {{ folder.name }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <button *ngIf="canDeleteWordle" (click)="deleteWordleAndFolder()">Borrar</button>
+    </div>
+
+    <ul class="wordle-list">
+        <div *ngIf="isCreatingFolder" class="folder-name-input">
+            <input type="text" placeholder="Nombre de la carpeta" [(ngModel)]="folderName"
+                (keyup.enter)="createFolder()" />
+        </div>
+
+        <li *ngFor="let folder of folderList; let i = index" [class.selected]="selectedFolders.includes(i)"
+            (click)="toggleFolderSelection(i)" (dblclick)="enterFolder(i)">
+            <i class="fas fa-folder"></i>
+            <span *ngIf="!isEditingFolder[i]" (dblclick)="editFolderPushed(i); $event.stopPropagation()">
+                {{ folder.name }}
+            </span>
+            <input *ngIf="isEditingFolder[i]" type="text" [(ngModel)]="folder.name" (keyup.enter)="editFolder(i)" />
+        </li>
+
+
+        <li *ngFor="let wordle of wordleList; let i = index" [class.selected]="selectedWordles.includes(i)"
+            (click)="toggleWordleSelection(i)">
+            <span>{{ wordle.word }}</span>
+        </li>
+    </ul>
+</div>

@@ -19,7 +19,7 @@ public class WordleService {
     }
 
     public void deleteByContestId(Long id) {
-        wordleRepository.deleteByContestId(id);
+        wordleRepository.deleteByContestsId(id);
     }
 
     public List<Wordle> saveAll(List<Wordle> wordles) {
@@ -27,6 +27,26 @@ public class WordleService {
     }
 
     public List<Wordle> findByContestId(Long id) {
-        return wordleRepository.findByContestId(id);
+        return wordleRepository.findByContestsId(id);
+    }
+
+    public List<Wordle> findByProfessorId(Long id) {
+        return wordleRepository.findByUserId(id);
+    }
+
+    public boolean existsByWord(String word) {
+        return wordleRepository.findByWord(word).isPresent();
+    }
+
+    public Wordle getByWord(String word) {
+        return wordleRepository.findByWord(word).get();
+    }
+
+    public void save(Wordle wordle) {
+        wordleRepository.save(wordle);
+    }
+
+    public void delete(Wordle wordle) {
+        wordleRepository.delete(wordle);
     }
 }

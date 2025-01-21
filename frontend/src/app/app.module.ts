@@ -25,6 +25,10 @@ import { ContestRankingComponent } from './contest/contest-ranking.component';
 import { NewProfessorComponent } from './professor/new-professor.component';
 import { UserListComponent } from './user/user-list.component';
 import { EditUserComponent } from './user/edit-user.component';
+import { WordleListComponent } from './wordle/wordle-list.component';
+import { WordleComponent } from './wordle/wordle.component';
+import { EditWordleComponent } from './wordle/edit-wordle.component';
+import { FolderListComponent } from './folder/folder-list.component';
 
 
 @NgModule({
@@ -46,7 +50,11 @@ import { EditUserComponent } from './user/edit-user.component';
     ContestRankingComponent,
     NewProfessorComponent,
     UserListComponent,
-    EditUserComponent
+    EditUserComponent,
+    WordleListComponent,
+    WordleComponent,
+    EditWordleComponent,
+    FolderListComponent
   ],
   imports: [
     BrowserModule,

@@ -4,10 +4,13 @@ import app.TFGWordle.model.Wordle;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WordleRepository extends JpaRepository<Wordle, Long> {
-    Wordle findByWord(String word);
-    void deleteByContestId(Long id);
+    Optional<Wordle> findByWord(String word);
+    void deleteByContestsId(Long id);
 
-    List<Wordle> findByContestId(Long id);
+    List<Wordle> findByContestsId(Long id);
+
+    List<Wordle> findByUserId(Long id);
 }

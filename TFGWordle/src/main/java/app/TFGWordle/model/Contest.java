@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Contest {
@@ -29,7 +30,12 @@ public class Contest {
     @JsonIgnore
     private Competition competition;
 
-    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "contest_wordle",
+            joinColumns = @JoinColumn(name = "contest_id"),
+            inverseJoinColumns = @JoinColumn(name = "wordle_id")
+    )
     private List<Wordle> wordles = new ArrayList<>();
 
 
@@ -43,6 +49,19 @@ public class Contest {
         this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contest contest = (Contest) o;
+        return numTries == contest.numTries && Objects.equals(id, contest.id) && Objects.equals(name, contest.name) && Objects.equals(startDate, contest.startDate) && Objects.equals(endDate, contest.endDate) && Objects.equals(useDictionary, contest.useDictionary) && Objects.equals(useExternalFile, contest.useExternalFile) && Objects.equals(competition, contest.competition) && Objects.equals(wordles, contest.wordles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, startDate, endDate, numTries, useDictionary, useExternalFile, competition, wordles);
     }
 
     public void setId(Long id) {
