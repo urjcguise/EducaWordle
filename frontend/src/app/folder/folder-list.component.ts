@@ -3,7 +3,6 @@ import { Wordle } from '../models/wordle';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Folder } from '../models/folder';
 import { WordleService } from '../service/wordle.service';
-import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-folder-list',
@@ -36,15 +35,12 @@ export class FolderListComponent implements OnInit {
   folderSelected: string = '';
   dropdownVisible: boolean = false;
 
-  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router, private tokenService: TokenService) { }
+  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
       this.folderName = paramMap.get('folderName') || '';
-      if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR")) {
-        this.professorName = this.tokenService.getUserName()!;
-      }
-
+      this.professorName = history.state.professorName;
       this.wordleService.getFoldersByFolderName(this.folderName).subscribe({
         next: (folders) => {
           this.folderList = folders;
@@ -67,19 +63,19 @@ export class FolderListComponent implements OnInit {
   }
 
   @HostListener('document:click', ['$event'])
-    onDocumentClick(event: Event): void {
-      const targetElement = event.target as HTMLElement;
-  
-      if (!targetElement.closest('.wordle-list') && !targetElement.closest('.button-group')) {
-        this.deselectAll();
-      }
+  onDocumentClick(event: Event): void {
+    const targetElement = event.target as HTMLElement;
+
+    if (!targetElement.closest('.wordle-list') && !targetElement.closest('.button-group')) {
+      this.deselectAll();
     }
-  
-    deselectAll(): void {
-      this.selectedFolders = [];
-      this.selectedWordles = [];
-      this.updateButtonStates();
-    }
+  }
+
+  deselectAll(): void {
+    this.selectedFolders = [];
+    this.selectedWordles = [];
+    this.updateButtonStates();
+  }
 
   toggleFolderSelection(index: number): void {
     const selectedIndex = this.selectedFolders.indexOf(index);
@@ -106,7 +102,7 @@ export class FolderListComponent implements OnInit {
     this.canEditWordle = this.selectedWordles.length == 1 && this.selectedFolders.length == 0;
     this.canCreateFolder = this.selectedWordles.length == 0 && this.selectedFolders.length == 0;
     this.canEditFolder = this.selectedFolders.length == 1;
-    this.canMoveWordle = this.selectedWordles.length > 0 && this.selectedFolders.length == 0;
+    this.canMoveWordle = this.selectedWordles.length > 0 && this.selectedFolders.length == 0 && this.folderList.length > 0;
     this.canDeleteWordle = this.selectedWordles.length > 0 || this.selectedFolders.length > 0;
   }
 
@@ -118,7 +114,7 @@ export class FolderListComponent implements OnInit {
     if (this.selectedWordles.length === 1) {
       const selectedIndex = this.selectedWordles[0];
       const selectedWordle = this.wordleList[selectedIndex];
-      this.router.navigate([`/${selectedWordle.word}/editarWordle`]);
+      this.router.navigate([`/${selectedWordle.word}/editarWordle`], { state: { professorName: this.professorName } });
     }
   }
 
@@ -144,7 +140,7 @@ export class FolderListComponent implements OnInit {
   }
 
   createFolder() {
-    if (this.folderName && this.folderName.trim().length > 0) {
+    if (this.newFolderName && this.newFolderName.trim().length > 0) {
       this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.folderName).subscribe({
         next: () => {
           console.log('Carpeta creada correctamente');
@@ -155,12 +151,12 @@ export class FolderListComponent implements OnInit {
         }
       });
       this.isCreatingFolder = false;
-      this.folderName = '';
+      this.newFolderName = '';
     }
   }
 
   enterFolder(i: number) {
-    this.router.navigate(['/' + this.folderList[i].name + '/wordles']);
+    this.router.navigate(['/' + this.folderList[i].name + '/wordles'], { state: { professorName: this.professorName } });
   }
 
   moveWordle() {

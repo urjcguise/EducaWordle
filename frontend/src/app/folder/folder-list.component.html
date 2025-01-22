@@ -19,7 +19,7 @@
 
     <ul class="wordle-list">
         <div *ngIf="isCreatingFolder" class="folder-name-input">
-            <input type="text" placeholder="Nombre de la carpeta" [(ngModel)]="folderName"
+            <input type="text" placeholder="Nombre de la carpeta" [(ngModel)]="newFolderName"
                 (keyup.enter)="createFolder()" />
         </div>
 

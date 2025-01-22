@@ -33,6 +33,8 @@ export class EditWordleComponent implements OnInit {
     this.wordInitial = this.route.snapshot.paramMap.get('wordle') || '';
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.tokenService.getUserName()!;
+    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+      this.professorName = history.state.professorName;
 
     this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (competitions) => {

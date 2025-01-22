@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { WordleService } from '../service/wordle.service';
-import { TokenService } from '../service/token.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,14 +13,13 @@ export class WordleComponent implements OnInit {
   professorName: string = '';
   folderName!: string;
 
-  constructor(private wordleService: WordleService, private tokenService: TokenService, private route: ActivatedRoute) { }
+  constructor(private wordleService: WordleService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     if (history.state.folderName == '')
       this.folderName = 'empty'
     else
       this.folderName = history.state.folderName;
-    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.route.snapshot.paramMap.get('professorName') || '';
   }
 

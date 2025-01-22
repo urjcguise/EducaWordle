@@ -41,7 +41,7 @@ export class WordleListComponent implements OnInit {
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.tokenService.getUserName()!;
     if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
-      this.professorName = history.state.professorName; //TODO
+      this.professorName = history.state.professorName; 
 
     this.wordleService.getFoldersByProfessor(this.professorName).subscribe({
       next: (folders) => {
@@ -105,7 +105,7 @@ export class WordleListComponent implements OnInit {
     this.canEditWordle = this.selectedWordles.length == 1 && this.selectedFolders.length == 0;
     this.canCreateFolder = this.selectedWordles.length == 0 && this.selectedFolders.length == 0;
     this.canEditFolder = this.selectedFolders.length == 1;
-    this.canMoveWordle = this.selectedWordles.length > 0 && this.selectedFolders.length == 0;
+    this.canMoveWordle = this.selectedWordles.length > 0 && this.selectedFolders.length == 0 && this.folderList.length > 0;
     this.canDeleteWordle = this.selectedWordles.length > 0 || this.selectedFolders.length > 0;
   }
 
@@ -117,7 +117,7 @@ export class WordleListComponent implements OnInit {
     if (this.selectedWordles.length === 1) {
       const selectedIndex = this.selectedWordles[0];
       const selectedWordle = this.wordleList[selectedIndex];
-      this.router.navigate([`/${selectedWordle.word}/editarWordle`]);
+      this.router.navigate([`/${selectedWordle.word}/editarWordle`], { state: { professorName: this.professorName } });
     }
   }
 
@@ -159,7 +159,7 @@ export class WordleListComponent implements OnInit {
   }
 
   enterFolder(i: number) {
-    this.router.navigate(['/' + this.folderList[i].name + '/wordles']);
+    this.router.navigate(['/' + this.folderList[i].name + '/wordles'], { state: { professorName: this.professorName } });
   }
 
   moveWordle() {

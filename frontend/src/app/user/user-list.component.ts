@@ -74,4 +74,8 @@ export class UserListComponent implements OnInit {
   navigateToEditUser(userName: string) {
     this.router.navigate([userName + '/editarUsuario']);
   }
+
+  navigateToWordleList(professorName: string) {
+    this.router.navigate(['/wordles'], { state: {professorName: professorName} });
+  }
 }
