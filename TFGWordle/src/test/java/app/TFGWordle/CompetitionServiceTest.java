@@ -53,7 +53,7 @@ public class CompetitionServiceTest {
     void testSaveCompetitionByProfessor() {
         when(competitionRepository.save(competition)).thenReturn(competition);
 
-        Competition savedCompetition = competitionService.save(competition, professor);
+        Competition savedCompetition = competitionService.save(competition);
 
         assertNotNull(savedCompetition);
         assertEquals("Test Name", savedCompetition.getCompetitionName());
@@ -64,7 +64,7 @@ public class CompetitionServiceTest {
     void testSaveCompetitionByNonProfessor() {
         User nonProfessor = new User();
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            competitionService.save(competition, nonProfessor);
+            competitionService.save(competition);
         });
 
         assertEquals("El usuario no tiene permisos para crear la competición", exception.getMessage());

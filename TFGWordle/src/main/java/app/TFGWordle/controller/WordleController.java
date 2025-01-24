@@ -102,6 +102,13 @@ public class WordleController {
         wordle.setWord(wordUpdated);
         wordle.setContests(contests);
 
+        for (Contest oldContest : oldContests) {
+            if (!contests.contains(oldContest)) {
+                oldContest.getWordles().remove(wordle);
+                contestService.save(oldContest);
+            }
+        }
+
         for (Contest contest : contests) {
             if (!contestService.existsContest(contest.getContestName())) {
                 return new ResponseEntity<>("El concurso " + contest.getContestName() + " no existe", HttpStatus.NOT_FOUND);
@@ -115,13 +122,6 @@ public class WordleController {
             if (!contest.getWordles().contains(wordle)) {
                 contest.getWordles().add(wordle);
                 contestService.save(contest);
-            }
-        }
-
-        for (Contest oldContest : oldContests) {
-            if (!contests.contains(oldContest)) {
-                oldContest.getWordles().remove(wordle);
-                contestService.save(oldContest);
             }
         }
 

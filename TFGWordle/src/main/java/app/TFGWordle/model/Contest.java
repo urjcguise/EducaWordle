@@ -56,7 +56,7 @@ public class Contest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Contest contest = (Contest) o;
-        return numTries == contest.numTries && Objects.equals(id, contest.id) && Objects.equals(name, contest.name) && Objects.equals(startDate, contest.startDate) && Objects.equals(endDate, contest.endDate) && Objects.equals(useDictionary, contest.useDictionary) && Objects.equals(useExternalFile, contest.useExternalFile) && Objects.equals(competition, contest.competition) && Objects.equals(wordles, contest.wordles);
+        return Objects.equals(id, contest.id);
     }
 
     @Override

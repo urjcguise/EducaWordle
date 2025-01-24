@@ -38,7 +38,7 @@ export class UserService {
       return this.httpClient.post<any>(this.apiUrl + 'updateUser/' + oldUserName, uploadUser);
     }
 
-    getEmail(userName: string) {
-      return this.httpClient.get<string>(this.apiUrl + 'getUserEmail/' + userName);
-    }
+    public getEmail(userName: string) {
+      return this.httpClient.get(this.apiUrl + 'getUserEmail/' + userName, { responseType: 'text' });
+    }    
   }
