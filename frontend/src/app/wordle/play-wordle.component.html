@@ -37,7 +37,7 @@
             <button (click)="handleNextWord()" class="next-word-button">Siguiente palabra</button>
         </div>
 
-        <div *ngIf="!hasMoreWords && won" class="completion-message">
+        <div *ngIf="!hasMoreWords" class="completion-message">
             ¡Has completado todas las palabras!
             <button (click)="navigateToStatistics()" class="navigate-statistics-button">Ver estadísticas</button>
         </div>

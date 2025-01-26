@@ -29,7 +29,7 @@ public class ContestState {
     @JsonIgnore
     private User user;
 
-    @Column(name = "state", length = 700)
+    @Column(name = "state", columnDefinition = "TEXT")
     private String state;
 
     public ContestState() {}
