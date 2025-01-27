@@ -11,8 +11,11 @@ import { WordleService } from '../service/wordle.service';
 })
 export class FolderListComponent implements OnInit {
 
-  folderName: string = '';
+  folderParentName: string = '';
   professorName: string = '';
+
+  parentFolder!: Folder;
+  parentsFoldersList: string[] = [];
 
   wordleList: Wordle[] = [];
   folderList: Folder[] = [];
@@ -39,9 +42,24 @@ export class FolderListComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
-      this.folderName = paramMap.get('folderName') || '';
+      this.folderParentName = paramMap.get('folderName') || '';
       this.professorName = history.state.professorName;
-      this.wordleService.getFoldersByFolderName(this.folderName).subscribe({
+      this.wordleService.getFolder(this.folderParentName).subscribe({
+        next: (folder) => {
+          this.parentFolder = folder;
+          this.parentsFoldersList.push(folder.name);
+          while (folder.parentFolder != null) {
+            folder = folder.parentFolder;
+            this.parentsFoldersList.push(folder.name);
+          }
+          this.parentsFoldersList.push('...');
+          this.parentsFoldersList.reverse();
+        },
+        error: (e) => {
+          console.error('Error obteniendo la carpeta', e);
+        }
+      });
+      this.wordleService.getFoldersByFolderName(this.folderParentName).subscribe({
         next: (folders) => {
           this.folderList = folders;
           this.isEditingFolder = Array(folders.length).fill(false);
@@ -51,7 +69,7 @@ export class FolderListComponent implements OnInit {
         }
       });
 
-      this.wordleService.getWordlesByFolderName(this.folderName).subscribe({
+      this.wordleService.getWordlesByFolderName(this.folderParentName).subscribe({
         next: (wordles) => {
           this.wordleList = wordles;
         },
@@ -107,7 +125,7 @@ export class FolderListComponent implements OnInit {
   }
 
   createWordle() {
-    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderName: this.folderName } });
+    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderName: this.folderParentName } });
   }
 
   editWordle(): void {
@@ -141,9 +159,10 @@ export class FolderListComponent implements OnInit {
 
   createFolder() {
     if (this.newFolderName && this.newFolderName.trim().length > 0) {
-      this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.folderName).subscribe({
+      this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.folderParentName).subscribe({
         next: () => {
           console.log('Carpeta creada correctamente');
+          this.parentsFoldersList = [];
           this.ngOnInit();
         },
         error: (e) => {
@@ -156,11 +175,17 @@ export class FolderListComponent implements OnInit {
   }
 
   enterFolder(i: number) {
+    this.parentsFoldersList = [];
     this.router.navigate(['/' + this.folderList[i].name + '/wordles'], { state: { professorName: this.professorName } });
   }
 
+  navigateToFolder(folderName: string) {
+    this.parentsFoldersList = [];
+    this.router.navigate(['/' + folderName + '/wordles'], { state: { professorName: this.professorName } });
+  }
+
   moveWordle() {
-    this.wordleService.getFoldersByFolderName(this.folderName).subscribe({
+    this.wordleService.getFoldersByFolderName(this.folderParentName).subscribe({
       next: (folders) => {
         this.folderOptions = folders;
       },
@@ -185,6 +210,7 @@ export class FolderListComponent implements OnInit {
       }
     });
     this.dropdownVisible = false;
+    this.parentsFoldersList = [];
     this.ngOnInit();
   }
 

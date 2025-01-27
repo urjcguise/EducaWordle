@@ -6,4 +6,5 @@ export class Folder {
     professor!: User;
     wordles!: Wordle[];
     folders!: Folder[];
+    parentFolder!: Folder;
 }

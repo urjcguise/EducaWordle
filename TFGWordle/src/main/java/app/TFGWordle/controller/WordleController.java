@@ -1,5 +1,6 @@
 package app.TFGWordle.controller;
 
+import app.TFGWordle.dto.FolderDTO;
 import app.TFGWordle.model.Contest;
 import app.TFGWordle.model.Folder;
 import app.TFGWordle.model.Wordle;
@@ -253,6 +254,15 @@ public class WordleController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @GetMapping("/getFolder/{folderName}")
+    public ResponseEntity<FolderDTO> getFolder(@PathVariable String folderName) {
+        if(!folderService.existsByName(folderName))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Folder folder = folderService.getByName(folderName);
+        return ResponseEntity.status(HttpStatus.OK).body(new FolderDTO(folder));    }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFoldersByFolderName/{folderName}")

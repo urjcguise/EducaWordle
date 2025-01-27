@@ -58,6 +58,10 @@ export class WordleService {
     return this.httpClient.get<Folder[]>(this.apiUrl + "getFoldersByFolderName/" + folderName);
   }
 
+  public getFolder(folderName: string): Observable<Folder> {
+    return this.httpClient.get<Folder>(this.apiUrl + "getFolder/" + folderName);
+  }
+
   public getWordlesByFolderName(folderName: string): Observable<Wordle[]> {
     return this.httpClient.get<Wordle[]>(this.apiUrl + "getWordlesByFolderName/" + folderName);
   }

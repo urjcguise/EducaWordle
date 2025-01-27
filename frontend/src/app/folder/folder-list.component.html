@@ -1,5 +1,12 @@
 <div class="wordle-container">
-    <h2>{{folderName}}</h2>
+    <div>
+        <span *ngFor="let folder of parentsFoldersList; let last = last">
+          <span (click)="navigateToFolder(folder)">
+            {{ folder }}
+          </span>
+          <span *ngIf="!last"> > </span>
+        </span>
+      </div>
     <div class="button-group">
         <button *ngIf="canCreateWordle" (click)="createWordle()">Crear wordle</button>
         <button *ngIf="canEditWordle" (click)="editWordle()">Editar wordle</button>
