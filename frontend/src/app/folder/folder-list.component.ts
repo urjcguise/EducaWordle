@@ -180,8 +180,12 @@ export class FolderListComponent implements OnInit {
   }
 
   navigateToFolder(folderName: string) {
-    this.parentsFoldersList = [];
-    this.router.navigate(['/' + folderName + '/wordles'], { state: { professorName: this.professorName } });
+    if (folderName != '...') {
+      this.parentsFoldersList = [];
+      this.router.navigate(['/' + folderName + '/wordles'], { state: { professorName: this.professorName } });
+    } else {
+      this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
+    }
   }
 
   moveWordle() {
