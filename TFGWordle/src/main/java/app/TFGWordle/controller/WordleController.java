@@ -285,21 +285,32 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/moveToFolder/{folderName}")
     public ResponseEntity<?> moveToFolder(@PathVariable String folderName, @RequestBody List<String> wordles) {
-        if (!folderService.existsByName(folderName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Folder folder = folderService.getByName(folderName);
-
-        for (String wordle : wordles) {
-            if (!wordleService.existsByWord(wordle))
+        if (folderName.equals("...")) {
+            for (String wordle : wordles) {
+                if (!wordleService.existsByWord(wordle))
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                Wordle wordleToMove = wordleService.getByWord(wordle);
+                wordleToMove.setFolder(null);
+                wordleService.save(wordleToMove);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            if (!folderService.existsByName(folderName))
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            Wordle wordleToMove = wordleService.getByWord(wordle);
-            wordleToMove.setFolder(folder);
-            wordleService.save(wordleToMove);
-            folder.getWordles().add(wordleToMove);
-        }
-        folderService.save(folder);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+            Folder folder = folderService.getByName(folderName);
+
+            for (String wordle : wordles) {
+                if (!wordleService.existsByWord(wordle))
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                Wordle wordleToMove = wordleService.getByWord(wordle);
+                wordleToMove.setFolder(folder);
+                wordleService.save(wordleToMove);
+                folder.getWordles().add(wordleToMove);
+            }
+            folderService.save(folder);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }

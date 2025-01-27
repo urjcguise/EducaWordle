@@ -34,7 +34,7 @@ export class FolderListComponent implements OnInit {
   newFolderName: string = '';
   oldFolderName: string = '';
 
-  folderOptions: Folder[] = [];
+  folderOptions: string[] = [];
   folderSelected: string = '';
   dropdownVisible: boolean = false;
 
@@ -189,9 +189,20 @@ export class FolderListComponent implements OnInit {
   }
 
   moveWordle() {
+    if (this.dropdownVisible) {
+      this.dropdownVisible = false;
+      return;
+    }
+    this.folderOptions = [];
     this.wordleService.getFoldersByFolderName(this.folderParentName).subscribe({
       next: (folders) => {
-        this.folderOptions = folders;
+        folders.forEach((folder) => {
+          this.folderOptions.push(folder.name);
+        })
+        this.folderOptions = [
+          ...this.parentsFoldersList.filter(folder => folder !== this.folderParentName),
+          ...this.folderOptions
+        ];
       },
       error: (e) => {
         console.error('Error obteniendo las carpetas', e);
