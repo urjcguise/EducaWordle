@@ -1,0 +1,18 @@
+<li>
+    <i class="fas" [ngClass]="isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'" (click)="toggleExpansion()"></i>
+
+    <i class="fas fa-folder"></i>
+
+    <span>{{ folder.name }}</span>
+
+    <ul *ngIf="isExpanded">
+        <li *ngFor="let wordle of folder.wordles">
+            <i class="fas fa-file-alt"></i>
+            {{ wordle.word }}
+        </li>
+
+        <li *ngFor="let subfolder of folder.folders">
+            <app-folder [folder]="subfolder"></app-folder>
+        </li>
+    </ul>
+</li>

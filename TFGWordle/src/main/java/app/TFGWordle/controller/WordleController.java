@@ -226,16 +226,16 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFoldersByProfessor/{professorName}")
-    public ResponseEntity<List<Folder>> getFoldersByProfessor(@PathVariable String professorName) {
+    public ResponseEntity<List<FolderDTO>> getFoldersByProfessor(@PathVariable String professorName) {
         if(!userService.existsByUserName(professorName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         User professor = userService.getByUserName(professorName).get();
-        List<Folder> toReturn = new ArrayList<>();
+        List<FolderDTO> toReturn = new ArrayList<>();
 
         for (Folder f : folderService.getByProfessor(professor)) {
             if (f.getParentFolder() == null)
-                toReturn.add(f);
+                toReturn.add(new FolderDTO(f));
         }
         return ResponseEntity.status(HttpStatus.OK).body(toReturn);
     }

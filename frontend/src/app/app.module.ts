@@ -29,6 +29,7 @@ import { WordleListComponent } from './wordle/wordle-list.component';
 import { WordleComponent } from './wordle/wordle.component';
 import { EditWordleComponent } from './wordle/edit-wordle.component';
 import { FolderListComponent } from './folder/folder-list.component';
+import { FolderComponent } from './folder/folder.component';
 
 
 @NgModule({
@@ -54,7 +55,8 @@ import { FolderListComponent } from './folder/folder-list.component';
     WordleListComponent,
     WordleComponent,
     EditWordleComponent,
-    FolderListComponent
+    FolderListComponent,
+    FolderComponent
   ],
   imports: [
     BrowserModule,

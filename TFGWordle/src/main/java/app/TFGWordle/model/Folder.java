@@ -1,7 +1,9 @@
 package app.TFGWordle.model;
 
 import app.TFGWordle.security.entity.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,16 +28,15 @@ public class Folder {
     private User professor;
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<Wordle> wordles = new ArrayList<>();
 
     @OneToMany(mappedBy = "parentFolder", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference
     private List<Folder> folders = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "folder_id")
-    @JsonIgnore
+    @JsonBackReference
     private Folder parentFolder;
 
     public Folder() {

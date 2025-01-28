@@ -16,6 +16,9 @@ export class WordleListComponent implements OnInit {
 
   wordleList: Wordle[] = [];
   folderList: Folder[] = [];
+
+  isExpanded: boolean[] = [];
+
   selectedFolders: number[] = [];
   selectedWordles: number[] = [];
 
@@ -37,17 +40,18 @@ export class WordleListComponent implements OnInit {
 
   constructor(private wordleService: WordleService, private tokenService: TokenService, private router: Router) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.tokenService.getUserName()!;
     if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
-      this.professorName = history.state.professorName; 
+      this.professorName = history.state.professorName;
 
     this.wordleService.getFoldersByProfessor(this.professorName).subscribe({
       next: (folders) => {
         this.folderList = folders;
         this.folderList.forEach(() => {
           this.isEditingFolder.push(false);
+          this.isExpanded.push(false);
         })
       },
       error: (e) => {
@@ -65,7 +69,7 @@ export class WordleListComponent implements OnInit {
   }
 
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
+  onDocumentClick(event: Event) {
     const targetElement = event.target as HTMLElement;
 
     if (!targetElement.closest('.wordle-list') && !targetElement.closest('.button-group')) {
@@ -74,13 +78,13 @@ export class WordleListComponent implements OnInit {
     }
   }
 
-  deselectAll(): void {
+  deselectAll() {
     this.selectedFolders = [];
     this.selectedWordles = [];
     this.updateButtonStates();
   }
 
-  toggleFolderSelection(index: number): void {
+  toggleFolderSelection(index: number) {
     const selectedIndex = this.selectedFolders.indexOf(index);
     if (selectedIndex === -1) {
       this.selectedFolders.push(index);
@@ -90,7 +94,7 @@ export class WordleListComponent implements OnInit {
     this.updateButtonStates();
   }
 
-  toggleWordleSelection(index: number): void {
+  toggleWordleSelection(index: number) {
     const selectedIndex = this.selectedWordles.indexOf(index);
     if (selectedIndex === -1) {
       this.selectedWordles.push(index);
@@ -98,6 +102,10 @@ export class WordleListComponent implements OnInit {
       this.selectedWordles.splice(selectedIndex, 1);
     }
     this.updateButtonStates();
+  }
+
+  toggleFolderExpansion(index: number) {
+    this.isExpanded[index] = !this.isExpanded[index];
   }
 
   updateButtonStates(): void {
@@ -113,7 +121,7 @@ export class WordleListComponent implements OnInit {
     this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderName: "" } });
   }
 
-  editWordle(): void {
+  editWordle() {
     if (this.selectedWordles.length === 1) {
       const selectedIndex = this.selectedWordles[0];
       const selectedWordle = this.wordleList[selectedIndex];
@@ -191,7 +199,7 @@ export class WordleListComponent implements OnInit {
     this.ngOnInit();
   }
 
-  deleteWordleAndFolder(): void {
+  deleteWordleAndFolder() {
     const selectedWordleNames = this.selectedWordles.map(
       (index) => this.wordleList[index].word
     );

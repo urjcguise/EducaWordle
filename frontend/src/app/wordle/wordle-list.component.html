@@ -23,15 +23,36 @@
                 (keyup.enter)="createFolder()" />
         </div>
 
-        <li *ngFor="let folder of folderList; let i = index" [class.selected]="selectedFolders.includes(i)"
-            (click)="toggleFolderSelection(i)" (dblclick)="enterFolder(i)">
-            <i class="fas fa-folder"></i>
-            <span *ngIf="!isEditingFolder[i]" (dblclick)="editFolderPushed(i); $event.stopPropagation()">
-                {{ folder.name }}
-            </span>
-            <input *ngIf="isEditingFolder[i]" type="text" [(ngModel)]="folder.name" (keyup.enter)="editFolder(i)" />
-        </li>
+        <ul>
+            <li *ngFor="let folder of folderList; let i = index" [class.selected]="selectedFolders.includes(i)"
+                (click)="toggleFolderSelection(i)" (dblclick)="enterFolder(i)">
+                <div (dblclick)="!isEditingFolder[i] && enterFolder(i); $event.stopPropagation()"
+                    [class.folder-container]="true" class="folder-item">
+                    <i class="fas" [ngClass]="isExpanded[i] ? 'fa-chevron-down' : 'fa-chevron-right'"
+                        (click)="toggleFolderExpansion(i); $event.stopPropagation()"></i>
 
+                    <i class="fas fa-folder"></i>
+
+                    <span *ngIf="!isEditingFolder[i]" (dblclick)="editFolderPushed(i); $event.stopPropagation()">
+                        {{ folder.name }}
+                    </span>
+
+                    <input *ngIf="isEditingFolder[i]" type="text" [(ngModel)]="folder.name"
+                        (keyup.enter)="editFolder(i)" />
+                </div>
+
+                <ul *ngIf="isExpanded[i]">
+                    <li *ngFor="let wordle of folder.wordles">
+                        <i class="fas fa-file-alt"></i>
+                        {{ wordle.word }}
+                    </li>
+
+                    <li *ngFor="let subfolder of folder.folders">
+                        <app-folder [folder]="subfolder"></app-folder>
+                    </li>
+                </ul>
+            </li>
+        </ul>
 
         <li *ngFor="let wordle of wordleList; let i = index" [class.selected]="selectedWordles.includes(i)"
             (click)="toggleWordleSelection(i)">

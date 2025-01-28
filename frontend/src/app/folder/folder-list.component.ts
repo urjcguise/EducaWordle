@@ -22,6 +22,8 @@ export class FolderListComponent implements OnInit {
   selectedFolders: number[] = [];
   selectedWordles: number[] = [];
 
+  isExpanded: boolean[] = [];
+
   canCreateWordle: boolean = true;
   canEditWordle: boolean = false;
   canCreateFolder: boolean = true;
@@ -62,7 +64,10 @@ export class FolderListComponent implements OnInit {
       this.wordleService.getFoldersByFolderName(this.folderParentName).subscribe({
         next: (folders) => {
           this.folderList = folders;
-          this.isEditingFolder = Array(folders.length).fill(false);
+          this.folderList.forEach(() => {
+            this.isEditingFolder.push(false);
+            this.isExpanded.push(false);
+          })
         },
         error: (e) => {
           console.error('Error obteniendo las carpetas', e);
@@ -113,6 +118,10 @@ export class FolderListComponent implements OnInit {
       this.selectedWordles.splice(selectedIndex, 1);
     }
     this.updateButtonStates();
+  }
+
+  toggleFolderExpansion(index: number) {
+    this.isExpanded[index] = !this.isExpanded[index];
   }
 
   updateButtonStates(): void {
