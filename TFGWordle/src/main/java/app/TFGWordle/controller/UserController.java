@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.*;
 
 @RestController
@@ -31,31 +32,6 @@ public class UserController {
     public UserController(UserService userService, ParticipationService participationService) {
         this.userService = userService;
         this.participationService = participationService;
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/deleteUserByName/{userName}")
-    public ResponseEntity<?> deleteUserByName(@PathVariable String userName) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        User userToDelete = userService.getByUserName(userName).get();
-        userService.deleteUser(userToDelete);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/getCompetitions/{userName}")
-    public ResponseEntity<List<Competition>> getCompetition(@PathVariable String userName) {
-        if (userService.existsByUserName(userName)) {
-            User user = userService.getByUserName(userName).get();
-            List<Competition> toReturn = new ArrayList<>();
-            for (Participation participation : participationService.findCompetitionsByStudent(user.getId())) {
-                toReturn.add(participation.getCompetition());
-            }
-            return new ResponseEntity<>(toReturn, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -114,5 +90,30 @@ public class UserController {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(userService.getByUserName(userName).get().getEmail(), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/deleteUserByName/{userName}")
+    public ResponseEntity<?> deleteUserByName(@PathVariable String userName) {
+        if (!userService.existsByUserName(userName))
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        User userToDelete = userService.getByUserName(userName).get();
+        userService.deleteUser(userToDelete);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getCompetitions/{userName}")
+    public ResponseEntity<List<Competition>> getCompetition(@PathVariable String userName) {
+        if (userService.existsByUserName(userName)) {
+            User user = userService.getByUserName(userName).get();
+            List<Competition> toReturn = new ArrayList<>();
+            for (Participation participation : participationService.findCompetitionsByStudent(user.getId())) {
+                toReturn.add(participation.getCompetition());
+            }
+            return new ResponseEntity<>(toReturn, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
