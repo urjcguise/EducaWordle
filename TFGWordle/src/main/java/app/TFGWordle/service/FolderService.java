@@ -30,11 +30,15 @@ public class FolderService {
         return folderRepository.findByName(folderName);
     }
 
-    public Folder getByName(String folderName) {
-        return folderRepository.getByName(folderName);
-    }
-
     public void delete(Folder folder) {
         folderRepository.delete(folder);
+    }
+
+    public boolean existsById(Long id) {
+        return folderRepository.existsById(id);
+    }
+
+    public Folder getById(Long id) {
+        return folderRepository.getById(id);
     }
 }

@@ -8,7 +8,7 @@
             <button (click)="moveWordle()">Mover a carpeta</button>
             <div *ngIf="dropdownVisible" class="dropdown">
                 <ul>
-                    <li *ngFor="let folder of folderOptions" (click)="selectFolderToMove(folder.name)">
+                    <li *ngFor="let folder of folderOptions" (click)="selectFolderToMove(folder)">
                         {{ folder.name }}
                     </li>
                 </ul>

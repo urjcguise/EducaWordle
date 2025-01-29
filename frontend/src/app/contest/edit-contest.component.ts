@@ -126,6 +126,15 @@ export class EditContestComponent {
       }
     }
 
+    const commonWordles = this.wordles.filter(wordle => this.initialWordles.includes(wordle));
+    const removedWordles = this.initialWordles.filter(wordle => !this.wordles.includes(wordle));
+    const addedWordles = this.wordles.filter(wordle => !this.initialWordles.includes(wordle));
+
+    this.deleteWordles(removedWordles);
+    this.saveWordles(addedWordles);
+
+    const updatedWordles: Wordle[] = [...commonWordles, ...addedWordles].map(word => ({ word }));
+
     const updatedContest: Contest = {
       ...this.contest,
       contestName: this.contest.contestName,
@@ -133,38 +142,40 @@ export class EditContestComponent {
       endDate: new Date(this.formattedEndDate),
       useDictionary: this.dictionary,
       useExternalFile: this.file,
-      wordles: []
+      wordles: updatedWordles
     };
     this.contestService.editContest(this.contestName, updatedContest).subscribe({
       next: () => {
-        if (this.wordles.length > 0)
-          this.saveWordles();
-        else
-          alert('Concurso guardado con éxito');
+        alert('Concurso guardado con éxito');
       },
       error: (err) => console.error('Error al editar concurso', err)
     });
   }
 
-  saveWordles() {
-    
-    this.wordleService.deleteWordles(this.initialWordles).subscribe({
+  deleteWordles(wordlesToDelete: string[]) {
+    if (wordlesToDelete.length == 0)
+      return;
+    this.wordleService.deleteWordles(wordlesToDelete).subscribe({
       next: () => {
         console.log('Wordles eliminados con éxito');
       },
       error: (err) => console.error('Error al eliminar Wordles', err)
     });
+  }
 
-    this.wordleService.saveWordles(this.wordles, this.contest.contestName, this.professorName, '').subscribe({
+  saveWordles(wordlesToSave: string[]) {
+    if (wordlesToSave.length == 0)
+      return;
+    this.wordleService.saveWordles(wordlesToSave, this.contest.contestName, this.professorName, 0).subscribe({
       next: () => {
-        alert('Concurso y Wordles guardados con éxito');
+        alert('Wordles guardados con éxito');
         this.initialWordles = [...this.wordles];
       },
       error: (err) => console.error('Error al editar Wordles', err)
     });
   }
 
-  trackByIndex(index: number, item: any): number {
+  trackByIndex(index: number): number {
     return index;
   }
 

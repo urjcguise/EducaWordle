@@ -14,6 +14,4 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     @Query("SELECT COUNT(f) > 0 FROM Folder f WHERE f.name = :name")
     boolean findByName(@Param("name") String name);
-
-    Folder getByName(String name);
 }

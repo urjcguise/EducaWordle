@@ -11,16 +11,13 @@ export class WordleComponent implements OnInit {
 
   wordles: string[] = [''];
   professorName: string = '';
-  folderName!: string;
+  folderId: number = 0;
 
   constructor(private wordleService: WordleService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    if (history.state.folderName == '')
-      this.folderName = 'empty'
-    else
-      this.folderName = history.state.folderName;
-      this.professorName = this.route.snapshot.paramMap.get('professorName') || '';
+    this.folderId = history.state.folderId;
+    this.professorName = this.route.snapshot.paramMap.get('professorName') || '';
   }
 
   addWordle() {
@@ -33,7 +30,7 @@ export class WordleComponent implements OnInit {
     this.wordles.splice(index, 1);
   }
 
-  trackByIndex(index: number, item: any): number {
+  trackByIndex(index: number): number {
     return index;
   }
 
@@ -45,7 +42,7 @@ export class WordleComponent implements OnInit {
       }
     }
 
-    this.wordleService.saveWordles(this.wordles, 'empty', this.professorName, this.folderName).subscribe({
+    this.wordleService.saveWordles(this.wordles, 'empty', this.professorName, this.folderId).subscribe({
       next: () => {
         alert('Wordles creados correctamente');
       },

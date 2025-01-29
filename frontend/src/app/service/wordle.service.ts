@@ -9,13 +9,13 @@ import { Folder } from '../models/folder';
   providedIn: 'root'
 })
 export class WordleService {
-  
+
   private apiUrl = 'http://localhost:9090/api/wordle/';
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
-  public saveWordles(wordles: string[], contestName: string, professorName: string, folderName: string): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "newWordles/" + contestName + '/' + professorName + '/' + folderName, wordles);
+  public saveWordles(wordles: string[], contestName: string, professorName: string, folderId: number): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + "newWordles/" + contestName + '/' + professorName + '/' + folderId, wordles);
   }
 
   public deleteWordles(wordlesName: string[]): Observable<any> {
@@ -42,35 +42,35 @@ export class WordleService {
     return this.httpClient.post<any>(this.apiUrl + "newFolder/" + folderName, professorName);
   }
 
-  public deleteFolders(foldersName: string[]): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "deleteFolders", foldersName);
+  public deleteFolders(foldersIds: number[]): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + "deleteFolders", foldersIds);
   }
 
   public getFoldersByProfessor(professorName: string): Observable<Folder[]> {
     return this.httpClient.get<Folder[]>(this.apiUrl + "getFoldersByProfessor/" + professorName);
   }
 
-  public editFolder(oldFolderName: string, newFolderName: string): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "editFolder/" + oldFolderName, newFolderName);
+  public editFolder(oldFolderNameId: number, newFolderName: string): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + "editFolder/" + oldFolderNameId, newFolderName);
   }
 
-  public getFoldersByFolderName(folderName: string): Observable<Folder[]> {
-    return this.httpClient.get<Folder[]>(this.apiUrl + "getFoldersByFolderName/" + folderName);
+  public getFoldersByFolderId(folderId: number): Observable<Folder[]> {
+    return this.httpClient.get<Folder[]>(this.apiUrl + "getFoldersByFolderId/" + folderId);
   }
 
-  public getFolder(folderName: string): Observable<Folder> {
-    return this.httpClient.get<Folder>(this.apiUrl + "getFolder/" + folderName);
+  public getFolder(folderId: number): Observable<Folder> {
+    return this.httpClient.get<Folder>(this.apiUrl + "getFolder/" + folderId);
   }
 
-  public getWordlesByFolderName(folderName: string): Observable<Wordle[]> {
-    return this.httpClient.get<Wordle[]>(this.apiUrl + "getWordlesByFolderName/" + folderName);
+  public getWordlesByFolderId(folderId: number): Observable<Wordle[]> {
+    return this.httpClient.get<Wordle[]>(this.apiUrl + "getWordlesByFolderId/" + folderId);
   }
 
-  public createFolderInsideFolder(newFolderName: string, professorName: string, folderName: string) {
-    return this.httpClient.post<any>(this.apiUrl + "newFolderInsideFolder/" + newFolderName + '/' + folderName, professorName);
+  public createFolderInsideFolder(newFolderName: string, professorName: string, folderId: number) {
+    return this.httpClient.post<any>(this.apiUrl + "newFolderInsideFolder/" + newFolderName + '/' + folderId, professorName);
   }
 
-  public moveToFolder(folderName: string, wordles: string[]) {
-    return this.httpClient.post<any>(this.apiUrl + "moveToFolder/" + folderName, wordles);
+  public moveToFolder(folderId: number, wordles: string[]) {
+    return this.httpClient.post<any>(this.apiUrl + "moveToFolder/" + folderId, wordles);
   }
 }

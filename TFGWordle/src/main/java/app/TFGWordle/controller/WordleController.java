@@ -35,8 +35,8 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/newWordles/{contestName}/{professorName}/{folderName}")
-    public ResponseEntity<List<Wordle>> createWordles(@RequestBody List<String> wordles, @PathVariable String contestName, @PathVariable String professorName, @PathVariable String folderName) {
+    @PostMapping("/newWordles/{contestName}/{professorName}/{folderId}")
+    public ResponseEntity<List<Wordle>> createWordles(@RequestBody List<String> wordles, @PathVariable String contestName, @PathVariable String professorName, @PathVariable Long folderId) {
 
         if (!userService.existsByUserName(professorName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -44,7 +44,7 @@ public class WordleController {
         if (!contestName.equals( "empty") & !contestService.existsContest(contestName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if (!folderName.equals("empty") && !folderService.existsByName(folderName))
+        if (folderId != 0 && !folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         User professor = userService.getByUserName(professorName).get();
@@ -57,8 +57,8 @@ public class WordleController {
 
         for (String wordle : wordles) {
             Wordle newWordle = new Wordle(wordle, contests, professor);
-            if (!folderName.equals("empty"))
-                newWordle.setFolder(folderService.getByName(folderName));
+            if (folderId != 0)
+                newWordle.setFolder(folderService.getById(folderId));
             toSave.add(newWordle);
         }
         if (!contests.isEmpty())
@@ -177,6 +177,9 @@ public class WordleController {
         if (!userService.existsByUserName(professorName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        if (folderService.existsByName(folderName))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
         User professor = userService.getByUserName(professorName).get();
 
         Folder newFolder = new Folder(folderName, professor);
@@ -190,26 +193,29 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/deleteFolders")
-    public ResponseEntity<?> deleteFolders(@RequestBody List<String> foldersName) {
-        for (String folderName : foldersName) {
-            if (!folderService.existsByName(folderName))
+    public ResponseEntity<?> deleteFolders(@RequestBody List<Long> foldersIds) {
+        for (Long folderId : foldersIds) {
+            if (!folderService.existsById(folderId))
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            Folder folder = folderService.getByName(folderName);
+            Folder folder = folderService.getById(folderId);
             folderService.delete(folder);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/newFolderInsideFolder/{newFolderName}/{folderName}")
-    public ResponseEntity<?> createFolderInsideFolder(@PathVariable String newFolderName, @PathVariable String folderName, @RequestBody String professorName) {
+    @PostMapping("/newFolderInsideFolder/{newFolderName}/{folderId}")
+    public ResponseEntity<?> createFolderInsideFolder(@PathVariable String newFolderName, @PathVariable Long folderId, @RequestBody String professorName) {
         if (!userService.existsByUserName(professorName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        if (!folderService.existsByName(folderName))
+        if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Folder parentFolder = folderService.getByName(folderName);
+        Folder parentFolder = folderService.getById(folderId);
         User professor = userService.getByUserName(professorName).get();
+
+        if (parentFolder.getFolders().stream().anyMatch(folder -> folder.getName().equals(newFolderName)))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
 
         Folder newFolder = new Folder(newFolderName, professor);
         newFolder.setParentFolder(parentFolder);
@@ -222,7 +228,6 @@ public class WordleController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newFolder);
     }
-
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFoldersByProfessor/{professorName}")
@@ -241,13 +246,13 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/editFolder/{oldFolderName}")
-    public ResponseEntity<?> editFolder(@PathVariable String oldFolderName, @RequestBody String newFolderName) {
-        if (!folderService.existsByName(oldFolderName))
+    @PostMapping("/editFolder/{oldFolderNameId}")
+    public ResponseEntity<?> editFolder(@PathVariable Long oldFolderNameId, @RequestBody String newFolderName) {
+        if (!folderService.existsById(oldFolderNameId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if (!oldFolderName.equals(newFolderName)) {
-            Folder folder = folderService.getByName(oldFolderName);
+        Folder folder = folderService.getById(oldFolderNameId);
+        if (!folder.getName().equals(newFolderName)) {
             folder.setName(newFolderName);
             folderService.save(folder);
         }
@@ -256,36 +261,38 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getFolder/{folderName}")
-    public ResponseEntity<FolderDTO> getFolder(@PathVariable String folderName) {
-        if(!folderService.existsByName(folderName))
+    @GetMapping("/getFolder/{folderId}")
+    public ResponseEntity<FolderDTO> getFolder(@PathVariable Long folderId) {
+        if(!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Folder folder = folderService.getByName(folderName);
+        Folder folder = folderService.getById(folderId);
         return ResponseEntity.status(HttpStatus.OK).body(new FolderDTO(folder));    }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getFoldersByFolderName/{folderName}")
-    public ResponseEntity<List<Folder>> getFoldersByFolderName(@PathVariable String folderName) {
-        if(!folderService.existsByName(folderName))
+    @GetMapping("/getFoldersByFolderId/{folderId}")
+    public ResponseEntity<List<Folder>> getFoldersByFolderId(@PathVariable Long folderId) {
+        if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.status(HttpStatus.OK).body(folderService.getByName(folderName).getFolders());
+        Folder parentFolder = folderService.getById(folderId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(parentFolder.getFolders());
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getWordlesByFolderName/{folderName}")
-    public ResponseEntity<List<Wordle>> getWordlesByFolderName(@PathVariable String folderName) {
-        if(!folderService.existsByName(folderName))
+    @GetMapping("/getWordlesByFolderId/{folderId}")
+    public ResponseEntity<List<Wordle>> getWordlesByFolderName(@PathVariable Long folderId) {
+        if(!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.status(HttpStatus.OK).body(folderService.getByName(folderName).getWordles());
+        return ResponseEntity.status(HttpStatus.OK).body(folderService.getById(folderId).getWordles());
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/moveToFolder/{folderName}")
-    public ResponseEntity<?> moveToFolder(@PathVariable String folderName, @RequestBody List<String> wordles) {
-        if (folderName.equals("...")) {
+    @PostMapping("/moveToFolder/{folderId}")
+    public ResponseEntity<?> moveToFolder(@PathVariable Long folderId, @RequestBody List<String> wordles) {
+        if (folderId == 0) {
             for (String wordle : wordles) {
                 if (!wordleService.existsByWord(wordle))
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -295,10 +302,10 @@ public class WordleController {
             }
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            if (!folderService.existsByName(folderName))
+            if (!folderService.existsById(folderId))
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-            Folder folder = folderService.getByName(folderName);
+            Folder folder = folderService.getById(folderId);
 
             for (String wordle : wordles) {
                 if (!wordleService.existsByWord(wordle))

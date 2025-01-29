@@ -18,10 +18,6 @@ public class WordleService {
         this.wordleRepository = wordleRepository;
     }
 
-    public void deleteByContestId(Long id) {
-        wordleRepository.deleteByContestsId(id);
-    }
-
     public List<Wordle> saveAll(List<Wordle> wordles) {
         return wordleRepository.saveAll(wordles);
     }

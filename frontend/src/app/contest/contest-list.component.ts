@@ -161,7 +161,7 @@ export class ContestListComponent implements OnInit {
     this.contestService.copyContest(newContest, oldContest.contestName).subscribe({
       next: () => {
         const wordStrings: string[] = oldContest.wordles.map(wordle => wordle.word);
-        this.wordleService.saveWordles(wordStrings, newContest.contestName, this.professorName, '').subscribe({
+        this.wordleService.saveWordles(wordStrings, newContest.contestName, this.professorName, 0).subscribe({
           next: () => {
             alert("Concurso copiado correctamente");
           },

@@ -109,6 +109,7 @@ public class ContestController {
 
         Contest oldContest = contestService.getByName(contestName);
         contest.setCompetition(oldContest.getCompetition());
+        contest.setWordles(oldContest.getWordles());
 
         return ResponseEntity.ok(contestService.save(contest));
     }

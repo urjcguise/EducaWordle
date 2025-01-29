@@ -2,7 +2,7 @@
     <div>
         <span *ngFor="let folder of parentsFoldersList; let last = last">
             <span (click)="navigateToFolder(folder)">
-                {{ folder }}
+                {{ folder.name }}
             </span>
             <span *ngIf="!last"> > </span>
         </span>
@@ -16,7 +16,7 @@
             <div *ngIf="dropdownVisible" class="dropdown">
                 <ul>
                     <li *ngFor="let folder of folderOptions" (click)="selectFolderToMove(folder)">
-                        {{ folder}}
+                        {{ folder.name }}
                     </li>
                 </ul>
             </div>
@@ -29,7 +29,6 @@
             <input type="text" placeholder="Nombre de la carpeta" [(ngModel)]="newFolderName"
                 (keyup.enter)="createFolder()" />
         </div>
-
 
         <ul>
             <li *ngFor="let folder of folderList; let i = index" [class.selected]="selectedFolders.includes(i)"

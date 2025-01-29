@@ -16,27 +16,30 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public Optional<User> getByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
     public Optional<User> getByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
+
     public Optional<User> getById(Long id) {
-       return userRepository.findById(id);
+        return userRepository.findById(id);
     }
+
     public boolean existsByUserName(String userName) {
         return userRepository.existsByUsername(userName);
     }
+
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
     public boolean existsById(Long id) {
         return userRepository.existsById(id);
     }
+
     public void save(User user) {
         userRepository.save(user);
     }
+
     public List<User> getAll() {
         return userRepository.findAll();
     }

@@ -32,10 +32,9 @@ export class WordleListComponent implements OnInit {
   isCreatingFolder: boolean = false;
   isEditingFolder: boolean[] = [];
   folderName: string = '';
-  oldFolderName: string = '';
+  oldFolderNameId: number = 0;
 
   folderOptions: Folder[] = [];
-  folderSelected: string = '';
   dropdownVisible: boolean = false;
 
   constructor(private wordleService: WordleService, private tokenService: TokenService, private router: Router) { }
@@ -118,7 +117,7 @@ export class WordleListComponent implements OnInit {
   }
 
   createWordle() {
-    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderName: "" } });
+    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderId: Number(0) } });
   }
 
   editWordle() {
@@ -130,12 +129,12 @@ export class WordleListComponent implements OnInit {
   }
 
   editFolderPushed(i: number) {
-    this.oldFolderName = this.folderList[i].name;
+    this.oldFolderNameId = this.folderList[i].id;
     this.isEditingFolder = this.isEditingFolder.map((_, index) => index === i);
   }
 
   editFolder(i: number) {
-    this.wordleService.editFolder(this.oldFolderName, this.folderList[i].name).subscribe({
+    this.wordleService.editFolder(this.oldFolderNameId, this.folderList[i].name).subscribe({
       next: () => {
         console.log('Carpeta modificada correctamente');
       },
@@ -167,7 +166,7 @@ export class WordleListComponent implements OnInit {
   }
 
   enterFolder(i: number) {
-    this.router.navigate(['/' + this.folderList[i].name + '/wordles'], { state: { professorName: this.professorName } });
+    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name } });
   }
 
   moveWordle() {
@@ -182,12 +181,12 @@ export class WordleListComponent implements OnInit {
     this.dropdownVisible = true;
   }
 
-  selectFolderToMove(folderName: string) {
-    this.folderSelected = folderName;
+  selectFolderToMove(folder: Folder) {
+    const folderId = folder.name === '...' ? 0 : folder.id;
     const selectedWordleNames = this.selectedWordles.map(
       (index) => this.wordleList[index].word
     );
-    this.wordleService.moveToFolder(this.folderSelected, selectedWordleNames).subscribe({
+    this.wordleService.moveToFolder(folderId, selectedWordleNames).subscribe({
       next: () => {
         console.log('Wordles movidos correctamente');
       },
@@ -204,12 +203,12 @@ export class WordleListComponent implements OnInit {
       (index) => this.wordleList[index].word
     );
 
-    const selectedFolderNames = this.selectedFolders.map(
-      (index) => this.folderList[index].name
+    const selectedFolderIds = this.selectedFolders.map(
+      (index) => this.folderList[index].id
     );
 
-    if (selectedFolderNames.length > 0) {
-      this.wordleService.deleteFolders(selectedFolderNames).subscribe({
+    if (selectedFolderIds.length > 0) {
+      this.wordleService.deleteFolders(selectedFolderIds).subscribe({
         next: () => {
           console.log('Carpetas eliminadas correctamente');
           this.folderList = this.folderList.filter(
