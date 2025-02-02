@@ -35,13 +35,13 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/newWordles/{contestName}/{professorName}/{folderId}")
-    public ResponseEntity<List<Wordle>> createWordles(@RequestBody List<String> wordles, @PathVariable String contestName, @PathVariable String professorName, @PathVariable Long folderId) {
+    @PostMapping("/newWordles/{contestId}/{professorName}/{folderId}")
+    public ResponseEntity<List<Wordle>> newWordles(@RequestBody List<String> wordles, @PathVariable Long contestId, @PathVariable String professorName, @PathVariable Long folderId) {
 
         if (!userService.existsByUserName(professorName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if (!contestName.equals( "empty") & !contestService.existsContest(contestName))
+        if (contestId != 0 & !contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (folderId != 0 && !folderService.existsById(folderId))
@@ -50,8 +50,8 @@ public class WordleController {
         User professor = userService.getByUserName(professorName).get();
         List<Contest> contests = new ArrayList<>();
 
-        if (!contestName.equals( "empty"))
-            contests.add(contestService.getByName(contestName));
+        if (contestId != 0)
+            contests.add(contestService.getById(contestId));
 
         List<Wordle> toSave = new ArrayList<>();
 
@@ -111,7 +111,7 @@ public class WordleController {
         }
 
         for (Contest contest : contests) {
-            if (!contestService.existsContest(contest.getContestName())) {
+            if (!contestService.existsByName(contest.getContestName())) {
                 return new ResponseEntity<>("El concurso " + contest.getContestName() + " no existe", HttpStatus.NOT_FOUND);
             }
 
@@ -132,13 +132,12 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/getWordlesByContest/{contestName}")
-    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable String contestName) {
-
-        if (!contestService.existsContest(contestName))
+    @GetMapping("/getWordlesByContest/{contestId}")
+    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         return ResponseEntity.status(HttpStatus.OK).body(wordleService.findByContestId(contest.getId()));
     }

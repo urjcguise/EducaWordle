@@ -72,10 +72,10 @@ export class ContestListComponent implements OnInit {
     });
   }
 
-  deleteContest(contestName: string) {
+  deleteContest(contestId: number) {
     const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta concurso?');
     if (confirmDelete) {
-      this.contestService.deleteContest(contestName).subscribe({
+      this.contestService.deleteContest(contestId).subscribe({
         next: () => {
           alert('Concurso eliminado con éxito.');
           this.loadContests();
@@ -85,9 +85,9 @@ export class ContestListComponent implements OnInit {
     }
   }
 
-  navigateToEditWordle(contestName: string) {
+  navigateToEditWordle(contestId: number) {
     if (this.competitionId != null) {
-      this.router.navigate([`/${contestName}/editarConcurso`]);
+      this.router.navigate([`/${contestId}/editarConcurso`]);
     } else {
       console.error("El id de la competición no está definido. Verifica su inicialización.");
     }
@@ -97,18 +97,17 @@ export class ContestListComponent implements OnInit {
     this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
   }
 
-  navigateToPlayWordle(contestName: string, wordleIndex: number) {
+  navigateToPlayWordle(contestId: number, wordleIndex: number) {
     // El wordleIndex está por si se realiza la funcionalidad que se resuelvan los wordle de manera aleatoria
-    this.router.navigate(['/wordle'], { state: { contestName, wordleIndex, competitionName: this.competitionName } });
+    this.router.navigate(['/wordle'], { state: { contestId, wordleIndex, competitionName: this.competitionName } });
   }
 
-  navigateToWatchStatistics(contestName: string) {
-    console.log(this.competitionName)
-    this.router.navigate([`/${contestName}/verEstadisticas`], { state: { competitionName: this.competitionName } });
+  navigateToWatchStatistics(contestId: number) {
+    this.router.navigate([`/${contestId}/verEstadisticas`], { state: { competitionName: this.competitionName } });
   }
 
-  navigateToRanking(contestName: string) {
-    this.router.navigate([`/${contestName}/verRanking`]);
+  navigateToRanking(contestId: number) {
+    this.router.navigate([`/${contestId}/verRanking`]);
   }
 
   getContestState(contest: Contest): Promise<'upcoming' | 'ongoing' | 'finished'> {
@@ -120,7 +119,7 @@ export class ContestListComponent implements OnInit {
       return Promise.resolve('upcoming');
     } else if (now >= contest.startDate && now <= contest.endDate) {
       if (this.isStudent) {
-        return firstValueFrom(this.contestService.getContestState(contest.contestName, this.tokenService.getUserName()!))
+        return firstValueFrom(this.contestService.getContestState(contest.id, this.tokenService.getUserName()!))
           .then((state) => {
             for (const game of state.games) {
               if (!game.finished) {
@@ -147,6 +146,7 @@ export class ContestListComponent implements OnInit {
     oneYearLater.setFullYear(now.getFullYear() + 1);
 
     const newContest = {
+      id: 0,
       contestName: oldContest.contestName + "_copia",
       competition: oldContest.competition,
       startDate: now,
@@ -158,10 +158,10 @@ export class ContestListComponent implements OnInit {
       wordles: []
     };
 
-    this.contestService.copyContest(newContest, oldContest.contestName).subscribe({
-      next: () => {
+    this.contestService.copyContest(newContest, oldContest.id).subscribe({
+      next: (copiedContest) => {
         const wordStrings: string[] = oldContest.wordles.map(wordle => wordle.word);
-        this.wordleService.saveWordles(wordStrings, newContest.contestName, this.professorName, 0).subscribe({
+        this.wordleService.saveWordles(wordStrings, copiedContest.id, this.professorName, 0).subscribe({
           next: () => {
             alert("Concurso copiado correctamente");
           },

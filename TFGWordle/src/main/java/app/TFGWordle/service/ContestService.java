@@ -20,19 +20,27 @@ public class ContestService {
         return contestRepository.save(contest);
     }
 
+    public void deleteContest(Long id) {
+        contestRepository.deleteById(id);
+    }
+
     public List<Contest> getContestsByCompetition(Competition competition) {
         return contestRepository.findByCompetition(competition);
     }
 
-    public Boolean existsContest(String contestName) {
-        return contestRepository.findByName(contestName).isPresent();
+    public boolean existsByName(String name) {
+        return contestRepository.findByName(name).isPresent();
     }
 
     public Contest getByName(String contestName) {
         return contestRepository.findByName(contestName).get();
     }
 
-    public void deleteContest(Long id) {
-        contestRepository.deleteById(id);
+    public boolean existsById(Long id) {
+        return contestRepository.existsById(id);
+    }
+
+    public Contest getById(Long id) {
+        return contestRepository.findById(id).get();
     }
 }

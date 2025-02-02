@@ -59,14 +59,20 @@ public class ContestController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newContest/{competitionId}")
     public ResponseEntity<Contest> createContest(@RequestBody Contest contest, @PathVariable Long competitionId) {
-        if (contestService.existsContest(contest.getContestName()))
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        if (!competitionService.existsCompetition(competitionId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Competition competition = competitionService.getCompetitionById(competitionId);
+        if (competition.getContests().contains(contest))
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+        competition.getContests().add(contest);
         contest.setCompetition(competition);
         contest.setNumTries(6);
         contest.setUseDictionary(false);
         contest.setUseExternalFile(false);
+
+        competitionService.save(competition);
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
@@ -82,11 +88,13 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @DeleteMapping("/deleteContest/{contestName}")
-    public ResponseEntity<?> deleteContest(@PathVariable("contestName") String contestName) {
-        if (!contestService.existsContest(contestName))
+    @DeleteMapping("/deleteContest/{contestId}")
+    public ResponseEntity<?> deleteContest(@PathVariable Long contestId) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
-        Contest contest = contestService.getByName(contestName);
+
+        Contest contest = contestService.getById(contestId);
+
         if (contestStateService.existsByContest(contest.getId())) {
             List<ContestState> contestState = contestStateService.getAllByContest(contest.getId());
             List<ContestStateLog> contestStateLogs = contestStateService.getLogsByContestId(contest.getId());
@@ -98,16 +106,17 @@ public class ContestController {
             }
         }
         contestService.deleteContest(contest.getId());
+
         return ResponseEntity.ok(Map.of("message", "Concurso eliminado"));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/editContest/{contestName}")
-    public ResponseEntity<?> updateContest(@PathVariable String contestName, @RequestBody Contest contest) {
-        if (!contestService.existsContest(contestName))
+    @PostMapping("/editContest/{contestId}")
+    public ResponseEntity<?> updateContest(@PathVariable Long contestId, @RequestBody Contest contest) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        Contest oldContest = contestService.getByName(contestName);
+        Contest oldContest = contestService.getById(contestId);
         contest.setCompetition(oldContest.getCompetition());
         contest.setWordles(oldContest.getWordles());
 
@@ -115,35 +124,34 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/{contestName}/contest")
-    public ResponseEntity<Contest> getContestByName(@PathVariable String contestName) {
-        if (!contestService.existsContest(contestName))
+    @GetMapping("/{contestId}/contest")
+    public ResponseEntity<Contest> getContestById(@PathVariable Long contestId) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
-        return ResponseEntity.ok(contest);
+        return ResponseEntity.ok(contestService.getById(contestId));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/copyContest/{oldContestName}")
-    public ResponseEntity<Contest> copyContest(@RequestBody Contest newContest, @PathVariable String oldContestName) {
-        if (contestService.existsContest(newContest.getContestName()))
+    @PostMapping("/copyContest/{oldContestId}")
+    public ResponseEntity<Contest> copyContest(@RequestBody Contest newContest, @PathVariable Long oldContestId) {
+        if (contestService.existsByName(newContest.getContestName()))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        newContest.setCompetition(contestService.getByName(oldContestName).getCompetition());
+        newContest.setCompetition(contestService.getById(oldContestId).getCompetition());
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(newContest));
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/newContestState/{contestName}/{userName}")
-    public ResponseEntity<?> createContestState(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleState wordleState) {
+    @PostMapping("/newContestState/{contestId}/{userName}")
+    public ResponseEntity<?> createContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        if (!contestService.existsContest(contestName))
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
         User user = userService.getByUserName(userName).get();
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         if (contestStateService.existsState(contest.getId(), user.getId()))
             return new ResponseEntity<>("Estado ya creado", HttpStatus.CONFLICT);
@@ -160,15 +168,15 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/getContestState/{contestName}/{userName}")
-    public ResponseEntity<WordleState> getContestState(@PathVariable String contestName, @PathVariable String userName) {
+    @GetMapping("/getContestState/{contestId}/{userName}")
+    public ResponseEntity<WordleState> getContestState(@PathVariable Long contestId, @PathVariable String userName) {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        if (!contestService.existsContest(contestName))
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         User user = userService.getByUserName(userName).get();
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         if (!contestStateService.existsState(contest.getId(), user.getId()))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -177,15 +185,15 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/updateContestState/{contestName}/{userName}")
-    public ResponseEntity<?> updateContestState(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleState wordleState) {
+    @PostMapping("/updateContestState/{contestId}/{userName}")
+    public ResponseEntity<?> updateContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        if (!contestService.existsContest(contestName))
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
         User user = userService.getByUserName(userName).get();
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
         ContestState contestState = contestStateService.getContestState(contest.getId(), user.getId());
         try {
             JsonNode jsonNode = objectMapper.valueToTree(wordleState);
@@ -197,15 +205,15 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/createContestLog/{contestName}/{userName}")
-    public ResponseEntity<?> createContestLog(@PathVariable String contestName, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
+    @PostMapping("/createContestLog/{contestId}/{userName}")
+    public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        if (!contestService.existsContest(contestName))
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
         User user = userService.getByUserName(userName).get();
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         ContestStateLog contestStateLog = new ContestStateLog(contest, user);
         try {
@@ -219,12 +227,12 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/getAllContestState/{contestName}")
-    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable String contestName) throws JsonProcessingException {
-        if (!contestService.existsContest(contestName))
+    @GetMapping("/getAllContestState/{contestId}")
+    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable Long contestId) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         List<ContestState> contestStates = contestStateService.getAllByContest(contest.getId());
 
@@ -238,12 +246,12 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getAllContestStateLogs/{contestName}")
-    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable String contestName) throws JsonProcessingException {
-        if (!contestService.existsContest(contestName))
+    @GetMapping("/getAllContestStateLogs/{contestId}")
+    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable Long contestId) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         List<String> contestStateLogs = contestStateService.getAllLogsByContest(contest.getId());
 
@@ -260,14 +268,14 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/getAllUserContestStateLogs/{contestName}/{userName}")
-    public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable String contestName, @PathVariable String userName) throws JsonProcessingException {
-        if (!contestService.existsContest(contestName))
+    @GetMapping("/getAllUserContestStateLogs/{contestId}/{userName}")
+    public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (!userService.existsByUserName(userName))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
         User user = userService.getByUserName(userName).get();
 
         List<String> contestStatesLogs = contestStateService.getAllLogsByContestAndUser(contest.getId(), user.getId());
@@ -291,22 +299,22 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/existsInExternalDictionary/{contestName}/{wordle}")
-    public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable String contestName, @PathVariable String wordle) {
-        if(!contestService.existsContest(contestName))
+    @GetMapping("/existsInExternalDictionary/{contestId}/{wordle}")
+    public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable Long contestId, @PathVariable String wordle) {
+        if(!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
         return ResponseEntity.ok(dictionaryService.existsInExternalDictionary(wordle, contest.getId()));
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
-    @PostMapping("/saveExternalDictionary/{contestName}")
-    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable String contestName, @RequestBody List<String> words) {
-        if (!contestService.existsContest(contestName))
+    @PostMapping("/saveExternalDictionary/{contestId}")
+    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable Long contestId, @RequestBody List<String> words) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        Contest contestToLink = contestService.getByName(contestName);
+        Contest contestToLink = contestService.getById(contestId);
 
         List<DictionaryExternal> toSave = new ArrayList<>();
         for (String word : words) {
@@ -319,22 +327,22 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/getWordles/{contestName}")
-    public ResponseEntity<List<Wordle>> getWordles(@PathVariable String contestName) {
-        if(!contestService.existsContest(contestName))
+    @GetMapping("/getWordles/{contestId}")
+    public ResponseEntity<List<Wordle>> getWordles(@PathVariable Long contestId) {
+        if(!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
         return ResponseEntity.ok(wordleService.findByContestId(contest.getId()));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getLogsInExcel/{contestName}")
-    public ResponseEntity<Resource> getLogsInExcel(@PathVariable String contestName) {
-        if(!contestService.existsContest(contestName))
+    @GetMapping("/getLogsInExcel/{contestId}")
+    public ResponseEntity<Resource> getLogsInExcel(@PathVariable Long contestId) {
+        if(!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Contest contest = contestService.getByName(contestName);
+        Contest contest = contestService.getById(contestId);
 
         List<String> logs = contestStateService.getAllLogsByContest(contest.getId());
         ByteArrayOutputStream out = new ByteArrayOutputStream();

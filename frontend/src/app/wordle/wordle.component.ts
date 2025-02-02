@@ -42,7 +42,7 @@ export class WordleComponent implements OnInit {
       }
     }
 
-    this.wordleService.saveWordles(this.wordles, 'empty', this.professorName, this.folderId).subscribe({
+    this.wordleService.saveWordles(this.wordles, 0, this.professorName, this.folderId).subscribe({
       next: () => {
         alert('Wordles creados correctamente');
       },

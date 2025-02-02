@@ -16,7 +16,7 @@ import { interval, Subscription } from 'rxjs';
 export class ContestStatisticsComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription;
 
-  contestName!: string;
+  contestId: number = 0;
   competitionName!: string;
   isProfessor: boolean = false;
   isStudent: boolean = false;
@@ -86,12 +86,12 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.contestName = this.route.snapshot.paramMap.get('contestName')!;
+    this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.isProfessor = this.tokenService.getAuthorities().includes("ROLE_PROFESSOR");
     this.isStudent = this.tokenService.getAuthorities().includes("ROLE_STUDENT");
     this.isAdmin = this.tokenService.getAuthorities().includes("ROLE_ADMIN");
 
-    this.contestService.getContestByName(this.contestName).subscribe({
+    this.contestService.getContestById(this.contestId).subscribe({
       next: (contest) => {
         contest.wordles.forEach((w: Wordle) => {
           this.wordlesInContest.push(w.word);
@@ -102,7 +102,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       },
     });
 
-    this.contestService.getWordlesInContest(this.contestName).subscribe({
+    this.contestService.getWordlesInContest(this.contestId).subscribe({
       next: (wordles) => {
         wordles.forEach((wordle) => {
           this.wordlesData.push({
@@ -130,7 +130,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.contestService.getAllUserState(this.contestName).subscribe({
+    this.contestService.getAllUserState(this.contestId).subscribe({
       next: (data) => {
         this.totalStudents = data.length;
 
@@ -180,7 +180,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     });
 
     if (this.isStudent) {
-      this.contestService.getAllUserStateLog(this.contestName, this.tokenService.getUserName()!).subscribe({
+      this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
         next: (logs) => {
           logs.forEach((log: WordleStateLog) => {
             const studentInfoItem = this.studentInformation.find((logs) => logs.wordle.toLowerCase() === log.wordleToGuess);
@@ -205,7 +205,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     }
 
     if (this.isProfessor || this.isAdmin) {
-      this.contestService.getAllStateLog(this.contestName).subscribe({
+      this.contestService.getAllStateLog(this.contestId).subscribe({
         next: (logs) => {
           logs.forEach((log: WordleStateLog) => {
             this.studentsLog.push({
@@ -238,7 +238,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   getLogs() {
-    this.contestService.getAllStateLog(this.contestName).subscribe({
+    this.contestService.getAllStateLog(this.contestId).subscribe({
       next: (logs) => {
         const updatedLogs = logs.map((log: WordleStateLog) => ({
           student: log.userName,
@@ -288,7 +288,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel() {
-    this.contestService.getLogsInExcel(this.contestName).subscribe({
+    this.contestService.getLogsInExcel(this.contestId).subscribe({
       next: (docu) => {
         const blob = new Blob([docu], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);

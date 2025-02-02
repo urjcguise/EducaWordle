@@ -73,7 +73,7 @@ export class PlayWordleComponent {
   userEmail: string = '';
 
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
-    this.wordleService.getWordlesByContest(history.state.contestName).subscribe({
+    this.wordleService.getWordlesByContest(history.state.contestId).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
         this.targetWords = this.wordleList.map((wordle) => wordle.word);
@@ -87,7 +87,7 @@ export class PlayWordleComponent {
       },
     });
 
-    this.contestService.getContestByName(history.state.contestName).subscribe({
+    this.contestService.getContestById(history.state.contestId).subscribe({
       next: (cont) => {
         this.contest = cont;
         this.numTries = cont.numTries;
@@ -124,7 +124,7 @@ export class PlayWordleComponent {
 
     this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     this.wordleState = new WordleState(this.wordleList.length, this.games);
-    this.contestService.createContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
+    this.contestService.createContestState(history.state.contestId, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
       },
@@ -217,7 +217,7 @@ export class PlayWordleComponent {
 
     if (this.contest.useDictionary) {
       const checkDictionary = this.contest.useExternalFile
-        ? () => this.contestService.existsInExternalDictionary(wordFromCurTry, this.contest.contestName)
+        ? () => this.contestService.existsInExternalDictionary(wordFromCurTry, this.contest.id)
         : () => this.contestService.existsInDictionary(wordFromCurTry);
 
       checkDictionary().subscribe({
@@ -387,7 +387,7 @@ export class PlayWordleComponent {
     });
     currentGame.state = newState;
 
-    this.contestService.updateContestState(history.state.contestName, this.tokenService.getUserName()!, this.wordleState).subscribe({
+    this.contestService.updateContestState(history.state.contestId, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso actualizado correctamente');
       },
@@ -422,7 +422,7 @@ export class PlayWordleComponent {
       wrong: counts.wrong,
       state: this.won
     };
-    this.contestService.createContestLog(this.contest.contestName, this.tokenService.getUserName()!, this.wordleStateLog).subscribe({
+    this.contestService.createContestLog(this.contest.id, this.tokenService.getUserName()!, this.wordleStateLog).subscribe({
       next: () => {
         console.log('Creado nuevo log correctamente');
       },
@@ -433,6 +433,6 @@ export class PlayWordleComponent {
   }
 
   navigateToStatistics() {
-    this.router.navigate(['/' + this.contest.contestName + '/verEstadisticas'], { state: { competitionName: history.state.competitionName } });
+    this.router.navigate(['/' + this.contest.id + '/verEstadisticas'], { state: { competitionName: history.state.competitionName } });
   }
 }

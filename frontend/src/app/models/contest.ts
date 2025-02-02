@@ -2,6 +2,7 @@ import { Competition } from './competition';
 import { Wordle } from './wordle';
 
 export class Contest {
+    id!: number;
     contestName!: string;
     competition!: Competition;
     startDate!: Date;

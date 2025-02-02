@@ -17,7 +17,7 @@ export class EditContestComponent {
   professorName: string = '';
 
   contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, "", new Competition(""), []);
-  contestName = "";
+  contestId: number = 0;
   dictionary: boolean = false;
   file: boolean = false;
   wordles: string[] = [];
@@ -34,14 +34,13 @@ export class EditContestComponent {
   ngOnInit(): void {
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.tokenService.getUserName()!;
-    const contestNameParam = this.route.snapshot.paramMap.get('contestName');
-    this.contestName = contestNameParam || '';
+    this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.loadContest();
     this.getWordles();
   }
 
   loadContest(): void {
-    this.contestService.getContestByName(this.contestName).subscribe({
+    this.contestService.getContestById(this.contestId).subscribe({
       next: (data: Contest) => {
         this.contest = data;
         this.dictionary = data.useDictionary || false;
@@ -55,7 +54,7 @@ export class EditContestComponent {
   }
 
   getWordles(): void {
-    this.wordleService.getWordlesByContest(this.contestName).subscribe({
+    this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (data: Wordle[]) => {
         if (data && data.length > 0) {
           this.wordles = data.map((elem) => elem.word);
@@ -105,7 +104,7 @@ export class EditContestComponent {
       reader.onload = () => {
         const content = reader.result as string;
         toSave.push(...content.split('\n').map(line => line.trim()).filter(line => line !== ""));
-        this.contestService.saveExternalDictionary(toSave, this.contestName).subscribe({
+        this.contestService.saveExternalDictionary(toSave, this.contestId).subscribe({
           next: () => {
             console.log("Palabras guardadas correctamente en el diccionario");
           },
@@ -144,7 +143,7 @@ export class EditContestComponent {
       useExternalFile: this.file,
       wordles: updatedWordles
     };
-    this.contestService.editContest(this.contestName, updatedContest).subscribe({
+    this.contestService.editContest(this.contestId, updatedContest).subscribe({
       next: () => {
         alert('Concurso guardado con éxito');
       },
@@ -166,7 +165,7 @@ export class EditContestComponent {
   saveWordles(wordlesToSave: string[]) {
     if (wordlesToSave.length == 0)
       return;
-    this.wordleService.saveWordles(wordlesToSave, this.contest.contestName, this.professorName, 0).subscribe({
+    this.wordleService.saveWordles(wordlesToSave, this.contest.id, this.professorName, 0).subscribe({
       next: () => {
         alert('Wordles guardados con éxito');
         this.initialWordles = [...this.wordles];

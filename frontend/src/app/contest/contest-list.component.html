@@ -14,35 +14,35 @@
             <span class="contest-date">{{ item.contest.endDate | date: 'dd/MM/yyyy HH:mm' }}</span>
 
             <div *ngIf="isProfessor || isAdmin">
-              <button class="btn btn-danger btn-sm ml-2" (click)="deleteContest(item.contest.contestName)">
+              <button class="btn btn-danger btn-sm ml-2" (click)="deleteContest(item.contest.id)">
                 <i class="fas fa-trash-alt"></i>Borrar
               </button>
               <button *ngIf="item.state !== 'finished'" class="btn btn-warning btn-sm ml-2"
-                (click)="navigateToEditWordle(item.contest.contestName)">
+                (click)="navigateToEditWordle(item.contest.id)">
                 <i class="fas fa-clipboard-check"></i>Editar
               </button>
               <button class="btn btn-success btn-sm ml-2" (click)="copyContest(item.contest)">
                 <i class="fas fa-copy"></i>Copiar
               </button>
-              <button class="btn btn-info btn-sm ml-2" (click)="navigateToWatchStatistics(item.contest.contestName)">
+              <button class="btn btn-info btn-sm ml-2" (click)="navigateToWatchStatistics(item.contest.id)">
                 <i class="fas fa-chart-line"></i>Ver datos
               </button>
-              <button class="btn btn-primary btn-sm ml-2" (click)="navigateToRanking(item.contest.contestName)">
+              <button class="btn btn-primary btn-sm ml-2" (click)="navigateToRanking(item.contest.id)">
                 <i class="fas fa-trophy"></i>Ver ranking
               </button>
             </div>
 
             <div *ngIf="isStudent">
               <button *ngIf="item.state === 'ongoing'" class="btn btn-success btn-sm ml-2"
-                (click)="navigateToPlayWordle(item.contest.contestName, 0)">
+                (click)="navigateToPlayWordle(item.contest.id, 0)">
                 <i class="fas fa-play"></i>Comenzar
               </button>
               <button *ngIf="item.state === 'finished'" class="btn btn-primary btn-sm ml-2"
-                (click)="navigateToRanking(item.contest.contestName)">
+                (click)="navigateToRanking(item.contest.id)">
                 <i class="fas fa-trophy"></i>Ver ranking
               </button>
               <button *ngIf="item.state === 'finished'" class="btn btn-info btn-sm ml-2"
-                (click)="navigateToWatchStatistics(item.contest.contestName)">
+                (click)="navigateToWatchStatistics(item.contest.id)">
                 <i class="fas fa-chart-line"></i>Ver datos
               </button>
             </div>

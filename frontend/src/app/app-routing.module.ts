@@ -36,13 +36,13 @@ const routes: Routes = [
   { path: ':wordle/editarWordle', component: EditWordleComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
   { path: 'nuevoConcurso', component: ContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':competitionName/concursos', component: ContestListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] } },
-  { path: ':contestName/editarConcurso', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
+  { path: ':contestId/editarConcurso', component: EditContestComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':userName/editarUsuario', component: EditUserComponent, canActivate: [guard], data: { expectedRol: ['admin'] } },
   { path: ':competitionName/alumnos', component: StudentListComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
   { path: 'nuevoAlumno', component: NewStudentComponent, canActivate: [guard], data: { expectedRol: ['professor', 'admin'] } },
   { path: 'nuevoProfesor', component: NewProfessorComponent, canActivate: [guard], data: { expectedRol: ['admin'] } },
-  { path: ':contestName/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] } },
-  { path: ':contestName/verRanking', component: ContestRankingComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] } }
+  { path: ':contestId/verEstadisticas', component: ContestStatisticsComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] } },
+  { path: ':contestId/verRanking', component: ContestRankingComponent, canActivate: [guard], data: { expectedRol: ['professor', 'student', 'admin'] } }
 ];
 
 @NgModule({

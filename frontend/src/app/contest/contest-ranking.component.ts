@@ -11,7 +11,7 @@ import { UserState } from '../models/user-state';
 })
 export class ContestRankingComponent implements OnInit {
 
-  contestName: string = '';
+  contestId: number = 0;
   contest!: Contest;
 
   studentsRanking: {
@@ -25,11 +25,11 @@ export class ContestRankingComponent implements OnInit {
   constructor(private contestService: ContestService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.contestName = this.route.snapshot.paramMap.get('contestName')!;
-    this.contestService.getContestByName(this.contestName).subscribe({
+    this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
+    this.contestService.getContestById(this.contestId).subscribe({
       next: (contest) => {
         this.contest = contest;
-        this.contestService.getAllUserState(this.contest.contestName).subscribe({
+        this.contestService.getAllUserState(this.contest.id).subscribe({
           next: (userState) => {
             this.obtainRanking(userState);
           },

@@ -14,8 +14,8 @@ export class WordleService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public saveWordles(wordles: string[], contestName: string, professorName: string, folderId: number): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "newWordles/" + contestName + '/' + professorName + '/' + folderId, wordles);
+  public saveWordles(wordles: string[], contestId: number, professorName: string, folderId: number): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + "newWordles/" + contestId + '/' + professorName + '/' + folderId, wordles);
   }
 
   public deleteWordles(wordlesName: string[]): Observable<any> {
@@ -26,8 +26,8 @@ export class WordleService {
     return this.httpClient.post<any>(this.apiUrl + "updateWordle/" + wordInitial + '/' + wordUpdated, contests);
   }
 
-  public getWordlesByContest(contestName: string): Observable<Wordle[]> {
-    return this.httpClient.get<Wordle[]>(this.apiUrl + "getWordlesByContest/" + contestName);
+  public getWordlesByContest(contestId: number): Observable<Wordle[]> {
+    return this.httpClient.get<Wordle[]>(this.apiUrl + "getWordlesByContest/" + contestId);
   }
 
   public getWordlesByProfessor(professorName: string): Observable<Wordle[]> {

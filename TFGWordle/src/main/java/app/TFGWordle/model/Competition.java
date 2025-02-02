@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,6 +26,10 @@ public class Competition {
 
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Participation> participations = new HashSet<>();
+
+    @OneToMany(mappedBy = "competition")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Contest> contests = new ArrayList<>();
 
     public Competition() {
     }
@@ -63,5 +69,13 @@ public class Competition {
 
     public void setParticipations(Set<Participation> participations) {
         this.participations = participations;
+    }
+
+    public List<Contest> getContests() {
+        return contests;
+    }
+
+    public void setContests(List<Contest> contests) {
+        this.contests = contests;
     }
 }

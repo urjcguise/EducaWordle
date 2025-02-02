@@ -24,24 +24,24 @@ export class ContestService {
     return this.httpClient.get<Contest[]>(this.apiUrl + competitionName + '/contests');
   }
 
-  public deleteContest(contestName: string) {
-    return this.httpClient.delete<Contest>(this.apiUrl + 'deleteContest/' + contestName);
+  public deleteContest(contestId: number) {
+    return this.httpClient.delete<Contest>(this.apiUrl + 'deleteContest/' + contestId);
   }
 
-  public editContest(contestName: string, updatedContest: Contest) {
-    return this.httpClient.post<any>(this.apiUrl + 'editContest/' + contestName, updatedContest);
+  public editContest(contestId: number, updatedContest: Contest) {
+    return this.httpClient.post<any>(this.apiUrl + 'editContest/' + contestId, updatedContest);
   }
 
-  public getContestByName(contestName: string) {
-    return this.httpClient.get<Contest>(this.apiUrl + contestName + '/contest');
+  public getContestById(contestId: number) {
+    return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');
   }
 
-  public copyContest(newContest: Contest, oldContestName: string): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestName, newContest);
+  public copyContest(newContest: Contest, oldContestId: number): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestId, newContest);
   }
 
-  public createContestState(contestName: string, userName: string, wordleState: WordleState): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + 'newContestState/' + contestName + '/' + userName, wordleState).pipe(
+  public createContestState(contestId: number, userName: string, wordleState: WordleState): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'newContestState/' + contestId + '/' + userName, wordleState).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 409) {
           console.log('El estado del concurso ya existe. No se creará nuevamente.');
@@ -52,48 +52,48 @@ export class ContestService {
     );
   }
 
-  public getContestState(contestName: string, userName: string) {
-    return this.httpClient.get<WordleState>(this.apiUrl + 'getContestState/' + contestName + '/' + userName);
+  public getContestState(contestId: number, userName: string) {
+    return this.httpClient.get<WordleState>(this.apiUrl + 'getContestState/' + contestId + '/' + userName);
   }
 
-  public updateContestState(contestName: string, userName: string, wordleState: WordleState) {
-    return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestName + '/' + userName, wordleState);
+  public updateContestState(contestId: number, userName: string, wordleState: WordleState) {
+    return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestId + '/' + userName, wordleState);
   }
 
-  public createContestLog(contestName: string, userName: string, contestLog: WordleStateLog) {
-    return this.httpClient.post<any>(this.apiUrl + 'createContestLog/' + contestName + '/' + userName, contestLog);
+  public createContestLog(contestId: number, userName: string, contestLog: WordleStateLog) {
+    return this.httpClient.post<any>(this.apiUrl + 'createContestLog/' + contestId + '/' + userName, contestLog);
   }
 
-  public getAllUserState(contestName: string) {
-    return this.httpClient.get<UserState[]>(this.apiUrl + 'getAllContestState/' + contestName);
+  public getAllStateLog(contestId: number) {
+    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllContestStateLogs/' + contestId);
   }
 
-  public getAllUserStateLog(contestName: string, userName: string) {
-    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllUserContestStateLogs/' + contestName + '/' + userName);
+  public getAllUserState(contestId: number) {
+    return this.httpClient.get<UserState[]>(this.apiUrl + 'getAllContestState/' + contestId);
   }
 
-  public getAllStateLog(contestName: string) {
-    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllContestStateLogs/' + contestName);
-  }
+  public getAllUserStateLog(contestId: number, userName: string) {
+    return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllUserContestStateLogs/' + contestId + '/' + userName);
+  }  
 
   public existsInDictionary(word: string) {
     return this.httpClient.get<Boolean>(this.apiUrl + 'existsInDictionary/' + word);
   }
 
-  public existsInExternalDictionary(word: string, contestName: string) {
-    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInExternalDictionary/' + contestName + '/' + word);
+  public existsInExternalDictionary(word: string, contestId: number) {
+    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInExternalDictionary/' + contestId + '/' + word);
   }
 
-  public saveExternalDictionary(words: string[], contestName: string) {
-    return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestName, words);
+  public saveExternalDictionary(words: string[], contestId: number) {
+    return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestId, words);
   }
 
-  public getWordlesInContest(contestName: string) {
-    return this.httpClient.get<Wordle[]>(this.apiUrl + 'getWordles/' + contestName);
+  public getWordlesInContest(contestId: number) {
+    return this.httpClient.get<Wordle[]>(this.apiUrl + 'getWordles/' + contestId);
   }
 
-  public getLogsInExcel(contestName: string) {
-    return this.httpClient.get(this.apiUrl + 'getLogsInExcel/' + contestName, {
+  public getLogsInExcel(contestId: number) {
+    return this.httpClient.get(this.apiUrl + 'getLogsInExcel/' + contestId, {
       responseType: 'blob'
     });
   }
