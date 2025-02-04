@@ -111,12 +111,12 @@ public class WordleController {
         }
 
         for (Contest contest : contests) {
-            if (!contestService.existsByName(contest.getContestName())) {
+            if (!contestService.existsById(contest.getId())) {
                 return new ResponseEntity<>("El concurso " + contest.getContestName() + " no existe", HttpStatus.NOT_FOUND);
             }
 
             if (contest.getCompetition() == null) {
-                Contest existingContest = contestService.getByName(contest.getContestName());
+                Contest existingContest = contestService.getById(contest.getId());
                 contest.setCompetition(existingContest.getCompetition());
             }
 

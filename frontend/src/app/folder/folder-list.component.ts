@@ -184,6 +184,7 @@ export class FolderListComponent implements OnInit {
   }
 
   enterFolder(i: number) {
+    this.parentsFoldersList = [];
     this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name } });
   }
 

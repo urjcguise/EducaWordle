@@ -28,10 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/competitions")
@@ -94,9 +91,17 @@ public class CompetitionController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @DeleteMapping("/deleteCompetition/{id}")
-    public ResponseEntity<?> deleteCompetition(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteCompetition(@PathVariable Long id) {
         if (!competitionService.existsCompetition(id))
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
+
+        List<Participation> participations = competitionService.getParticipations(id);
+        for (Participation p: participations) {
+            User student = p.getStudent();
+            if (student.getParticipations().size() == 1)
+                userService.deleteUser(student);
+        }
+
         List<Contest> contestInCompetition = contestService.getContestsByCompetition(competitionService.getCompetitionById(id));
         for (Contest contest : contestInCompetition) {
             contestService.deleteContest(contest.getId());
@@ -152,6 +157,12 @@ public class CompetitionController {
                     String password = row.getCell(2).getStringCellValue();
 
                     if (userService.existsByUserName(name) || userService.existsByEmail(email)) {
+                        User userExists = userService.getByUserName(name).get();
+                        List<Participation> competitions = participationService.findCompetitionsByStudent(userExists.getId());
+                        if (!competitions.contains(competition)) {
+                            Participation newParticipation = new Participation(userExists, competition);
+                            participationService.save(newParticipation);
+                        }
                         continue;
                     }
 

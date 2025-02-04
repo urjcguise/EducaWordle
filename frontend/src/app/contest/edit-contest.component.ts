@@ -139,6 +139,7 @@ export class EditContestComponent {
       contestName: this.contest.contestName,
       startDate: new Date(this.formattedStartDate),
       endDate: new Date(this.formattedEndDate),
+      numTries: this.numTries,
       useDictionary: this.dictionary,
       useExternalFile: this.file,
       wordles: updatedWordles

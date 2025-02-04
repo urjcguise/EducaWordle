@@ -1,6 +1,7 @@
 package app.TFGWordle.service;
 
 import app.TFGWordle.model.Competition;
+import app.TFGWordle.model.Participation;
 import app.TFGWordle.repository.CompetitionRepository;
 import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
@@ -42,5 +43,9 @@ public class CompetitionService {
 
     public boolean existsCompetitionByName(String name) {
         return competitionRepository.existsByName(name);
+    }
+
+    public List<Participation> getParticipations(Long id) {
+        return competitionRepository.getParticipationsById(id);
     }
 }

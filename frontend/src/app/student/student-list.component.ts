@@ -47,7 +47,7 @@ export class StudentListComponent implements OnInit {
 
     this.competitionService.addByExcel(this.competitionId, formData).subscribe({
       next: () => {
-        console.log('Alumnos creados correctamente');
+        alert('Alumnos creados correctamente');
       },
       error: (error) => {
         console.error('Error creando los alumnos', error);

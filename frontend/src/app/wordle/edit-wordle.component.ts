@@ -41,7 +41,11 @@ export class EditWordleComponent implements OnInit {
         competitions.forEach((competition) => {
           this.contestService.getContestsByCompetition(competition.competitionName).subscribe({
             next: (contests) => {
-              const formattedContests = contests.map((contest) => ({ contest }));
+              const now = new Date();
+              const formattedContests = contests
+                .filter((contest) => new Date(contest.endDate) > now)
+                .map((contest) => ({ contest }));
+
               this.competitionWithContest.push({
                 competition: competition,
                 contests: formattedContests,
@@ -69,11 +73,11 @@ export class EditWordleComponent implements OnInit {
   }
 
   isContestSelected(contest: Contest): boolean {
-    return this.contestsUse.some((usedContest) => usedContest.contestName === contest.contestName);
+    return this.contestsUse.some((usedContest) => usedContest.id === contest.id);
   }
 
   toggleContestSelection(contest: Contest): void {
-    const index = this.contestsUse.findIndex((usedContest) => usedContest.contestName === contest.contestName);
+    const index = this.contestsUse.findIndex((usedContest) => usedContest.id === contest.id);
     if (index > -1) {
       this.contestsUse.splice(index, 1);
     } else {

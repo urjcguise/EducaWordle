@@ -1,5 +1,6 @@
 package app.TFGWordle.service;
 
+import app.TFGWordle.model.Contest;
 import app.TFGWordle.model.Dictionary;
 import app.TFGWordle.model.DictionaryExternal;
 import app.TFGWordle.repository.DictionaryExternalRepository;
@@ -35,5 +36,9 @@ public class DictionaryService {
 
     public Boolean existsInExternalDictionary(String wordle, Long contestId) {
         return externalRepository.existsWord(wordle, contestId);
+    }
+
+    public void deleteWordsByContest(Contest contest) {
+        externalRepository.deleteByContest(contest);
     }
 }

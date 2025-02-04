@@ -95,6 +95,9 @@ public class ContestController {
 
         Contest contest = contestService.getById(contestId);
 
+        if (contest.getUseExternalFile())
+            dictionaryService.deleteWordsByContest(contest);
+
         if (contestStateService.existsByContest(contest.getId())) {
             List<ContestState> contestState = contestStateService.getAllByContest(contest.getId());
             List<ContestStateLog> contestStateLogs = contestStateService.getLogsByContestId(contest.getId());
