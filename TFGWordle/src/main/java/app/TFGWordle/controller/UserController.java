@@ -3,7 +3,6 @@ package app.TFGWordle.controller;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.dto.NewUser;
-import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.service.UserService;
@@ -16,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,26 +37,20 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllProfessors")
     public ResponseEntity<List<User>> getAllProfessors() {
-        List<User> userList = userService.getAll();
-        List<User> toReturn = new ArrayList<>();
-        Rol rolProfessor = new Rol(RolName.ROLE_PROFESSOR);
-        for (User user : userList) {
-            if (user.getRoles().contains(rolProfessor))
-                toReturn.add(user);
-        }
+        List<User> toReturn = userService.getAll().stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getRolName().equals(RolName.ROLE_PROFESSOR)))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllStudents")
     public ResponseEntity<List<User>> getAllStudents() {
-        List<User> userList = userService.getAll();
-        List<User> toReturn = new ArrayList<>();
-        Rol rolStudent = new Rol(RolName.ROLE_STUDENT);
-        for (User user : userList) {
-            if (user.getRoles().contains(rolStudent))
-                toReturn.add(user);
-        }
+        List<User> toReturn = userService.getAll().stream()
+                .filter(user -> user.getRoles().stream()
+                        .anyMatch(role -> role.getRolName().equals(RolName.ROLE_STUDENT)))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
