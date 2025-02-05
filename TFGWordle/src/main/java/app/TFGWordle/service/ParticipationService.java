@@ -22,7 +22,7 @@ public class ParticipationService {
         return participationRepository.findByCompetitionId(competitionId);
     }
 
-    public List<Participation> findCompetitionsByStudent(Long studentId) {
+    public List<Participation> findParticipationsByStudent(Long studentId) {
         return participationRepository.findByUserId(studentId);
     }
 

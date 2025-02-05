@@ -58,10 +58,8 @@ public class CompetitionController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newCompetition/{professorName}")
     public ResponseEntity<?> createCompetition(@PathVariable String professorName, @RequestBody Competition competition) {
-        if (!userService.existsByUserName(professorName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-
-        User professor = userService.getByUserName(professorName).get();
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (competitionService.existsCompetitionByName(competition.getCompetitionName()))
             return new ResponseEntity<>("Nombre ya utilizado", HttpStatus.CONFLICT);
@@ -76,7 +74,7 @@ public class CompetitionController {
     @GetMapping("/getCompetitions/{professorName}")
     public ResponseEntity<List<Competition>> getCompetitionsByProfessor(@PathVariable String professorName) {
         User professor = userService.getByUserName(professorName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profesor no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         List<Competition> competitions = competitionService.getCompetitionsByProfesor(professor);
         return new ResponseEntity<>(competitions, HttpStatus.OK);
@@ -158,8 +156,8 @@ public class CompetitionController {
 
                     if (userService.existsByUserName(name) || userService.existsByEmail(email)) {
                         User userExists = userService.getByUserName(name).get();
-                        List<Participation> competitions = participationService.findCompetitionsByStudent(userExists.getId());
-                        if (!competitions.contains(competition)) {
+                        List<Participation> participations = participationService.findParticipationsByStudent(userExists.getId());
+                        if (!participations.contains(competition)) {
                             Participation newParticipation = new Participation(userExists, competition);
                             participationService.save(newParticipation);
                         }

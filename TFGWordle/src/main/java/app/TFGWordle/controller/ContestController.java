@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -148,12 +149,11 @@ public class ContestController {
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/newContestState/{contestId}/{userName}")
     public ResponseEntity<?> createContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        User user = userService.getByUserName(userName).get();
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
 
         if (contestStateService.existsState(contest.getId(), user.getId()))
@@ -173,12 +173,11 @@ public class ContestController {
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getContestState/{contestId}/{userName}")
     public ResponseEntity<WordleState> getContestState(@PathVariable Long contestId, @PathVariable String userName) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User user = userService.getByUserName(userName).get();
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
 
         if (!contestStateService.existsState(contest.getId(), user.getId()))
@@ -190,12 +189,11 @@ public class ContestController {
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/updateContestState/{contestId}/{userName}")
     public ResponseEntity<?> updateContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        User user = userService.getByUserName(userName).get();
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
         ContestState contestState = contestStateService.getContestState(contest.getId(), user.getId());
         try {
@@ -210,12 +208,11 @@ public class ContestController {
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/createContestLog/{contestId}/{userName}")
     public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        User user = userService.getByUserName(userName).get();
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
 
         ContestStateLog contestStateLog = new ContestStateLog(contest, user);
@@ -275,11 +272,10 @@ public class ContestController {
     public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
-        User user = userService.getByUserName(userName).get();
 
         List<String> contestStatesLogs = contestStateService.getAllLogsByContestAndUser(contest.getId(), user.getId());
 

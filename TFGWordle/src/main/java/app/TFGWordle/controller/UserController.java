@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,18 +58,18 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getUserData/{userName}")
     public ResponseEntity<User> getUserData(@PathVariable String userName) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(userService.getByUserName(userName).get(), HttpStatus.OK);
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/updateUser/{oldUserName}")
     public ResponseEntity<?> updateUser(@PathVariable String oldUserName, @RequestBody NewUser uploadUser) {
-        if (!userService.existsByUserName(oldUserName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        User userToUpdate = userService.getByUserName(oldUserName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        User userToUpdate = userService.getByUserName(oldUserName).get();
         userToUpdate.setUsername(uploadUser.getName());
         userToUpdate.setEmail(uploadUser.getEmail());
         if (!uploadUser.getPassword().isEmpty())
@@ -81,33 +82,33 @@ public class UserController {
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getUserEmail/{userName}")
     public ResponseEntity<String> getUserEmail(@PathVariable String userName) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(userService.getByUserName(userName).get().getEmail(), HttpStatus.OK);
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return new ResponseEntity<>(user.getEmail(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/deleteUserByName/{userName}")
+    @DeleteMapping("/deleteUserByName/{userName}")
     public ResponseEntity<?> deleteUserByName(@PathVariable String userName) {
-        if (!userService.existsByUserName(userName))
-            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-        User userToDelete = userService.getByUserName(userName).get();
+        User userToDelete = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         userService.deleteUser(userToDelete);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getCompetitions/{userName}")
-    public ResponseEntity<List<Competition>> getCompetition(@PathVariable String userName) {
-        if (userService.existsByUserName(userName)) {
-            User user = userService.getByUserName(userName).get();
-            List<Competition> toReturn = new ArrayList<>();
-            for (Participation participation : participationService.findCompetitionsByStudent(user.getId())) {
-                toReturn.add(participation.getCompetition());
-            }
-            return new ResponseEntity<>(toReturn, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<List<Competition>> getCompetitions(@PathVariable String userName) {
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        List<Competition> toReturn = participationService.findParticipationsByStudent(user.getId())
+                .stream()
+                .map(Participation::getCompetition)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 }

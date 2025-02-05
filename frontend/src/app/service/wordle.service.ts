@@ -19,8 +19,11 @@ export class WordleService {
   }
 
   public deleteWordles(wordlesName: string[]): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "deleteWordles", wordlesName);
+    return this.httpClient.delete<any>(this.apiUrl + "deleteWordles", {
+      body: wordlesName
+    });
   }
+
 
   public updateWordle(wordInitial: string, wordUpdated: string, contests: Contest[]): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + "updateWordle/" + wordInitial + '/' + wordUpdated, contests);
@@ -43,7 +46,9 @@ export class WordleService {
   }
 
   public deleteFolders(foldersIds: number[]): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + "deleteFolders", foldersIds);
+    return this.httpClient.delete<any>(this.apiUrl + "deleteFolders", {
+      body: foldersIds
+    });
   }
 
   public getFoldersByProfessor(professorName: string): Observable<Folder[]> {

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +38,14 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newWordles/{contestId}/{professorName}/{folderId}")
     public ResponseEntity<List<Wordle>> newWordles(@RequestBody List<String> wordles, @PathVariable Long contestId, @PathVariable String professorName, @PathVariable Long folderId) {
-
-        if (!userService.existsByUserName(professorName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
         if (contestId != 0 & !contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (folderId != 0 && !folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User professor = userService.getByUserName(professorName).get();
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<Contest> contests = new ArrayList<>();
 
         if (contestId != 0)
@@ -68,7 +66,7 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/deleteWordles")
+    @DeleteMapping("/deleteWordles")
     public ResponseEntity<?> deleteWordles(@RequestBody List<String> wordlesName) {
 
         for (String word : wordlesName) {
@@ -145,11 +143,8 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getWordlesByProfessor/{professorName}")
     public ResponseEntity<List<Wordle>> getWordlesByProfessor(@PathVariable String professorName) {
-
-        if (!userService.existsByUserName(professorName))
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-
-        User professor = userService.getByUserName(professorName).get();
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<Wordle> toReturn = new ArrayList<>();
 
         for (Wordle w : wordleService.findByProfessorId(professor.getId())) {
@@ -173,13 +168,11 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newFolder/{folderName}")
     public ResponseEntity<?> createFolder(@PathVariable String folderName, @RequestBody String professorName) {
-        if (!userService.existsByUserName(professorName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
         if (folderService.existsByName(folderName))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        User professor = userService.getByUserName(professorName).get();
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         Folder newFolder = new Folder(folderName, professor);
         newFolder.setWordles(new ArrayList<>());
@@ -191,7 +184,7 @@ public class WordleController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/deleteFolders")
+    @DeleteMapping("/deleteFolders")
     public ResponseEntity<?> deleteFolders(@RequestBody List<Long> foldersIds) {
         for (Long folderId : foldersIds) {
             if (!folderService.existsById(folderId))
@@ -205,13 +198,12 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newFolderInsideFolder/{newFolderName}/{folderId}")
     public ResponseEntity<?> createFolderInsideFolder(@PathVariable String newFolderName, @PathVariable Long folderId, @RequestBody String professorName) {
-        if (!userService.existsByUserName(professorName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Folder parentFolder = folderService.getById(folderId);
-        User professor = userService.getByUserName(professorName).get();
 
         if (parentFolder.getFolders().stream().anyMatch(folder -> folder.getName().equals(newFolderName)))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -231,10 +223,8 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFoldersByProfessor/{professorName}")
     public ResponseEntity<List<FolderDTO>> getFoldersByProfessor(@PathVariable String professorName) {
-        if(!userService.existsByUserName(professorName))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        User professor = userService.getByUserName(professorName).get();
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<FolderDTO> toReturn = new ArrayList<>();
 
         for (Folder f : folderService.getByProfessor(professor)) {
