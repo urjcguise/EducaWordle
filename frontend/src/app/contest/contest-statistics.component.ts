@@ -6,7 +6,7 @@ import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
 import { TokenService } from '../service/token.service';
 import { WordleStateLog } from '../models/wordle-state-log';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-contest-statistics',
@@ -99,11 +99,11 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('El concurso no existe', error);
-      },
+      }
     });
 
-    this.contestService.getWordlesInContest(this.contestId).subscribe({
-      next: (wordles) => {
+    this.contestService.getWordlesInContest(this.contestId).pipe(
+      tap((wordles) => {
         wordles.forEach((wordle) => {
           this.wordlesData.push({
             wordle: wordle.word,
@@ -124,24 +124,19 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
             info: []
           });
         });
-      },
-      error: (error) => {
-        console.error('Error obteniendo los wordles', error);
-      }
-    });
-
-    this.contestService.getAllUserState(this.contestId).subscribe({
+      }),
+      switchMap(() => this.contestService.getAllUserState(this.contestId))
+    ).subscribe({
       next: (data) => {
         this.totalStudents = data.length;
-
         data.forEach((userState: UserState) => {
           const userName = userState.userName;
           const email = userState.email;
           let endTime = "";
           let totalTime = 0;
           userState.state.games.forEach((game: Game) => {
-            const wordleDataItem = this.wordlesData.find((data) => data.wordle === game.wordle);
-            const wordleStudentsItem = this.wordleStudents.find((data) => data.wordle === game.wordle);
+            const wordleDataItem = this.wordlesData.find((item) => item.wordle === game.wordle);
+            const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === game.wordle);
 
             if (!wordleDataItem || !wordleStudentsItem) {
               console.error(`No se encontró el wordle para ${game.wordle}`);
@@ -173,36 +168,38 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
             });
           });
         });
+
+        if (this.isStudent) {
+          this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
+            next: (logs) => {
+              logs.forEach((log: WordleStateLog) => {
+                const studentInfoItem = this.studentInformation.find(item =>
+                  item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
+                );
+                if (!studentInfoItem) {
+                  console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
+                  return;
+                }
+                studentInfoItem.info.push({
+                  nunTry: log.numTry,
+                  time: log.dateLog,
+                  lastWord: log.wordleInserted,
+                  correct: log.correct,
+                  wrongPlace: log.wrongPosition,
+                  wrong: log.wrong
+                });
+              });
+            },
+            error: (e) => {
+              console.error('Error obteniendo los logs', e);
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Error consiguiendo los usuarios y sus estados', error);
       }
     });
-
-    if (this.isStudent) {
-      this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
-        next: (logs) => {
-          logs.forEach((log: WordleStateLog) => {
-            const studentInfoItem = this.studentInformation.find((logs) => logs.wordle.toLowerCase() === log.wordleToGuess);
-            if (!studentInfoItem) {
-              console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
-              return;
-            }
-            studentInfoItem.info.push({
-              nunTry: log.numTry,
-              time: log.dateLog,
-              lastWord: log.wordleInserted,
-              correct: log.correct,
-              wrongPlace: log.wrongPosition,
-              wrong: log.wrong
-            });
-          });
-        },
-        error: (e) => {
-          console.error('Error obteniendo los logs', e);
-        }
-      });
-    }
 
     if (this.isProfessor || this.isAdmin) {
       this.contestService.getAllStateLog(this.contestId).subscribe({
@@ -219,16 +216,10 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
               state: log.state
             });
           });
-          this.studentsLog.sort((a, b) => {
-            const dateA = new Date(a.time).getTime();
-            const dateB = new Date(b.time).getTime();
-
-            return dateA - dateB;
-          });
-
+          this.studentsLog.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
           this.subscription = interval(5000).subscribe(() => {
             this.getLogs();
-          })
+          });
         },
         error: (e) => {
           console.error('Error obteniendo los logs', e);
@@ -254,12 +245,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
         this.studentsLog.length = 0;
         this.studentsLog.push(...updatedLogs);
 
-        this.studentsLog.sort((a, b) => {
-          const dateA = new Date(a.time).getTime();
-          const dateB = new Date(b.time).getTime();
-
-          return dateA - dateB;
-        });
+        this.studentsLog.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
       },
       error: (e) => {
         console.error('Error obteniendo los logs', e);
@@ -272,7 +258,8 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe();
   }
 
-  convertTime(seconds: number) {
+  convertTime(seconds: number): string {
+    if (this.totalStudents === 0) return '0:00';
     const average = seconds / this.totalStudents;
     const minutes = Math.floor(average / 60);
     const remainingSeconds = Math.floor(average % 60);
@@ -280,10 +267,12 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   convertPercentage(total: number): number {
+    if (this.totalStudents === 0) return 0;
     return parseFloat(((total / this.totalStudents) * 100).toFixed(2));
   }
 
-  convertTries(totalTries: number) {
+  convertTries(totalTries: number): number {
+    if (this.totalStudents === 0) return 0;
     return parseFloat((totalTries / this.totalStudents).toFixed(2));
   }
 
