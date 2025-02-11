@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ContestService } from '../service/contest.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { WordleService } from '../service/wordle.service';
 import { firstValueFrom } from 'rxjs';
@@ -25,7 +25,14 @@ export class ContestListComponent implements OnInit {
 
   professorName: string = '';
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) { }
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private tokenService: TokenService, private router: Router, private wordleService: WordleService) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate')
+          this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
+      }
+    });
+  }
 
   ngOnInit() {
     this.competitionId = history.state.competitionId;
@@ -34,10 +41,9 @@ export class ContestListComponent implements OnInit {
       console.error('No se encontró la competición');
     }
     this.loadContests();
-    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR")) {
+    this.professorName = history.state.professorName;
+    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.isProfessor = true;
-      this.professorName = this.tokenService.getUserName()!;
-    }
     if (this.tokenService.getAuthorities().includes("ROLE_STUDENT"))
       this.isStudent = true;
     if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
@@ -73,37 +79,36 @@ export class ContestListComponent implements OnInit {
   }
 
   deleteContest(contestId: number) {
-    const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta concurso?');
+    const confirmDelete = confirm('¿Está seguro de que desea eliminar este concurso?');
     if (confirmDelete) {
       this.contestService.deleteContest(contestId).subscribe({
         next: () => {
-          alert('Concurso eliminado con éxito.');
+          alert('Concurso eliminado con éxito');
           this.loadContests();
         },
-        error: (err) => console.error('Error al eliminar la concurso:', err)
+        error: (err) => console.error('Error al eliminar el concurso:', err)
       });
     }
   }
 
-  navigateToEditWordle(contestId: number) {
-    this.router.navigate([`/${contestId}/editarConcurso`]);
+  navigateToEditContest(contestId: number) {
+    this.router.navigate([`/${contestId}/editarConcurso`], { state: { competitionName: this.competitionName } });
   }
 
   navigateToCreateContest() {
-    this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId } });
+    this.router.navigate(['/nuevoConcurso'], { state: { competitionId: this.competitionId, competitionName: this.competitionName } });
   }
 
   navigateToPlayWordle(contestId: number, wordleIndex: number) {
-    // El wordleIndex está por si se realiza la funcionalidad que se resuelvan los wordle de manera aleatoria
     this.router.navigate(['/wordle'], { state: { contestId, wordleIndex, competitionName: this.competitionName } });
   }
 
   navigateToWatchStatistics(contestId: number) {
-    this.router.navigate([`/${contestId}/verEstadisticas`], { state: { competitionName: this.competitionName } });
+    this.router.navigate([`/${contestId}/verEstadisticas`], { state: { competitionName: this.competitionName, professorName: this.professorName } });
   }
 
   navigateToRanking(contestId: number) {
-    this.router.navigate([`/${contestId}/verRanking`]);
+    this.router.navigate([`/${contestId}/verRanking`], { state: { competitionName: this.competitionName, professorName: this.professorName } });
   }
 
   getContestState(contest: Contest): Promise<'upcoming' | 'ongoing' | 'finished'> {

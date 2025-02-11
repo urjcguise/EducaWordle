@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Contest } from '../models/contest';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
 import { Wordle } from '../models/wordle';
 import { WordleService } from '../service/wordle.service';
@@ -27,9 +27,18 @@ export class EditContestComponent {
   formattedStartDate: string = "";
   formattedEndDate: string = "";
 
-  competition!: Competition;
+  competitionName: string = '';
 
-  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private tokenService: TokenService) { }
+  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private tokenService: TokenService, private router: Router) {
+    this.competitionName = history.state.competitionName;
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate([this.competitionName + '/concursos']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))

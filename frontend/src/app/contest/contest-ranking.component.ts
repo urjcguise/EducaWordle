@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Contest } from '../models/contest';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
 import { UserState } from '../models/user-state';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-contest-ranking',
@@ -11,6 +12,10 @@ import { UserState } from '../models/user-state';
 })
 export class ContestRankingComponent implements OnInit {
 
+  isAdmin: boolean = false;
+  professorName: string = '';
+
+  competitionName: string = '';
   contestId: number = 0;
   contest!: Contest;
 
@@ -22,10 +27,28 @@ export class ContestRankingComponent implements OnInit {
     totalTime: number;
   }[] = [];
 
-  constructor(private contestService: ContestService, private route: ActivatedRoute) { }
+  constructor(private contestService: ContestService, private route: ActivatedRoute, private router: Router, private tokenService: TokenService) {
+    this.competitionName = history.state.competitionName;
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          if (this.isAdmin)
+            this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
+          else
+            this.router.navigate([this.competitionName + '/concursos']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
+
+    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN")) {
+      this.isAdmin = true;
+      this.professorName = history.state.professorName;
+    }
+
     this.contestService.getContestById(this.contestId).subscribe({
       next: (contest) => {
         this.contest = contest;

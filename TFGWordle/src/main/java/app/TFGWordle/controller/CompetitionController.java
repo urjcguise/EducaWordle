@@ -80,13 +80,6 @@ public class CompetitionController {
         return new ResponseEntity<>(competitions, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/getCompetitionById/{id}")
-    public ResponseEntity<Competition> getCompetitionById(@PathVariable Long id) {
-        Competition competition = competitionService.getCompetitionById(id);
-        return new ResponseEntity<>(competition, HttpStatus.OK);
-    }
-
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @DeleteMapping("/deleteCompetition/{id}")
     public ResponseEntity<?> deleteCompetition(@PathVariable Long id) {

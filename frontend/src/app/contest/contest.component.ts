@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-contest',
@@ -12,12 +13,21 @@ export class ContestComponent implements OnInit {
 
   contestForm!: FormGroup;
   competitionId!: number;
+  competitionName: string = '';
 
-  constructor(private fb: FormBuilder, private contestService: ContestService) { 
+  constructor(private fb: FormBuilder, private contestService: ContestService, private router: Router) {
+    this.competitionName = history.state.competitionName;
     this.contestForm = this.fb.group({
       contestName: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required]
+    });
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate([this.competitionName + '/concursos']);
+        }
+      }
     });
   }
 

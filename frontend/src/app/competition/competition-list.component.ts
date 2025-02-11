@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Competition } from '../models/competition';
 import { CompetitionService } from '../service/competition.service';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { UserService } from '../service/user.service';
 
@@ -18,11 +18,22 @@ export class CompetitionListComponent implements OnInit {
   roles: string[] = [];
 
   competitions: Competition[] = [];
-  noCompetitions = true; 
+  noCompetitions = true;
 
   professorName: string = '';
 
-  constructor(private competitionService: CompetitionService, private router: Router, private tokenService: TokenService, private userService: UserService) { }
+  constructor(private competitionService: CompetitionService, private router: Router, private tokenService: TokenService, private userService: UserService) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          if (this.isAdmin)
+            this.router.navigate(['/usuarios']);
+          else
+            this.router.navigate(['/']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.roles = this.tokenService.getAuthorities();
@@ -43,7 +54,6 @@ export class CompetitionListComponent implements OnInit {
   }
 
   loadCompetitionsStudent() {
-    console.log(this.tokenService.getUserName());
     this.userService.getCompetitionsByUserName(this.tokenService.getUserName()!).subscribe({
       next: (data) => {
         if (data.length != 0) {
@@ -71,11 +81,11 @@ export class CompetitionListComponent implements OnInit {
   }
 
   createCompetition() {
-    this.router.navigate(['/nuevaCompeticion'], { state: {professorName: this.professorName} });
+    this.router.navigate(['/nuevaCompeticion'], { state: { professorName: this.professorName } });
   }
 
   viewContests(competitionName: string, competitionId: number): void {
-    this.router.navigate(['/' + competitionName + '/concursos'], { state: {competitionId} });
+    this.router.navigate(['/' + competitionName + '/concursos'], { state: { competitionId, professorName: this.professorName } });
   }
 
   deleteCompetition(id: number): void {
@@ -83,7 +93,7 @@ export class CompetitionListComponent implements OnInit {
     if (confirmDelete) {
       this.competitionService.deleteCompetition(id).subscribe({
         next: () => {
-          alert('Competición eliminada con éxito.');
+          alert('Competición eliminada con éxito');
           this.loadCompetitionsProfessor();
         },
         error: (err) => console.error('Error al eliminar la competición:', err)
@@ -92,6 +102,6 @@ export class CompetitionListComponent implements OnInit {
   }
 
   viewStudents(competitionName: string, competitionId: number): void {
-    this.router.navigate(['/' + competitionName + '/alumnos'], { state: {competitionId: competitionId} });
+    this.router.navigate(['/' + competitionName + '/alumnos'], { state: { competitionId: competitionId, professorName: this.professorName } });
   }
 }

@@ -24,7 +24,6 @@ export class WordleService {
     });
   }
 
-
   public updateWordle(wordInitial: string, wordUpdated: string, contests: Contest[]): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + "updateWordle/" + wordInitial + '/' + wordUpdated, contests);
   }

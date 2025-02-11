@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -13,7 +13,15 @@ export class UserListComponent implements OnInit {
   professorList: User[] = [];
   studentList: User[] = [];
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(private userService: UserService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.userService.getAllProfessors().subscribe({
@@ -76,6 +84,6 @@ export class UserListComponent implements OnInit {
   }
 
   navigateToWordleList(professorName: string) {
-    this.router.navigate(['/wordles'], { state: {professorName: professorName} });
+    this.router.navigate(['/wordles'], { state: { professorName: professorName } });
   }
 }

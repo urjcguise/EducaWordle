@@ -38,5 +38,4 @@ export class IndexComponent implements OnInit {
       this.userName = '';
     }
   }
-
 }

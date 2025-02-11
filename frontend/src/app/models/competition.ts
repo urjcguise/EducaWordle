@@ -1,4 +1,4 @@
-export class Competition{
+export class Competition {
     competitionName!: string;
     id!: number;
 

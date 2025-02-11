@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WordleService } from '../service/wordle.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { Contest } from '../models/contest';
 import { ContestService } from '../service/contest.service';
@@ -26,7 +26,15 @@ export class EditWordleComponent implements OnInit {
 
   professorName: string = '';
 
-  constructor(private wordleService: WordleService, private route: ActivatedRoute, private tokenService: TokenService, private competitionService: CompetitionService, private contestService: ContestService) { }
+  constructor(private wordleService: WordleService, private route: ActivatedRoute, private tokenService: TokenService, private competitionService: CompetitionService, private contestService: ContestService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/wordles']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.wordle = this.route.snapshot.paramMap.get('wordle') || '';

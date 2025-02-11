@@ -6,7 +6,7 @@ import { TokenService } from '../service/token.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ProdInterceptorService implements HttpInterceptor{
+export class ProdInterceptorService implements HttpInterceptor {
 
   constructor(private tokerService: TokenService) { }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -14,10 +14,10 @@ export class ProdInterceptorService implements HttpInterceptor{
     const token = this.tokerService.getToken();
 
     if (token) {
-      intReq = req.clone({headers: req.headers.set('Authorization', 'Bearer ' + token)});
+      intReq = req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + token) });
     }
     return next.handle(intReq);
   }
 }
 
-export const interceptorProvider = [{provide: HTTP_INTERCEPTORS, useClass: ProdInterceptorService, multi: true}];
+export const interceptorProvider = [{ provide: HTTP_INTERCEPTORS, useClass: ProdInterceptorService, multi: true }];

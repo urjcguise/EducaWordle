@@ -14,7 +14,10 @@ import { interval, Subscription, switchMap, tap } from 'rxjs';
   styleUrls: ['./contest-statistics.component.css']
 })
 export class ContestStatisticsComponent implements OnInit, OnDestroy {
+
   private subscription: Subscription = new Subscription;
+
+  professorName: string = '';
 
   contestId: number = 0;
   competitionName!: string;
@@ -79,7 +82,10 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate([this.competitionName + '/concursos']);
+          if (this.isAdmin)
+            this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
+          else
+            this.router.navigate([this.competitionName + '/concursos']);
         }
       }
     });
@@ -90,6 +96,9 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     this.isProfessor = this.tokenService.getAuthorities().includes("ROLE_PROFESSOR");
     this.isStudent = this.tokenService.getAuthorities().includes("ROLE_STUDENT");
     this.isAdmin = this.tokenService.getAuthorities().includes("ROLE_ADMIN");
+
+    if (this.isAdmin)
+      this.professorName = history.state.professorName;
 
     this.contestService.getContestById(this.contestId).subscribe({
       next: (contest) => {

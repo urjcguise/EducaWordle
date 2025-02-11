@@ -7,7 +7,7 @@ import { TokenService } from '../service/token.service';
 import { Game, State, WordleState } from '../models/wordle-state';
 import { differenceInSeconds, format } from 'date-fns';
 import { WordleStateLog } from '../models/wordle-state-log';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 
 
@@ -34,6 +34,8 @@ enum LetterState {
 })
 export class PlayWordleComponent {
   @ViewChildren('tryContainer') tryContainers!: QueryList<ElementRef>;
+
+  competitionName: string = '';
 
   readonly tries: Try[] = [];
   readonly LetterState = LetterState;
@@ -73,6 +75,14 @@ export class PlayWordleComponent {
   userEmail: string = '';
 
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
+    this.competitionName = history.state.competitionName;
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate([this.competitionName + '/concursos']);
+        }
+      }
+    });
     this.wordleService.getWordlesByContest(history.state.contestId).subscribe({
       next: (wrdl) => {
         this.wordleList = wrdl;
@@ -111,7 +121,7 @@ export class PlayWordleComponent {
     this.userService.getEmail(this.tokenService.getUserName()!).subscribe({
       next: (email) => {
         this.userEmail = email;
-      }, 
+      },
       error: (e) => {
         console.error('Error obteniendo el email', e)
       }
@@ -151,8 +161,6 @@ export class PlayWordleComponent {
         }));
       }
 
-      // Borrar
-      console.log('Palabra objetivo:', this.targetWord);
     } else {
       this.showInfoMessage('¡Has completado todas las palabras!');
       this.finished = true;
@@ -433,6 +441,6 @@ export class PlayWordleComponent {
   }
 
   navigateToStatistics() {
-    this.router.navigate(['/' + this.contest.id + '/verEstadisticas'], { state: { competitionName: history.state.competitionName } });
+    this.router.navigate(['/' + this.contest.id + '/verEstadisticas'], { state: { competitionName: this.competitionName } });
   }
 }

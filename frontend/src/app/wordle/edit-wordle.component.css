@@ -32,7 +32,6 @@
 
 .contest-item {
     margin-left: 20px;
-    /* Margen izquierdo para los contests */
     display: flex;
     align-items: center;
     margin-bottom: 5px;

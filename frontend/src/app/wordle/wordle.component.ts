@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WordleService } from '../service/wordle.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-wordle',
@@ -13,7 +13,15 @@ export class WordleComponent implements OnInit {
   professorName: string = '';
   folderId: number = 0;
 
-  constructor(private wordleService: WordleService, private route: ActivatedRoute) { }
+  constructor(private wordleService: WordleService, private route: ActivatedRoute, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/wordles']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.folderId = history.state.folderId;

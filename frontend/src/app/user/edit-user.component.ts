@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { UserService } from '../service/user.service';
-import { User } from '../models/user';
 import { NewUser } from '../models/new-user';
 
 @Component({
@@ -9,7 +8,7 @@ import { NewUser } from '../models/new-user';
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.css']
 })
-export class EditUserComponent implements OnInit{
+export class EditUserComponent implements OnInit {
 
   updatedUser: NewUser = new NewUser('', '', '', []);
   oldUserName: string = '';
@@ -17,7 +16,15 @@ export class EditUserComponent implements OnInit{
   email: string = '';
   password: string = '';
 
-  constructor(private route: ActivatedRoute, private userService: UserService) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/usuarios']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.oldUserName = this.route.snapshot.paramMap.get('userName') || '';

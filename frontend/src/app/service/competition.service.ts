@@ -1,5 +1,5 @@
-import { Injectable, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Competition } from '../models/competition';
 import { Contest } from '../models/contest';
@@ -20,10 +20,6 @@ export class CompetitionService {
 
   public getCompetitionsByProfessor(professorName: string): Observable<Competition[]> {
     return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + professorName);
-  }
-
-  public getCompetitionById(id: number): Observable<Competition> {
-    return this.httpClient.get<Competition>(this.apiUrl + 'getCompetitionById/' + id);
   }
 
   public deleteCompetition(id: number): Observable<Contest> {

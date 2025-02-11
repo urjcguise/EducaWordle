@@ -29,7 +29,7 @@
       <h4>No estás en ninguna competición</h4>
     </div>
     <div *ngIf="!noCompetitions">
-      <li *ngFor="let competition of competitions" class="competition-item">
+      <li *ngFor="let competition of competitions" class="competition-item list-margin">
         <span>{{ competition.competitionName }}</span>
         <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
           <i class="far fa-eye"></i>

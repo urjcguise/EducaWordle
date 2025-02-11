@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user';
 import { CompetitionService } from '../service/competition.service';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-student-list',
@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 })
 export class StudentListComponent implements OnInit {
 
+  professorName: string = '';
+
   students: User[] = [];
   competitionId!: number;
 
@@ -17,10 +19,19 @@ export class StudentListComponent implements OnInit {
 
   currentTab: string = 'add-student';
 
-  constructor(private competitionService: CompetitionService, private router: Router) { }
+  constructor(private competitionService: CompetitionService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
+    this.professorName = history.state.professorName;
     this.competitionService.getStudentsByCompetition(this.competitionId).subscribe({
       next: (stdts) => {
         this.students = stdts;

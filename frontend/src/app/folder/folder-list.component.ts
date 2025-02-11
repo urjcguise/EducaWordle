@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Wordle } from '../models/wordle';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { Folder } from '../models/folder';
 import { WordleService } from '../service/wordle.service';
 
@@ -11,10 +11,11 @@ import { WordleService } from '../service/wordle.service';
 })
 export class FolderListComponent implements OnInit {
 
-  folderParentName: string = '';
-  folderParentId: number = 0;
+  actualFolderName: string = '';
+  actualFolderId: number = 0;
   professorName: string = '';
 
+  parentFolderId: number = 0;
   parentsFoldersList: Folder[] = [];
 
   wordleList: Wordle[] = [];
@@ -39,16 +40,32 @@ export class FolderListComponent implements OnInit {
   folderOptions: Folder[] = [];
   dropdownVisible: boolean = false;
 
-  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router) { }
+  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router) {
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          if (this.parentFolderId != 0)
+            this.router.navigate([this.parentFolderId + '/wordles']);
+          else
+            this.router.navigate(['/wordles']);
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
-      this.folderParentId = Number(paramMap.get('folderId'));
-      this.folderParentName = history.state.folderName;
+      this.actualFolderId = Number(paramMap.get('folderId'));
+      this.actualFolderName = history.state.folderName;
       this.professorName = history.state.professorName;
       this.parentsFoldersList = [];
-      this.wordleService.getFolder(this.folderParentId).subscribe({
+      this.wordleService.getFolder(this.actualFolderId).subscribe({
         next: (folder) => {
+          if (folder.parentFolder != null)
+            this.parentFolderId = folder.parentFolder.id;
+          else
+            this.parentFolderId = 0;
           this.parentsFoldersList.push(folder);
           while (folder.parentFolder != null) {
             folder = folder.parentFolder;
@@ -62,7 +79,7 @@ export class FolderListComponent implements OnInit {
           console.error('Error obteniendo la carpeta', e);
         }
       });
-      this.wordleService.getFoldersByFolderId(this.folderParentId).subscribe({
+      this.wordleService.getFoldersByFolderId(this.actualFolderId).subscribe({
         next: (folders) => {
           this.folderList = folders;
           this.folderList.forEach(() => {
@@ -75,7 +92,7 @@ export class FolderListComponent implements OnInit {
         }
       });
 
-      this.wordleService.getWordlesByFolderId(this.folderParentId).subscribe({
+      this.wordleService.getWordlesByFolderId(this.actualFolderId).subscribe({
         next: (wordles) => {
           this.wordleList = wordles;
         },
@@ -135,7 +152,7 @@ export class FolderListComponent implements OnInit {
   }
 
   createWordle() {
-    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderId: this.folderParentId } });
+    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderId: this.actualFolderId } });
   }
 
   editWordle(): void {
@@ -157,7 +174,7 @@ export class FolderListComponent implements OnInit {
 
   createFolder() {
     if (this.newFolderName && this.newFolderName.trim().length > 0) {
-      this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.folderParentId).subscribe({
+      this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.actualFolderId).subscribe({
         next: () => {
           console.log('Carpeta creada correctamente');
           this.ngOnInit();
@@ -185,12 +202,12 @@ export class FolderListComponent implements OnInit {
 
   enterFolder(i: number) {
     this.parentsFoldersList = [];
-    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name } });
+    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name, parentFolderId: this.actualFolderId } });
   }
 
   navigateToFolder(folder: Folder) {
     if (folder.name != '...') {
-      this.router.navigate(['/' + folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: folder.id } });
+      this.router.navigate(['/' + folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: folder.id, parentFolderId: this.actualFolderId } });
     } else {
       this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
     }
@@ -202,13 +219,13 @@ export class FolderListComponent implements OnInit {
       return;
     }
     this.folderOptions = [];
-    this.wordleService.getFoldersByFolderId(this.folderParentId).subscribe({
+    this.wordleService.getFoldersByFolderId(this.actualFolderId).subscribe({
       next: (folders) => {
         folders.forEach((folder) => {
           this.folderOptions.push(folder);
         })
         this.folderOptions = [
-          ...this.parentsFoldersList.filter(folder => folder.name !== this.folderParentName),
+          ...this.parentsFoldersList.filter(folder => folder.name !== this.actualFolderName),
           ...this.folderOptions
         ];
       },
@@ -260,7 +277,7 @@ export class FolderListComponent implements OnInit {
         }
       });
     } else {
-      console.log('No hay carpetas seleccionadas para eliminar.');
+      console.log('No hay carpetas seleccionadas para eliminar');
     }
 
     if (selectedWordleNames.length > 0) {
@@ -278,7 +295,7 @@ export class FolderListComponent implements OnInit {
         }
       });
     } else {
-      console.log('No hay Wordles seleccionados para eliminar.');
+      console.log('No hay Wordles seleccionados para eliminar');
     }
   }
 }

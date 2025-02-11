@@ -74,7 +74,7 @@ export class ContestService {
 
   public getAllUserStateLog(contestId: number, userName: string) {
     return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllUserContestStateLogs/' + contestId + '/' + userName);
-  }  
+  }
 
   public existsInDictionary(word: string) {
     return this.httpClient.get<Boolean>(this.apiUrl + 'existsInDictionary/' + word);

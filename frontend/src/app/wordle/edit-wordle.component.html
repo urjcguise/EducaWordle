@@ -8,11 +8,8 @@
     <div *ngFor="let competition of competitionWithContest">
         <strong>{{competition.competition.competitionName}}</strong>
         <div *ngFor="let contest of competition.contests" class="contest-item">
-            <input 
-                type="checkbox" 
-                [checked]="isContestSelected(contest.contest)" 
-                (change)="toggleContestSelection(contest.contest)"
-            />
+            <input type="checkbox" [checked]="isContestSelected(contest.contest)"
+                (change)="toggleContestSelection(contest.contest)" />
             <span>{{contest.contest.contestName}}</span>
         </div>
     </div>

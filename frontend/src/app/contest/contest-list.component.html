@@ -18,7 +18,7 @@
                 <i class="fas fa-trash-alt"></i>Borrar
               </button>
               <button *ngIf="item.state !== 'finished'" class="btn btn-warning btn-sm ml-2"
-                (click)="navigateToEditWordle(item.contest.id)">
+                (click)="navigateToEditContest(item.contest.id)">
                 <i class="fas fa-clipboard-check"></i>Editar
               </button>
               <button class="btn btn-success btn-sm ml-2" (click)="copyContest(item.contest)">

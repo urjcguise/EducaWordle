@@ -24,5 +24,4 @@ export class MenuComponent implements OnInit {
     this.tokenService.logOut();
     window.location.reload();
   }
-
 }

@@ -50,14 +50,14 @@ export class LoginComponent implements OnInit {
         this.isLoginFail = true;
 
         if (err && err.error && err.error.message) {
-          this.errMsj = err.error.message;  // Mensaje de error desde el servidor
+          this.errMsj = err.error.message;
         } else {
-          this.errMsj = "Error en el inicio de sesión. Intenta de nuevo.";  // Mensaje de error genérico
+          this.errMsj = "Error en el inicio de sesión, intente de nuevo";
         }
-        
+
         console.log(this.errMsj);
 
-        return of(null); // Retorna un observable vacío en caso de error
+        return of(null);
       })
     ).subscribe();
   }

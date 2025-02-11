@@ -9,7 +9,7 @@ import { CompetitionService } from '../service/competition.service';
   templateUrl: './new-student.component.html',
   styleUrls: ['./new-student.component.css']
 })
-export class NewStudentComponent implements OnInit{
+export class NewStudentComponent implements OnInit {
 
   competitionId!: number;
 
@@ -19,8 +19,8 @@ export class NewStudentComponent implements OnInit{
   password!: string;
   errMsj!: string;
 
-  constructor(private authService: AuthService, private competitionService: CompetitionService) {}
-  
+  constructor(private authService: AuthService, private competitionService: CompetitionService) { }
+
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
   }

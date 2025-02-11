@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Wordle } from '../models/wordle';
 import { WordleService } from '../service/wordle.service';
 import { TokenService } from '../service/token.service';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { Folder } from '../models/folder';
 
 @Component({
@@ -13,6 +13,7 @@ import { Folder } from '../models/folder';
 export class WordleListComponent implements OnInit {
 
   professorName: string = '';
+  isAdmin: boolean = false;
 
   wordleList: Wordle[] = [];
   folderList: Folder[] = [];
@@ -37,13 +38,26 @@ export class WordleListComponent implements OnInit {
   folderOptions: Folder[] = [];
   dropdownVisible: boolean = false;
 
-  constructor(private wordleService: WordleService, private tokenService: TokenService, private router: Router) { }
+  constructor(private wordleService: WordleService, private tokenService: TokenService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          if (this.isAdmin)
+            this.router.navigate(['/usuarios']);
+          else
+            this.router.navigate(['/']);
+        }
+      }
+    });
+  }
 
   ngOnInit() {
     if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
       this.professorName = this.tokenService.getUserName()!;
-    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN")) {
       this.professorName = history.state.professorName;
+      this.isAdmin = true;
+    }
 
     this.wordleService.getFoldersByProfessor(this.professorName).subscribe({
       next: (folders) => {
@@ -166,7 +180,7 @@ export class WordleListComponent implements OnInit {
   }
 
   enterFolder(i: number) {
-    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name } });
+    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name, parentFolderId: 0 } });
   }
 
   moveWordle() {
@@ -189,6 +203,7 @@ export class WordleListComponent implements OnInit {
     this.wordleService.moveToFolder(folderId, selectedWordleNames).subscribe({
       next: () => {
         console.log('Wordles movidos correctamente');
+        this.ngOnInit();
       },
       error: (e) => {
         console.error('Error moviendo los wordle', e);

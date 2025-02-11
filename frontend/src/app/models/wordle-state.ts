@@ -20,7 +20,7 @@ export class Game {
   lastWordle: string;
   timeGuess: string;
 
-  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "", timeGuess: string ="") {
+  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "", timeGuess: string = "") {
     this.wordle = wordle;
     this.finished = finished;
     this.won = won;
