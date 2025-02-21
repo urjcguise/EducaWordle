@@ -40,6 +40,14 @@ export class WordleService {
     return this.httpClient.get<Contest[]>(this.apiUrl + "getContestsWhereIsUsed/" + wordle);
   }
 
+  public checkWordleAttempt(contestId: number, wordle: string, wordleIndex: number, userEmail: string) {
+    return this.httpClient.get<number[]>(this.apiUrl + "checkWordleAttempt/" + contestId + "/" + wordleIndex + "/" + wordle + '/' + userEmail);
+  }
+
+  public getWordleInContest(contestId: number, wordleIndex: number) {
+    return this.httpClient.get<Wordle>(this.apiUrl + "getWordleInContest/" + contestId + "/" + wordleIndex);
+  }
+
   public createFolder(folderName: string, professorName: string): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + "newFolder/" + folderName, professorName);
   }

@@ -7,6 +7,7 @@ import app.TFGWordle.model.Wordle;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.ContestService;
+import app.TFGWordle.service.ContestStateService;
 import app.TFGWordle.service.FolderService;
 import app.TFGWordle.service.WordleService;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wordle")
@@ -27,12 +29,14 @@ public class WordleController {
     private final ContestService contestService;
     private final UserService userService;
     private final FolderService folderService;
+    private final ContestStateService contestStateService;
 
-    public WordleController(WordleService wordleService, ContestService contestService, UserService userService, FolderService folderService) {
+    public WordleController(WordleService wordleService, ContestService contestService, UserService userService, FolderService folderService, ContestStateService contestStateService) {
         this.wordleService = wordleService;
         this.contestService = contestService;
         this.userService = userService;
         this.folderService = folderService;
+        this.contestStateService = contestStateService;
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -163,6 +167,57 @@ public class WordleController {
 
         Wordle wordle = wordleService.getByWord(word);
         return ResponseEntity.status(HttpStatus.OK).body(wordle.getContests());
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/checkWordleAttempt/{contestId}/{wordleIndex}/{word}/{userEmail}")
+    public ResponseEntity<List<Integer>> checkWordleAttempt(@PathVariable Long contestId, @PathVariable Integer wordleIndex, @PathVariable String word, @PathVariable String userEmail) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        User user = userService.getByEmail(userEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        Map<Character, Integer> letterCounts = contestStateService.getContestState(contestId, user.getId()).getLetterCountsList().get(wordleIndex);
+
+        List<Integer> toReturn = new ArrayList<>();
+        Contest contest = contestService.getById(contestId);
+        String wordle = contest.getWordles().get(wordleIndex).getWord();
+
+        for (int i = 0; i < wordle.length(); i++) {
+            char expected = wordle.charAt(i);
+            char got = Character.toLowerCase(word.charAt(i));
+
+            if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+                toReturn.add(2);
+                letterCounts.put(got, letterCounts.get(got) - 1);
+            }
+            else
+                toReturn.add(3);
+        }
+
+        for (int i = 0; i < wordle.length(); i++) {
+            char got = Character.toLowerCase(word.charAt(i));
+            if (toReturn.get(i) == 3 && wordle.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+                toReturn.set(i, 1);
+                letterCounts.put(got, letterCounts.get(got) - 1);
+            }
+        }
+
+        for (int i = 0; i < wordle.length(); i++) {
+            if (toReturn.get(i) == 3)
+                toReturn.set(i, 0);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(toReturn);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getWordleInContest/{contestId}/{wordleIndex}")
+    public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return ResponseEntity.status(HttpStatus.OK).body(contestService.getById(contestId).getWordles().get(wordleIndex));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")

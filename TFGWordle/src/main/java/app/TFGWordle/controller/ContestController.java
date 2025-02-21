@@ -29,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -156,10 +157,20 @@ public class ContestController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
 
+        List<Map<Character, Integer>> letterCounts = new ArrayList<>();
+        for (Wordle wordle: contest.getWordles()) {
+            Map<Character, Integer> letterCount = new HashMap<>();
+            for (char c: wordle.getWord().toCharArray()) {
+                letterCount.put(c, letterCount.getOrDefault(c, 0) + 1);
+            }
+            letterCounts.add(letterCount);
+        }
+
         if (contestStateService.existsState(contest.getId(), user.getId()))
             return new ResponseEntity<>("Estado ya creado", HttpStatus.CONFLICT);
 
         ContestState newContestState = new ContestState(contest, user);
+        newContestState.setLetterCountsList(letterCounts);
 
         try {
             JsonNode jsonNode = objectMapper.valueToTree(wordleState);
@@ -206,16 +217,18 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/createContestLog/{contestId}/{userName}")
-    public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
+    @PostMapping("/createContestLog/{contestId}/{wordlePosition}/{userName}")
+    public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable Integer wordlePosition, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
         User user = userService.getByUserName(userName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
+        Wordle wordle = contest.getWordles().get(wordlePosition);
 
         ContestStateLog contestStateLog = new ContestStateLog(contest, user);
+        wordleStateLog.setWordleToGuess(wordle.getWord());
         try {
             JsonNode jsonNode = objectMapper.valueToTree(wordleStateLog);
             contestStateLog.setState(jsonNode);

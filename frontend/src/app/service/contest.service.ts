@@ -60,8 +60,8 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'updateContestState/' + contestId + '/' + userName, wordleState);
   }
 
-  public createContestLog(contestId: number, userName: string, contestLog: WordleStateLog) {
-    return this.httpClient.post<any>(this.apiUrl + 'createContestLog/' + contestId + '/' + userName, contestLog);
+  public createContestLog(contestId: number, wordlePosition: number, userName: string, contestLog: WordleStateLog) {
+    return this.httpClient.post<any>(this.apiUrl + 'createContestLog/' + contestId + '/' + wordlePosition + '/' + userName, contestLog);
   }
 
   public getAllStateLog(contestId: number) {

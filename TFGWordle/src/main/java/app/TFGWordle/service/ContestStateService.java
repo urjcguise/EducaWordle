@@ -47,7 +47,7 @@ public class ContestStateService {
 
         throw new RuntimeException("El resultado no es un JSON válido");
     }
-
+    
     public WordleStateLog getStateLog(String contestStateLog) {
         try {
             JsonNode jsonNode = objectMapper.readTree(contestStateLog);
