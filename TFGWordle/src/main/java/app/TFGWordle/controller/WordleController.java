@@ -10,6 +10,8 @@ import app.TFGWordle.service.ContestService;
 import app.TFGWordle.service.ContestStateService;
 import app.TFGWordle.service.FolderService;
 import app.TFGWordle.service.WordleService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -213,10 +215,13 @@ public class WordleController {
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getWordleInContest/{contestId}/{wordleIndex}")
-    public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex) {
+    public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        JsonNode state = contestStateService.getContestState(contestId, contestId).getState();
+        if (!state.get("games").get(wordleIndex).get("finished").asBoolean())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.OK).body(contestService.getById(contestId).getWordles().get(wordleIndex));
     }
 

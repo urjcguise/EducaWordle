@@ -282,24 +282,31 @@ export class PlayWordleComponent {
         }
 
         if (this.numSubmittedTries === this.numTries && !this.won) {
+          this.hasMoreWords = this.currentWordleIndex < this.numWordles - 1;
+          this.finished = true;
+          this.won = false;
           const currentGame = this.wordleState.games[this.currentWordleIndex];
           currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
+          this.updateContestState();
+          this.uploadNewLog();
           this.wordleService.getWordleInContest(this.contest.id, this.currentWordleIndex).subscribe({
             next: (wordle) => {
               this.showInfoMessage(`La palabra era: ${wordle.word.toUpperCase()}`);
             },
             error: (e) => {
-              console.error('Error obteniendo el wordle', e);
+              if (e.status === 404)
+                console.error('Error obteniendo el wordle', e);
+              if (e.status === 400)
+                console.error('No puedes realizar esa llamada', e);
             }
           })
-          this.hasMoreWords = this.currentWordleIndex < this.numWordles - 1;
-          this.finished = true;
-          this.won = false;
+          
         }
-
-        this.updateContestState();
-        this.uploadNewLog();
+        if (!this.won) {
+          this.updateContestState();
+          this.uploadNewLog();
+        }
 
       },
       error: (e) => {
