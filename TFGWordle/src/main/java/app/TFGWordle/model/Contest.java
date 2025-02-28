@@ -1,14 +1,16 @@
 package app.TFGWordle.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 
 @Entity
 public class Contest {
@@ -38,6 +40,9 @@ public class Contest {
     )
     private List<Wordle> wordles = new ArrayList<>();
 
+    @Convert(converter = ListOfIntegerConverter.class)
+    @Column(name = "wordles_length", columnDefinition = "TEXT")
+    private List<Integer> wordlesLength = new ArrayList<>();
 
     public Contest() {}
 
@@ -139,5 +144,37 @@ public class Contest {
     public void updateWordles(List<Wordle> wordles) {
         this.wordles.clear();
         this.wordles.addAll(wordles);
+    }
+
+    public List<Integer> getWordlesLength() {
+        return wordlesLength;
+    }
+
+    public void setWordlesLength(List<Integer> wordlesLength) {
+        this.wordlesLength = wordlesLength;
+    }
+
+    @Converter
+    public static class ListOfIntegerConverter implements AttributeConverter<List<Integer>, String> {
+
+        private final ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        public String convertToDatabaseColumn(List<Integer> attribute) {
+            try {
+                return objectMapper.writeValueAsString(attribute);
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Error al convertir lista de enteros a JSON", e);
+            }
+        }
+
+        @Override
+        public List<Integer> convertToEntityAttribute(String dbData) {
+            try {
+                return objectMapper.readValue(dbData, new TypeReference<List<Integer>>(){});
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Error al convertir JSON a lista de enteros", e);
+            }
+        }
     }
 }

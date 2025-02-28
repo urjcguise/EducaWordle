@@ -4,8 +4,8 @@ import { catchError, EMPTY, Observable, throwError } from 'rxjs';
 import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
 import { UserState } from '../models/user-state';
-import { Wordle } from '../models/wordle';
 import { WordleStateLog } from '../models/wordle-state-log';
+import { Wordle } from '../models/wordle';
 
 @Injectable({
   providedIn: 'root'
@@ -28,16 +28,20 @@ export class ContestService {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteContest/' + contestId);
   }
 
-  public editContest(contestId: number, updatedContest: Contest) {
-    return this.httpClient.post<any>(this.apiUrl + 'editContest/' + contestId, updatedContest);
+  public editContest(updatedContest: Contest, updatedWordles: Wordle[]) {
+    const requestBody = {
+      contest: updatedContest,
+      wordles: updatedWordles
+    };
+    return this.httpClient.post<any>(this.apiUrl + 'editContest', requestBody);
   }
 
   public getContestById(contestId: number) {
     return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');
   }
 
-  public copyContest(newContest: Contest, oldContestId: number): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestId, newContest);
+  public copyContest(newContest: Contest, oldContestId: number) {
+    return this.httpClient.post<Contest>(this.apiUrl + 'copyContest/' + oldContestId, newContest);
   }
 
   public createContestState(contestId: number, userName: string, wordleState: WordleState): Observable<any> {
@@ -86,10 +90,6 @@ export class ContestService {
 
   public saveExternalDictionary(words: string[], contestId: number) {
     return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestId, words);
-  }
-
-  public getWordlesInContest(contestId: number) {
-    return this.httpClient.get<Wordle[]>(this.apiUrl + 'getWordles/' + contestId);
   }
 
   public getLogsInExcel(contestId: number) {

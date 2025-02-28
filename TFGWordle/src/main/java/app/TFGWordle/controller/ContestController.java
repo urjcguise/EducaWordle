@@ -1,5 +1,6 @@
 package app.TFGWordle.controller;
 
+import app.TFGWordle.dto.EditContestDTO;
 import app.TFGWordle.dto.UserState;
 import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.dto.WordleStateLog;
@@ -116,16 +117,22 @@ public class ContestController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/editContest/{contestId}")
-    public ResponseEntity<?> updateContest(@PathVariable Long contestId, @RequestBody Contest contest) {
-        if (!contestService.existsById(contestId))
+    @PostMapping("/editContest")
+    public ResponseEntity<?> editContest(@RequestBody EditContestDTO contestDTO) {
+        if (!contestService.existsById(contestDTO.getContest().getId()))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        Contest oldContest = contestService.getById(contestId);
-        contest.setCompetition(oldContest.getCompetition());
-        contest.setWordles(oldContest.getWordles());
+        List<Wordle> wordles = new ArrayList<>();
+        List<Integer> wordleLength = new ArrayList<>();
 
-        return ResponseEntity.ok(contestService.save(contest));
+        for (Wordle w: contestDTO.getWordles()) {
+            wordleLength.add(w.getWord().length());
+            wordles.add(wordleService.getByWord(w.getWord()));
+        }
+        contestDTO.getContest().setCompetition(contestService.getById(contestDTO.getContest().getId()).getCompetition());
+        contestDTO.getContest().setWordles(wordles);
+        contestDTO.getContest().setWordlesLength(wordleLength);
+        return ResponseEntity.ok(contestService.save(contestDTO.getContest()));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
@@ -143,7 +150,9 @@ public class ContestController {
         if (contestService.existsByName(newContest.getContestName()))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
-        newContest.setCompetition(contestService.getById(oldContestId).getCompetition());
+        Contest oldContest = contestService.getById(oldContestId);
+        newContest.setCompetition(oldContest.getCompetition());
+        newContest.setWordlesLength(oldContest.getWordlesLength());
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(newContest));
     }
 
@@ -336,16 +345,6 @@ public class ContestController {
         }
 
         return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
-    }
-
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/getWordles/{contestId}")
-    public ResponseEntity<List<Wordle>> getWordles(@PathVariable Long contestId) {
-        if(!contestService.existsById(contestId))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Contest contest = contestService.getById(contestId);
-        return ResponseEntity.ok(wordleService.findByContestId(contest.getId()));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")

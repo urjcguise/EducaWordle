@@ -51,7 +51,7 @@ export class PlayWordleComponent {
 
   private curLetterIndex = 0;
 
-  wordleLength: number = 0;
+  wordleLength: number[] = [];
 
   numSubmittedTries = 0;
   currentWordleIndex = 0;
@@ -88,12 +88,12 @@ export class PlayWordleComponent {
         this.contest = cont;
         this.numTries = cont.numTries;
 
-        this.numWordles = cont.wordles.length;
-        this.wordleLength = cont.wordles[this.currentWordleIndex].word.length;
+       this.numWordles = cont.wordlesLength.length;
+       this.wordleLength = cont.wordlesLength;
 
         for (let i = 0; i < this.numTries; i++) {
           const letters: Letter[] = [];
-          for (let j = 0; j < this.wordleLength; j++) {
+          for (let j = 0; j < this.wordleLength[this.currentWordleIndex]; j++) {
             letters.push({ text: '', state: LetterState.PENDING });
           }
           this.tries.push({ letters });
@@ -119,7 +119,7 @@ export class PlayWordleComponent {
     });
 
     for (var i = 0; i < this.numWordles; i++) {
-      const newGame = new Game('');
+      const newGame = new Game();
       this.games.push(newGame);
     }
 
@@ -141,7 +141,7 @@ export class PlayWordleComponent {
       this.won = false;
 
       for (let tryData of this.tries) {
-        tryData.letters = Array.from({ length: this.wordleLength }, () => ({
+        tryData.letters = Array.from({ length: this.wordleLength[this.currentWordleIndex] }, () => ({
           text: '',
           state: LetterState.PENDING,
         }));
@@ -181,12 +181,12 @@ export class PlayWordleComponent {
   handleClickKey(key: string) {
     if (this.finished) return;
     if (key.length === 1 && /^[a-zñ]$/i.test(key)) {
-      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength) {
+      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.currentWordleIndex]) {
         this.setLetter(key);
         this.curLetterIndex++;
       }
     } else if (key === 'Backspace') {
-      if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength) {
+      if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength[this.currentWordleIndex]) {
         this.curLetterIndex--;
         this.setLetter('');
       }
@@ -196,8 +196,8 @@ export class PlayWordleComponent {
   }
 
   private setLetter(letter: string) {
-    const tryIndex = Math.floor(this.curLetterIndex / this.wordleLength);
-    const letterIndex = this.curLetterIndex % this.wordleLength;
+    const tryIndex = Math.floor(this.curLetterIndex / this.wordleLength[this.currentWordleIndex]);
+    const letterIndex = this.curLetterIndex % this.wordleLength[this.currentWordleIndex];
     this.tries[tryIndex].letters[letterIndex].text = letter;
   }
 
@@ -225,7 +225,7 @@ export class PlayWordleComponent {
   }
 
   private checkWordLenght(word: string) {
-    if (word.length < this.wordleLength) {
+    if (word.length < this.wordleLength[this.currentWordleIndex]) {
       this.showInfoMessage('No hay suficientes letras');
       this.shakeTryContainer(this.numSubmittedTries);
       return false;
@@ -261,7 +261,7 @@ export class PlayWordleComponent {
     this.wordleService.checkWordleAttempt(this.contest.id, wordFromCurTry, this.currentWordleIndex, this.userEmail).subscribe({
       next: (checkStates) => {
 
-        for (let i = 0; i < this.wordleLength; i++) {
+        for (let i = 0; i < this.wordleLength[this.currentWordleIndex]; i++) {
           curTry.letters[i].state = checkStates[i];
           const key = curTry.letters[i].text.toLowerCase();
           const currentStoredState = this.curLetterStates[key];
@@ -296,14 +296,15 @@ export class PlayWordleComponent {
             },
             error: (e) => {
               if (e.status === 404)
-                console.error('Error obteniendo el wordle', e);
-              if (e.status === 400)
+                console.error('No existe ese concurso', e);
+              if (e.status === 401)
                 console.error('No puedes realizar esa llamada', e);
+              if (e.status === 400)
+                console.error('No existe el usuario', e);
             }
           })
           
-        }
-        if (!this.won) {
+        } else {
           this.updateContestState();
           this.uploadNewLog();
         }

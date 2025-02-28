@@ -6,6 +6,7 @@ import { Wordle } from '../models/wordle';
 import { WordleService } from '../service/wordle.service';
 import { Competition } from '../models/competition';
 import { TokenService } from '../service/token.service';
+import { Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-edit-contest',
@@ -20,8 +21,8 @@ export class EditContestComponent {
   contestId: number = 0;
   dictionary: boolean = false;
   file: boolean = false;
-  wordles: string[] = [];
-  initialWordles: string[] = [];
+  wordles: Wordle[] = [];
+  initialWordles: Wordle[] = [];
   numTries: number = 0;
 
   formattedStartDate: string = "";
@@ -34,7 +35,7 @@ export class EditContestComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate([this.competitionName + '/concursos']);
+          this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
         }
       }
     });
@@ -66,11 +67,11 @@ export class EditContestComponent {
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (data: Wordle[]) => {
         if (data && data.length > 0) {
-          this.wordles = data.map((elem) => elem.word);
-          this.initialWordles = data.map((elem) => elem.word);
+          this.wordles = [...data];
+          this.initialWordles = [...data];
         } else {
-          this.wordles = [''];
-          this.initialWordles = [''];
+          this.wordles = [];
+          this.initialWordles = [];
         }
       },
       error: (err) => console.error('Error al obtener Wordles', err)
@@ -89,7 +90,7 @@ export class EditContestComponent {
 
   addWordle() {
     if (this.wordles.length < 3) {
-      this.wordles.push('');
+      this.wordles.push(new Wordle(''));
     }
   }
 
@@ -128,7 +129,7 @@ export class EditContestComponent {
 
   updateContest() {
     for (const word of this.wordles) {
-      if (word == "") {
+      if (word.word == "") {
         alert('No se puede guardar un wordle vacío');
         return;
       }
@@ -139,29 +140,33 @@ export class EditContestComponent {
     const addedWordles = this.wordles.filter(wordle => !this.initialWordles.includes(wordle));
 
     this.deleteWordles(removedWordles);
-    this.saveWordles(addedWordles);
 
-    const updatedWordles: Wordle[] = [...commonWordles, ...addedWordles].map(word => ({ word }));
+    this.saveWordles(addedWordles).pipe(
+      switchMap(() => {
+        const updatedWordles: Wordle[] = [...commonWordles, ...addedWordles];
 
-    const updatedContest: Contest = {
-      ...this.contest,
-      contestName: this.contest.contestName,
-      startDate: new Date(this.formattedStartDate),
-      endDate: new Date(this.formattedEndDate),
-      numTries: this.numTries,
-      useDictionary: this.dictionary,
-      useExternalFile: this.file,
-      wordles: updatedWordles
-    };
-    this.contestService.editContest(this.contestId, updatedContest).subscribe({
+        const updatedContest: Contest = {
+          ...this.contest,
+          contestName: this.contest.contestName,
+          startDate: new Date(this.formattedStartDate),
+          endDate: new Date(this.formattedEndDate),
+          numTries: this.numTries,
+          useDictionary: this.dictionary,
+          useExternalFile: this.file
+        };
+
+        return this.contestService.editContest(updatedContest, updatedWordles);
+      })
+    ).subscribe({
       next: () => {
         alert('Concurso guardado con éxito');
+        this.ngOnInit();
       },
       error: (err) => console.error('Error al editar concurso', err)
     });
   }
 
-  deleteWordles(wordlesToDelete: string[]) {
+  deleteWordles(wordlesToDelete: Wordle[]) {
     if (wordlesToDelete.length == 0)
       return;
     this.wordleService.deleteWordles(wordlesToDelete).subscribe({
@@ -172,16 +177,11 @@ export class EditContestComponent {
     });
   }
 
-  saveWordles(wordlesToSave: string[]) {
+  saveWordles(wordlesToSave: Wordle[]): Observable<any> {
     if (wordlesToSave.length == 0)
-      return;
-    this.wordleService.saveWordles(wordlesToSave, this.contest.id, this.professorName, 0).subscribe({
-      next: () => {
-        alert('Wordles guardados con éxito');
-        this.initialWordles = [...this.wordles];
-      },
-      error: (err) => console.error('Error al editar Wordles', err)
-    });
+      return of(null);
+    const nameWordles = wordlesToSave.map(w => w.word);
+    return this.wordleService.saveWordles(nameWordles, this.contest.id, this.professorName, 0);
   }
 
   trackByIndex(index: number): number {

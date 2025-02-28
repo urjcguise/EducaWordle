@@ -1,5 +1,4 @@
 import { Competition } from './competition';
-import { Wordle } from './wordle';
 
 export class Contest {
     id!: number;
@@ -11,7 +10,7 @@ export class Contest {
     useDictionary!: boolean;
     useExternalFile!: boolean;
     fileRoute!: string;
-    wordles!: Wordle[];
+    wordlesLength!: number[];
 
     constructor(contestName: string,
         startDate: Date,
@@ -21,7 +20,7 @@ export class Contest {
         useExternalFile: boolean,
         fileRoute: string,
         competition: Competition,
-        wordles: Wordle[] = []) {
+        wordlesLength: number[]) {
         this.contestName = contestName;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -30,6 +29,6 @@ export class Contest {
         this.useExternalFile = useExternalFile;
         this.fileRoute = fileRoute;
         this.competition = competition;
-        this.wordles = wordles;
+        this.wordlesLength = wordlesLength;
     }
 }

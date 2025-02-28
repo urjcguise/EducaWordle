@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 export class ContestListComponent implements OnInit {
 
   contests: Contest[] = [];
-  contestsWithState: { contest: Contest; state: 'upcoming' | 'ongoing' | 'finished' }[] = [];
+  contestsWithState: { contest: Contest; state: 'upcoming' | 'ongoing' | 'finished'; empty: boolean }[] = [];
   competitionName!: string;
   competitionId!: number;
 
@@ -64,7 +64,8 @@ export class ContestListComponent implements OnInit {
 
           const contestsWithStatePromises = this.contests.map(async (contest) => ({
             contest,
-            state: await this.getContestState(contest)
+            state: await this.getContestState(contest),
+            empty: this.checkEmpty(contest)
           }));
 
           this.contestsWithState = await Promise.all(contestsWithStatePromises);
@@ -156,25 +157,36 @@ export class ContestListComponent implements OnInit {
       useDictionary: oldContest.useDictionary,
       useExternalFile: oldContest.useExternalFile,
       fileRoute: oldContest.fileRoute,
-      wordles: []
+      wordlesLength: []
     };
 
     this.contestService.copyContest(newContest, oldContest.id).subscribe({
       next: (copiedContest) => {
-        const wordStrings: string[] = oldContest.wordles.map(wordle => wordle.word);
-        this.wordleService.saveWordles(wordStrings, copiedContest.id, this.professorName, 0).subscribe({
-          next: () => {
-            alert("Concurso copiado correctamente");
+        this.wordleService.getWordlesByContest(oldContest.id).subscribe({
+          next: (wordles) => {
+            const wordStrings: string[] = wordles.map(wordle => wordle.word);
+            this.wordleService.saveWordles(wordStrings, copiedContest.id, this.professorName, 0).subscribe({
+              next: () => {
+                alert("Concurso copiado correctamente");
+              },
+              error: (e) => {
+                console.error('Error guardando los wordle', e);
+              }
+            });
+            this.loadContests();
           },
-          error: (error) => {
-            console.error('Error guardando los wordle', error);
+          error: (e) => {
+            console.error('Error obteniendo los wordles', e);
           }
         });
-        this.loadContests();
       },
-      error: (error) => {
-        console.error('Error copiando el concurso', error);
+      error: (e) => {
+        console.error('Error copiando el concurso', e);
       }
     });
+  }
+
+  private checkEmpty(contest: Contest): boolean {
+    return contest.wordlesLength.length == 0;
   }
 }

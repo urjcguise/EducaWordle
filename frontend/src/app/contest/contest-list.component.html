@@ -33,7 +33,7 @@
             </div>
 
             <div *ngIf="isStudent">
-              <button *ngIf="item.state === 'ongoing'" class="btn btn-success btn-sm ml-2"
+              <button *ngIf="item.state === 'ongoing' && !item.empty" class="btn btn-success btn-sm ml-2"
                 (click)="navigateToPlayWordle(item.contest.id, 0)">
                 <i class="fas fa-play"></i>Comenzar
               </button>
@@ -45,6 +45,7 @@
                 (click)="navigateToWatchStatistics(item.contest.id)">
                 <i class="fas fa-chart-line"></i>Ver datos
               </button>
+              <h6 *ngIf="item.empty">Wordle vacío</h6>
             </div>
           </div>
         </div>

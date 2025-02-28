@@ -254,8 +254,8 @@ export class FolderListComponent implements OnInit {
   }
 
   deleteWordleAndFolder(): void {
-    const selectedWordleNames = this.selectedWordles.map(
-      (index) => this.wordleList[index].word
+    const selectedWordle = this.selectedWordles.map(
+      (index) => this.wordleList[index]
     );
 
     const selectedFolderIds = this.selectedFolders.map(
@@ -280,8 +280,8 @@ export class FolderListComponent implements OnInit {
       console.log('No hay carpetas seleccionadas para eliminar');
     }
 
-    if (selectedWordleNames.length > 0) {
-      this.wordleService.deleteWordles(selectedWordleNames).subscribe({
+    if (selectedWordle.length > 0) {
+      this.wordleService.deleteWordles(selectedWordle).subscribe({
         next: () => {
           console.log('Wordles eliminados correctamente');
           this.wordleList = this.wordleList.filter(

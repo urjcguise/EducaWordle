@@ -9,7 +9,6 @@ export class WordleState {
 }
 
 export class Game {
-  wordle: string;
   finished: boolean;
   won: boolean;
   tryCount: number;
@@ -20,8 +19,7 @@ export class Game {
   lastWordle: string;
   timeGuess: string;
 
-  constructor(wordle: string = '', finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "", timeGuess: string = "") {
-    this.wordle = wordle;
+  constructor(finished: boolean = false, won: boolean = false, tryCount: number = 0, state: State = new State(), startTime: string = '', finishTime: string = '', timeNeeded: number = 0, lastWordle: string = "", timeGuess: string = "") {
     this.finished = finished;
     this.won = won;
     this.tryCount = tryCount;

@@ -1,6 +1,7 @@
 package app.TFGWordle.controller;
 
 import app.TFGWordle.dto.FolderDTO;
+import app.TFGWordle.dto.WordleDTO;
 import app.TFGWordle.model.Contest;
 import app.TFGWordle.model.Folder;
 import app.TFGWordle.model.Wordle;
@@ -15,6 +16,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -65,29 +70,36 @@ public class WordleController {
                 newWordle.setFolder(folderService.getById(folderId));
             toSave.add(newWordle);
         }
-        if (!contests.isEmpty())
-            contests.get(0).updateWordles(toSave);
+        wordleService.saveAll(toSave);
+        if (!contests.isEmpty()) {
+            Contest contestToSave = contests.get(0);
+            contestToSave.updateWordles(toSave);
+            contestToSave.setWordlesLength(wordles.stream().map(String::length).toList());
+            contestService.save(contestToSave);
+        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(wordleService.saveAll(toSave));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @DeleteMapping("/deleteWordles")
-    public ResponseEntity<?> deleteWordles(@RequestBody List<String> wordlesName) {
+    public ResponseEntity<?> deleteWordles(@RequestBody List<Wordle> wordles) {
 
-        for (String word : wordlesName) {
-            if (!wordleService.existsByWord(word))
-                return new ResponseEntity<>("No existe la palabra " + word, HttpStatus.NOT_FOUND);
-
-            Wordle wordle = wordleService.getByWord(word);
-            if (!wordle.getContests().isEmpty()) {
-                List<Contest> contests = wordle.getContests();
+        for (Wordle wordle : wordles) {
+            if (!wordleService.existsById(wordle.getId()))
+                return new ResponseEntity<>("No existe la palabra " + wordle.getWord(), HttpStatus.NOT_FOUND);
+            Wordle wordleToEdit = wordleService.getById(wordle.getId());
+            if (!wordleToEdit.getContests().isEmpty()) {
+                List<Contest> contests = wordleToEdit.getContests();
                 for (Contest contest : contests) {
-                    contest.getWordles().remove(wordle);
+                    int wordlePosition = contest.getWordles().indexOf(wordleToEdit);
+                    contest.getWordlesLength().remove(wordlePosition);
+                    contest.getWordles().remove(wordleToEdit);
+                    contest.setCompetition(contestService.getById(contest.getId()).getCompetition());
                     contestService.save(contest);
                 }
             }
-            wordleService.delete(wordle);
+            wordleService.delete(wordleToEdit);
         }
 
         return ResponseEntity.ok().build();
@@ -137,25 +149,39 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/getWordlesByContest/{contestId}")
-    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId) {
+    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
         Contest contest = contestService.getById(contestId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isStudent = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"));
+        if (isStudent) {
+            User user = userService.getByUserName(((UserDetails) authentication.getPrincipal()).getUsername())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+            JsonNode state = contestStateService.getContestState(contestId, user.getId()).getState();
+            for (int i = 0; i < contest.getWordles().size(); i++) {
+                if (!state.get("games").get(i).get("finished").asBoolean())
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(wordleService.findByContestId(contest.getId()));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getWordlesByProfessor/{professorName}")
-    public ResponseEntity<List<Wordle>> getWordlesByProfessor(@PathVariable String professorName) {
+    public ResponseEntity<List<WordleDTO>> getWordlesByProfessor(@PathVariable String professorName) {
         User professor = userService.getByUserName(professorName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        List<Wordle> toReturn = new ArrayList<>();
+        List<WordleDTO> toReturn = new ArrayList<>();
 
         for (Wordle w : wordleService.findByProfessorId(professor.getId())) {
-            if (w.getFolder() == null)
-                toReturn.add(w);
+            if (w.getFolder() == null) {
+                WordleDTO wordleToReturn = new WordleDTO(w);
+                toReturn.add(wordleToReturn);
+            }
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(toReturn);
@@ -219,9 +245,14 @@ public class WordleController {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        JsonNode state = contestStateService.getContestState(contestId, contestId).getState();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = userService.getByUserName(((UserDetails) authentication.getPrincipal()).getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
+        JsonNode state = contestStateService.getContestState(contestId, user.getId()).getState();
         if (!state.get("games").get(wordleIndex).get("finished").asBoolean())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
         return ResponseEntity.status(HttpStatus.OK).body(contestService.getById(contestId).getWordles().get(wordleIndex));
     }
 

@@ -34,6 +34,10 @@ public class WordleService {
         return wordleRepository.findByWord(word).isPresent();
     }
 
+    public boolean existsById(Long id) {
+        return wordleRepository.existsById(id);
+    }
+
     public Wordle getByWord(String word) {
         return wordleRepository.findByWord(word).get();
     }
@@ -44,5 +48,9 @@ public class WordleService {
 
     public void delete(Wordle wordle) {
         wordleRepository.delete(wordle);
+    }
+
+    public Wordle getById(Long id) {
+        return wordleRepository.findById(id).get();
     }
 }

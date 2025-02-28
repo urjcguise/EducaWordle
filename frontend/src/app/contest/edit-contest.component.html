@@ -6,7 +6,7 @@
     </div>
 
     <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex">
-        <input type="text" placeholder="Nuevo Wordle" [(ngModel)]="wordles[i]" class="wordle-input" />
+        <input type="text" placeholder="Nuevo Wordle" [(ngModel)]="wordles[i].word" class="wordle-input" />
         <button type="button" class="delete-wordle-button" (click)="removeWordle(i)">
             🗑️
         </button>

@@ -18,9 +18,9 @@ export class WordleService {
     return this.httpClient.post<any>(this.apiUrl + "newWordles/" + contestId + '/' + professorName + '/' + folderId, wordles);
   }
 
-  public deleteWordles(wordlesName: string[]): Observable<any> {
+  public deleteWordles(wordles: Wordle[]): Observable<any> {
     return this.httpClient.delete<any>(this.apiUrl + "deleteWordles", {
-      body: wordlesName
+      body: wordles
     });
   }
 
