@@ -40,8 +40,8 @@ export class ContestService {
     return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');
   }
 
-  public copyContest(newContest: Contest, oldContestId: number) {
-    return this.httpClient.post<Contest>(this.apiUrl + 'copyContest/' + oldContestId, newContest);
+  public copyContest(oldContestId: number) {
+    return this.httpClient.post<Contest>(this.apiUrl + 'copyContest/' + oldContestId, null);
   }
 
   public createContestState(contestId: number, userName: string, wordleState: WordleState): Observable<any> {
@@ -92,8 +92,8 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'saveExternalDictionary/' + contestId, words);
   }
 
-  public getLogsInExcel(contestId: number) {
-    return this.httpClient.get(this.apiUrl + 'getLogsInExcel/' + contestId, {
+  public exportLogsInExcel(contestId: number) {
+    return this.httpClient.get(this.apiUrl + 'exportLogsInExcel/' + contestId, {
       responseType: 'blob'
     });
   }

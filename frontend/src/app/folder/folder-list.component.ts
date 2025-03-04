@@ -79,7 +79,7 @@ export class FolderListComponent implements OnInit {
           console.error('Error obteniendo la carpeta', e);
         }
       });
-      this.wordleService.getFoldersByFolderId(this.actualFolderId).subscribe({
+      this.wordleService.getFoldersInsideFolder(this.actualFolderId).subscribe({
         next: (folders) => {
           this.folderList = folders;
           this.folderList.forEach(() => {
@@ -92,7 +92,7 @@ export class FolderListComponent implements OnInit {
         }
       });
 
-      this.wordleService.getWordlesByFolderId(this.actualFolderId).subscribe({
+      this.wordleService.getWordlesInsideFolder(this.actualFolderId).subscribe({
         next: (wordles) => {
           this.wordleList = wordles;
         },
@@ -219,7 +219,7 @@ export class FolderListComponent implements OnInit {
       return;
     }
     this.folderOptions = [];
-    this.wordleService.getFoldersByFolderId(this.actualFolderId).subscribe({
+    this.wordleService.getFoldersInsideFolder(this.actualFolderId).subscribe({
       next: (folders) => {
         folders.forEach((folder) => {
           this.folderOptions.push(folder);

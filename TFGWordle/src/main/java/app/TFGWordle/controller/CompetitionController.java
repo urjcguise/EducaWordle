@@ -81,34 +81,32 @@ public class CompetitionController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @DeleteMapping("/deleteCompetition/{id}")
-    public ResponseEntity<?> deleteCompetition(@PathVariable Long id) {
-        if (!competitionService.existsCompetition(id))
+    @DeleteMapping("/deleteCompetition/{competitionId}")
+    public ResponseEntity<?> deleteCompetition(@PathVariable Long competitionId) {
+        if (!competitionService.existsCompetition(competitionId))
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
 
-        List<Participation> participations = competitionService.getParticipations(id);
+        List<Participation> participations = competitionService.getParticipations(competitionId);
         for (Participation p: participations) {
             User student = p.getStudent();
             if (student.getParticipations().size() == 1)
                 userService.deleteUser(student);
         }
 
-        List<Contest> contestInCompetition = contestService.getContestsByCompetition(competitionService.getCompetitionById(id));
+        List<Contest> contestInCompetition = contestService.getContestsByCompetition(competitionService.getCompetitionById(competitionId));
         for (Contest contest : contestInCompetition) {
             contestService.deleteContest(contest.getId());
         }
-        competitionService.deleteCompetition(id);
-        return ResponseEntity.ok(Map.of("message", "Competición eliminada"));
+        competitionService.deleteCompetition(competitionId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getStudents/{competitionId}")
     public ResponseEntity<List<User>> getStudents(@PathVariable Long competitionId) {
-        if (competitionService.existsCompetition(competitionId)) {
-            return ResponseEntity.ok(participationService.findStudentsByCompetition(competitionId));
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return competitionService.existsCompetition(competitionId)
+                ? new ResponseEntity<>(participationService.findStudentsByCompetition(competitionId), HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -123,7 +121,7 @@ public class CompetitionController {
             user.getParticipations().add(newParticipation);
 
             participationService.save(newParticipation);
-            return new ResponseEntity<>(Map.of("message", "Alumno asignado correctamente"), HttpStatus.CREATED);
+            return new ResponseEntity<>(Map.of("message", "Alumno asignado correctamente"), HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Competición o usuario no encontrado", HttpStatus.NOT_FOUND);
         }

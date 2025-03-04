@@ -29,10 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/contests")
@@ -79,7 +76,6 @@ public class ContestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/{competitionName}/contests")
     public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
         if (!competitionService.existsCompetitionByName(competitionName))
@@ -87,7 +83,7 @@ public class ContestController {
 
         Competition competition = competitionService.getCompetitionByName(competitionName);
         List<Contest> contests = contestService.getContestsByCompetition(competition);
-        return ResponseEntity.ok(contests);
+        return new ResponseEntity<>(contests, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -135,25 +131,37 @@ public class ContestController {
         return ResponseEntity.ok(contestService.save(contestDTO.getContest()));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/{contestId}/contest")
     public ResponseEntity<Contest> getContestById(@PathVariable Long contestId) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.ok(contestService.getById(contestId));
+        return new ResponseEntity<>(contestService.getById(contestId), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/copyContest/{oldContestId}")
-    public ResponseEntity<Contest> copyContest(@RequestBody Contest newContest, @PathVariable Long oldContestId) {
-        if (contestService.existsByName(newContest.getContestName()))
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public ResponseEntity<Contest> copyContest(@PathVariable Long oldContestId) {
+        if (!contestService.existsById(oldContestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Contest oldContest = contestService.getById(oldContestId);
+        Contest newContest = new Contest();
+
+        newContest.setContestName(oldContest.getContestName() + "_copia");
         newContest.setCompetition(oldContest.getCompetition());
+
+        Date actualDate = new Date((new Date().getTime() / 1000) * 1000);
+        newContest.setStartDate(actualDate);
+        long year = 365L * 24 * 60 * 60 * 1000;
+        newContest.setEndDate(new Date(actualDate.getTime() + year));
+
+        newContest.setNumTries(oldContest.getNumTries());
+        newContest.setUseDictionary(oldContest.getUseDictionary());
+        newContest.setUseExternalFile(oldContest.getUseExternalFile());
         newContest.setWordlesLength(oldContest.getWordlesLength());
-        return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(newContest));
+
+        return new ResponseEntity<>(contestService.save(newContest), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -187,7 +195,7 @@ public class ContestController {
         } catch (Exception e) {
             return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(contestStateService.save(newContestState));
+        return new ResponseEntity<>(contestStateService.save(newContestState), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -203,7 +211,7 @@ public class ContestController {
         if (!contestStateService.existsState(contest.getId(), user.getId()))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.ok(contestStateService.getState(contest.getId(), user.getId()));
+        return new ResponseEntity<>(contestStateService.getState(contest.getId(), user.getId()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -222,7 +230,25 @@ public class ContestController {
         } catch (Exception e) {
             return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(contestStateService.save(contestState));
+        return new ResponseEntity<>(contestStateService.save(contestState), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllContestState/{contestId}")
+    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable Long contestId) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+
+        List<ContestState> contestStates = contestStateService.getAllByContest(contest.getId());
+
+        List<UserState> toReturn = new ArrayList<>();
+        for (ContestState contestState : contestStates) {
+            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(), contestState.getState());
+            toReturn.add(toAdd);
+        }
+
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -245,48 +271,7 @@ public class ContestController {
             return new ResponseEntity<>("Error al procesar los datos" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         contestStateService.saveLog(contestStateLog);
-        return ResponseEntity.ok(HttpStatus.CREATED);
-    }
-
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
-    @GetMapping("/getAllContestState/{contestId}")
-    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable Long contestId) throws JsonProcessingException {
-        if (!contestService.existsById(contestId))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Contest contest = contestService.getById(contestId);
-
-        List<ContestState> contestStates = contestStateService.getAllByContest(contest.getId());
-
-        List<UserState> toReturn = new ArrayList<>();
-        for (ContestState contestState : contestStates) {
-            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(), contestState.getState());
-            toReturn.add(toAdd);
-        }
-
-        return ResponseEntity.ok(toReturn);
-    }
-
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getAllContestStateLogs/{contestId}")
-    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable Long contestId) throws JsonProcessingException {
-        if (!contestService.existsById(contestId))
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Contest contest = contestService.getById(contestId);
-
-        List<String> contestStateLogs = contestStateService.getAllLogsByContest(contest.getId());
-
-        if (contestStateLogs.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        List<WordleStateLog> toReturn = new ArrayList<>();
-        for (String csLog : contestStateLogs) {
-            WordleStateLog toAdd = contestStateService.getStateLog(csLog);
-            toReturn.add(toAdd);
-        }
-
-        return ResponseEntity.ok(toReturn);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -310,13 +295,53 @@ public class ContestController {
             toReturn.add(toAdd);
         }
 
-        return ResponseEntity.ok(toReturn);
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @GetMapping("/getAllContestStateLogs/{contestId}")
+    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable Long contestId) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+
+        List<String> contestStateLogs = contestStateService.getAllLogsByContest(contest.getId());
+
+        if (contestStateLogs.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        List<WordleStateLog> toReturn = new ArrayList<>();
+        for (String csLog : contestStateLogs) {
+            WordleStateLog toAdd = contestStateService.getStateLog(csLog);
+            toReturn.add(toAdd);
+        }
+
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/existsInDictionary/{word}")
     public ResponseEntity<Boolean> existsInDictionary(@PathVariable String word) {
-        return ResponseEntity.ok(dictionaryService.existsInGlobalDictionary(word));
+        return new ResponseEntity<>(dictionaryService.existsInGlobalDictionary(word), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/saveExternalDictionary/{contestId}")
+    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable Long contestId, @RequestBody List<String> words) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contestToLink = contestService.getById(contestId);
+
+        List<DictionaryExternal> toSave = new ArrayList<>();
+        for (String word : words) {
+            DictionaryExternal wordToSave = new DictionaryExternal(word);
+            wordToSave.setContest(contestToLink);
+            toSave.add(wordToSave);
+        }
+
+        return new ResponseEntity<>(dictionaryService.saveExternal(toSave), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -329,27 +354,9 @@ public class ContestController {
         return ResponseEntity.ok(dictionaryService.existsInExternalDictionary(wordle, contest.getId()));
     }
 
-    @PreAuthorize("hasRole('PROFESSOR')")
-    @PostMapping("/saveExternalDictionary/{contestId}")
-    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable Long contestId, @RequestBody List<String> words) {
-        if (!contestService.existsById(contestId))
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-
-        Contest contestToLink = contestService.getById(contestId);
-
-        List<DictionaryExternal> toSave = new ArrayList<>();
-        for (String word : words) {
-            DictionaryExternal wordToSave = new DictionaryExternal(word);
-            wordToSave.setContest(contestToLink);
-            toSave.add(wordToSave);
-        }
-
-        return ResponseEntity.ok(dictionaryService.saveExternal(toSave));
-    }
-
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getLogsInExcel/{contestId}")
-    public ResponseEntity<Resource> getLogsInExcel(@PathVariable Long contestId) {
+    @GetMapping("/exportLogsInExcel/{contestId}")
+    public ResponseEntity<Resource> exportLogsInExcel(@PathVariable Long contestId) {
         if(!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -405,16 +412,5 @@ public class ContestController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/getaLLProfessors")
-    public ResponseEntity<List<User>> getAllProfessors() {
-        List<User> userList = userService.getAll();
-        List<User> toReturn = new ArrayList<>();
-        for (User user : userList) {
-            if (user.getRoles().contains(RolName.ROLE_ADMIN))
-                toReturn.add(user);
-        }
-        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 }

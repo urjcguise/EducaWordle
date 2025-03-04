@@ -78,7 +78,7 @@ public class WordleController {
             contestService.save(contestToSave);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -102,7 +102,7 @@ public class WordleController {
             wordleService.delete(wordleToEdit);
         }
 
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -144,14 +144,13 @@ public class WordleController {
 
         wordleService.save(wordle);
 
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('STUDENT') || hasRole('ADMIN')")
     @GetMapping("/getWordlesByContest/{contestId}")
     public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Contest contest = contestService.getById(contestId);
 
@@ -167,7 +166,7 @@ public class WordleController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(wordleService.findByContestId(contest.getId()));
+        return new ResponseEntity<>(wordleService.findByContestId(contest.getId()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -184,7 +183,7 @@ public class WordleController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(toReturn);
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -194,7 +193,7 @@ public class WordleController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Wordle wordle = wordleService.getByWord(word);
-        return ResponseEntity.status(HttpStatus.OK).body(wordle.getContests());
+        return new ResponseEntity<>(wordle.getContests(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -236,7 +235,7 @@ public class WordleController {
                 toReturn.set(i, 0);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(toReturn);
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -253,7 +252,7 @@ public class WordleController {
         if (!state.get("games").get(wordleIndex).get("finished").asBoolean())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        return ResponseEntity.status(HttpStatus.OK).body(contestService.getById(contestId).getWordles().get(wordleIndex));
+        return new ResponseEntity<>(contestService.getById(contestId).getWordles().get(wordleIndex), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -271,7 +270,7 @@ public class WordleController {
 
         folderService.save(newFolder);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(newFolder);
+        return new ResponseEntity<>(newFolder, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -308,7 +307,7 @@ public class WordleController {
 
         folderService.save(parentFolder);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(newFolder);
+        return new ResponseEntity<>(newFolder, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -322,16 +321,16 @@ public class WordleController {
             if (f.getParentFolder() == null)
                 toReturn.add(new FolderDTO(f));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(toReturn);
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @PostMapping("/editFolder/{oldFolderNameId}")
-    public ResponseEntity<?> editFolder(@PathVariable Long oldFolderNameId, @RequestBody String newFolderName) {
-        if (!folderService.existsById(oldFolderNameId))
+    @PostMapping("/editFolder/{oldFolderId}")
+    public ResponseEntity<?> editFolder(@PathVariable Long oldFolderId, @RequestBody String newFolderName) {
+        if (!folderService.existsById(oldFolderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Folder folder = folderService.getById(oldFolderNameId);
+        Folder folder = folderService.getById(oldFolderId);
         if (!folder.getName().equals(newFolderName)) {
             folder.setName(newFolderName);
             folderService.save(folder);
@@ -350,23 +349,23 @@ public class WordleController {
         return ResponseEntity.status(HttpStatus.OK).body(new FolderDTO(folder));    }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getFoldersByFolderId/{folderId}")
+    @GetMapping("/getFoldersInsideFolder/{folderId}")
     public ResponseEntity<List<Folder>> getFoldersByFolderId(@PathVariable Long folderId) {
         if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Folder parentFolder = folderService.getById(folderId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(parentFolder.getFolders());
+        return new ResponseEntity<>(parentFolder.getFolders(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getWordlesByFolderId/{folderId}")
+    @GetMapping("/getWordlesInsideFolder/{folderId}")
     public ResponseEntity<List<Wordle>> getWordlesByFolderName(@PathVariable Long folderId) {
         if(!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return ResponseEntity.status(HttpStatus.OK).body(folderService.getById(folderId).getWordles());
+        return new ResponseEntity<>(folderService.getById(folderId).getWordles(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -380,7 +379,6 @@ public class WordleController {
                 wordleToMove.setFolder(null);
                 wordleService.save(wordleToMove);
             }
-            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             if (!folderService.existsById(folderId))
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -396,8 +394,7 @@ public class WordleController {
                 folder.getWordles().add(wordleToMove);
             }
             folderService.save(folder);
-
-            return new ResponseEntity<>(HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -17,7 +17,7 @@ export class EditContestComponent {
 
   professorName: string = '';
 
-  contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, "", new Competition(""), []);
+  contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, new Competition(""), []);
   contestId: number = 0;
   dictionary: boolean = false;
   file: boolean = false;

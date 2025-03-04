@@ -23,7 +23,6 @@ public class WordleState {
     }
 
     public static class Game {
-        //private String wordle;
         private boolean finished;
         private boolean won;
         private int tryCount;
@@ -33,16 +32,6 @@ public class WordleState {
         private State state;
         private String lastWordle;
         private String timeGuess;
-
-        /*
-        public String getWordle() {
-            return wordle;
-        }
-
-        public void setWordle(String wordle) {
-            this.wordle = wordle;
-        }
-        */
 
         public boolean isFinished() {
             return finished;

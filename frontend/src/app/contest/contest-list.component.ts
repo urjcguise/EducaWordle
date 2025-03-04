@@ -142,25 +142,7 @@ export class ContestListComponent implements OnInit {
   }
 
   copyContest(oldContest: Contest) {
-
-    const now = new Date();
-    const oneYearLater = new Date();
-    oneYearLater.setFullYear(now.getFullYear() + 1);
-
-    const newContest = {
-      id: 0,
-      contestName: oldContest.contestName + "_copia",
-      competition: oldContest.competition,
-      startDate: now,
-      endDate: oneYearLater,
-      numTries: oldContest.numTries,
-      useDictionary: oldContest.useDictionary,
-      useExternalFile: oldContest.useExternalFile,
-      fileRoute: oldContest.fileRoute,
-      wordlesLength: []
-    };
-
-    this.contestService.copyContest(newContest, oldContest.id).subscribe({
+    this.contestService.copyContest(oldContest.id).subscribe({
       next: (copiedContest) => {
         this.wordleService.getWordlesByContest(oldContest.id).subscribe({
           next: (wordles) => {

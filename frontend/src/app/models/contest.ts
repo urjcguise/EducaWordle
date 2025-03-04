@@ -9,7 +9,6 @@ export class Contest {
     numTries!: number;
     useDictionary!: boolean;
     useExternalFile!: boolean;
-    fileRoute!: string;
     wordlesLength!: number[];
 
     constructor(contestName: string,
@@ -18,7 +17,6 @@ export class Contest {
         numTries: number,
         useDictionary: boolean,
         useExternalFile: boolean,
-        fileRoute: string,
         competition: Competition,
         wordlesLength: number[]) {
         this.contestName = contestName;
@@ -27,7 +25,6 @@ export class Contest {
         this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
-        this.fileRoute = fileRoute;
         this.competition = competition;
         this.wordlesLength = wordlesLength;
     }

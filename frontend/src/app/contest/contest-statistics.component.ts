@@ -409,7 +409,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel() {
-    this.contestService.getLogsInExcel(this.contestId).subscribe({
+    this.contestService.exportLogsInExcel(this.contestId).subscribe({
       next: (docu) => {
         const blob = new Blob([docu], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
