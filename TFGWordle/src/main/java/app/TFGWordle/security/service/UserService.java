@@ -16,6 +16,11 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public Optional<User> getByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
