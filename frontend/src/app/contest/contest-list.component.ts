@@ -143,24 +143,8 @@ export class ContestListComponent implements OnInit {
 
   copyContest(oldContest: Contest) {
     this.contestService.copyContest(oldContest.id).subscribe({
-      next: (copiedContest) => {
-        this.wordleService.getWordlesByContest(oldContest.id).subscribe({
-          next: (wordles) => {
-            const wordStrings: string[] = wordles.map(wordle => wordle.word);
-            this.wordleService.saveWordles(wordStrings, copiedContest.id, this.professorName, 0).subscribe({
-              next: () => {
-                alert("Concurso copiado correctamente");
-              },
-              error: (e) => {
-                console.error('Error guardando los wordle', e);
-              }
-            });
-            this.loadContests();
-          },
-          error: (e) => {
-            console.error('Error obteniendo los wordles', e);
-          }
-        });
+      next: () => {
+        alert('Concurso y wordles copiados correctamente');
       },
       error: (e) => {
         console.error('Error copiando el concurso', e);

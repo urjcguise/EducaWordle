@@ -121,7 +121,9 @@ public class WordleController {
 
         for (Contest oldContest : oldContests) {
             if (!contests.contains(oldContest)) {
-                oldContest.getWordles().remove(wordle);
+                int index = oldContest.getWordles().indexOf(wordle);
+                oldContest.getWordles().remove(index);
+                oldContest.getWordlesLength().remove(index);
                 contestService.save(oldContest);
             }
         }
@@ -138,6 +140,7 @@ public class WordleController {
 
             if (!contest.getWordles().contains(wordle)) {
                 contest.getWordles().add(wordle);
+                contest.getWordlesLength().add(wordle.getWord().length());
                 contestService.save(contest);
             }
         }

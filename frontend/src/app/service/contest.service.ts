@@ -41,7 +41,7 @@ export class ContestService {
   }
 
   public copyContest(oldContestId: number) {
-    return this.httpClient.post<Contest>(this.apiUrl + 'copyContest/' + oldContestId, null);
+    return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestId, null);
   }
 
   public createContestState(contestId: number, userName: string, wordleState: WordleState): Observable<any> {

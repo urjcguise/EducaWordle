@@ -109,7 +109,7 @@ public class ContestController {
         }
         contestService.deleteContest(contest.getId());
 
-        return ResponseEntity.ok(Map.of("message", "Concurso eliminado"));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -141,7 +141,7 @@ public class ContestController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/copyContest/{oldContestId}")
-    public ResponseEntity<Contest> copyContest(@PathVariable Long oldContestId) {
+    public ResponseEntity<?> copyContest(@PathVariable Long oldContestId) {
         if (!contestService.existsById(oldContestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -160,8 +160,11 @@ public class ContestController {
         newContest.setUseDictionary(oldContest.getUseDictionary());
         newContest.setUseExternalFile(oldContest.getUseExternalFile());
         newContest.setWordlesLength(oldContest.getWordlesLength());
+        List<Wordle> copiedWordles = new ArrayList<>(oldContest.getWordles());
+        newContest.setWordles(copiedWordles);
 
-        return new ResponseEntity<>(contestService.save(newContest), HttpStatus.CREATED);
+        contestService.save(newContest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
