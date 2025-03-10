@@ -103,17 +103,6 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     if (this.isAdmin)
       this.professorName = history.state.professorName;
 
-    /*
-    this.contestService.getContestById(this.contestId).subscribe({
-      next: (contest) => {
-        contest.wordles.forEach((w: Wordle) => {
-          this.wordlesInContest.push(w.word);
-        });
-      },
-      error: (error) => {
-        console.error('El concurso no existe', error);
-      }
-    });*/
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (wordles) => {
         this.wordleList = wordles;
@@ -138,6 +127,83 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
             info: []
           });
         })
+
+        this.contestService.getAllUserState(this.contestId).subscribe({
+          next: (data) => {
+            this.totalStudents = data.length;
+            data.forEach((userState: UserState) => {
+              const userName = userState.userName;
+              const email = userState.email;
+              let endTime = "";
+              let totalTime = 0;
+              let wordleIndex = 0;
+              userState.state.games.forEach((game: Game) => {
+                const wordleDataItem = this.wordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
+                const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
+
+                if (!wordleDataItem || !wordleStudentsItem) {
+                  console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
+                  return;
+                }
+
+                if (game.finished) {
+                  if (game.won)
+                    wordleDataItem.success += 1;
+                  else
+                    wordleDataItem.wrong += 1;
+                  endTime = game.finishTime;
+                  totalTime = game.timeNeeded;
+                  wordleDataItem.totalTriesAccumulated += game.tryCount;
+                  wordleDataItem.totalTimeAccumulated += game.timeNeeded;
+                } else {
+                  wordleDataItem.trying += 1;
+                }
+
+                wordleStudentsItem.students.push({
+                  name: userName,
+                  email: email,
+                  totalTries: game.tryCount,
+                  startTime: game.startTime,
+                  endTime: endTime,
+                  totalTime: totalTime,
+                  lastWordle: game.lastWordle,
+                  finished: game.finished
+                });
+                wordleIndex += 1;
+              });
+            });
+
+            if (this.isStudent) {
+              this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
+                next: (logs) => {
+                  logs.forEach((log: WordleStateLog) => {
+                    const studentInfoItem = this.studentInformation.find(item =>
+                      item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
+                    );
+                    if (!studentInfoItem) {
+                      console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
+                      return;
+                    }
+                    studentInfoItem.info.push({
+                      nunTry: log.numTry,
+                      time: log.dateLog,
+                      lastWord: log.wordleInserted,
+                      correct: log.correct,
+                      wrongPlace: log.wrongPosition,
+                      wrong: log.wrong
+                    });
+                  });
+                },
+                error: (e) => {
+                  console.error('Error obteniendo los logs', e);
+                }
+              });
+            }
+          },
+          error: (e) => {
+            console.error('Error consiguiendo los usuarios y sus estados', e);
+          }
+        });
       },
       error: (e) => {
         if (e.status === 409)
@@ -149,190 +215,8 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.contestService.getAllUserState(this.contestId).subscribe({
-      next: (data) => {
-        this.totalStudents = data.length;
-        data.forEach((userState: UserState) => {
-          const userName = userState.userName;
-          const email = userState.email;
-          let endTime = "";
-          let totalTime = 0;
-          let wordleIndex = 0;
-          userState.state.games.forEach((game: Game) => {
-            /*
-            const wordleDataItem = this.wordlesData.find((item) => item.wordle === game.wordle);
-            const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === game.wordle);
-            */
-            const wordleDataItem = this.wordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
-            const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
-
-            if (!wordleDataItem || !wordleStudentsItem) {
-              console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
-              return;
-            }
-
-            if (game.finished) {
-              if (game.won)
-                wordleDataItem.success += 1;
-              else
-                wordleDataItem.wrong += 1;
-              endTime = game.finishTime;
-              totalTime = game.timeNeeded;
-              wordleDataItem.totalTriesAccumulated += game.tryCount;
-              wordleDataItem.totalTimeAccumulated += game.timeNeeded;
-            } else {
-              wordleDataItem.trying += 1;
-            }
-
-            wordleStudentsItem.students.push({
-              name: userName,
-              email: email,
-              totalTries: game.tryCount,
-              startTime: game.startTime,
-              endTime: endTime,
-              totalTime: totalTime,
-              lastWordle: game.lastWordle,
-              finished: game.finished
-            });
-            wordleIndex += 1;
-          });
-        });
 
 
-        if (this.isStudent) {
-          this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
-            next: (logs) => {
-              logs.forEach((log: WordleStateLog) => {
-                const studentInfoItem = this.studentInformation.find(item =>
-                  item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
-                );
-                if (!studentInfoItem) {
-                  console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
-                  return;
-                }
-                studentInfoItem.info.push({
-                  nunTry: log.numTry,
-                  time: log.dateLog,
-                  lastWord: log.wordleInserted,
-                  correct: log.correct,
-                  wrongPlace: log.wrongPosition,
-                  wrong: log.wrong
-                });
-              });
-            },
-            error: (e) => {
-              console.error('Error obteniendo los logs', e);
-            }
-          });
-        }
-      },
-      error: (e) => {
-        console.error('Error consiguiendo los usuarios y sus estados', e);
-      }
-    });
-
-
-    /*
-    this.contestService.getWordlesInContest(this.contestId).pipe(
-      tap((wordles) => {
-        wordles.forEach((wordle) => {
-          this.wordlesData.push({
-            wordle: wordle.word,
-            success: 0,
-            trying: 0,
-            wrong: 0,
-            averageTryCount: 0,
-            totalTriesAccumulated: 0,
-            averageTime: 0,
-            totalTimeAccumulated: 0
-          });
-          this.wordleStudents.push({
-            wordle: wordle.word,
-            students: []
-          });
-          this.studentInformation.push({
-            wordle: wordle.word,
-            info: []
-          });
-        });
-      }),
-      switchMap(() => this.contestService.getAllUserState(this.contestId))
-    ).subscribe({
-      next: (data) => {
-        this.totalStudents = data.length;
-        data.forEach((userState: UserState) => {
-          const userName = userState.userName;
-          const email = userState.email;
-          let endTime = "";
-          let totalTime = 0;
-          userState.state.games.forEach((game: Game) => {
-            const wordleDataItem = this.wordlesData.find((item) => item.wordle === game.wordle);
-            const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === game.wordle);
-
-            if (!wordleDataItem || !wordleStudentsItem) {
-              console.error(`No se encontró el wordle para ${game.wordle}`);
-              return;
-            }
-
-            if (game.finished) {
-              if (game.won)
-                wordleDataItem.success += 1;
-              else
-                wordleDataItem.wrong += 1;
-              endTime = game.finishTime;
-              totalTime = game.timeNeeded;
-              wordleDataItem.totalTriesAccumulated += game.tryCount;
-              wordleDataItem.totalTimeAccumulated += game.timeNeeded;
-            } else {
-              wordleDataItem.trying += 1;
-            }
-
-            wordleStudentsItem.students.push({
-              name: userName,
-              email: email,
-              totalTries: game.tryCount,
-              startTime: game.startTime,
-              endTime: endTime,
-              totalTime: totalTime,
-              lastWordle: game.lastWordle,
-              finished: game.finished
-            });
-          });
-        });
-        
-
-        if (this.isStudent) {
-          this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
-            next: (logs) => {
-              logs.forEach((log: WordleStateLog) => {
-                const studentInfoItem = this.studentInformation.find(item =>
-                  item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
-                );
-                if (!studentInfoItem) {
-                  console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
-                  return;
-                }
-                studentInfoItem.info.push({
-                  nunTry: log.numTry,
-                  time: log.dateLog,
-                  lastWord: log.wordleInserted,
-                  correct: log.correct,
-                  wrongPlace: log.wrongPosition,
-                  wrong: log.wrong
-                });
-              });
-            },
-            error: (e) => {
-              console.error('Error obteniendo los logs', e);
-            }
-          });
-        }
-      },
-      error: (error) => {
-        console.error('Error consiguiendo los usuarios y sus estados', error);
-      }
-    });
-*/
     if (this.isProfessor || this.isAdmin) {
       this.contestService.getAllStateLog(this.contestId).subscribe({
         next: (logs) => {

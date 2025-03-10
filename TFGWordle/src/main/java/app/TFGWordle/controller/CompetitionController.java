@@ -67,7 +67,7 @@ public class CompetitionController {
         competition.setProfessor(professor);
         competitionService.save(competition);
 
-        return new ResponseEntity<>(Map.of("message", "Competición creada exitosamente"), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -121,9 +121,9 @@ public class CompetitionController {
             user.getParticipations().add(newParticipation);
 
             participationService.save(newParticipation);
-            return new ResponseEntity<>(Map.of("message", "Alumno asignado correctamente"), HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Competición o usuario no encontrado", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -168,12 +168,12 @@ public class CompetitionController {
                     userService.save(newUser);
                     participationService.save(participation);
                 }
-                return new ResponseEntity<>(Map.of("message", "Archivo correctamente procesado"), HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         } else {
-            return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
