@@ -67,8 +67,8 @@ export class EditContestComponent {
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (data: Wordle[]) => {
         if (data && data.length > 0) {
-          this.wordles = [...data];
-          this.initialWordles = [...data];
+          this.wordles = JSON.parse(JSON.stringify(data));
+          this.initialWordles = JSON.parse(JSON.stringify(data));
         } else {
           this.wordles = [];
           this.initialWordles = [];
@@ -135,9 +135,18 @@ export class EditContestComponent {
       }
     }
 
-    const commonWordles = this.wordles.filter(wordle => this.initialWordles.includes(wordle));
-    const removedWordles = this.initialWordles.filter(wordle => !this.wordles.includes(wordle));
-    const addedWordles = this.wordles.filter(wordle => !this.initialWordles.includes(wordle));
+    const commonWordles = this.wordles.filter(wordle =>
+      this.initialWordles.some(initial => initial.word === wordle.word)
+    );
+
+    const removedWordles = this.initialWordles.filter(wordle =>
+      !this.wordles.some(current => current.word === wordle.word)
+    );
+
+    const addedWordles = this.wordles.filter(wordle =>
+      !this.initialWordles.some(initial => initial.word === wordle.word)
+    );
+
 
     this.deleteWordles(removedWordles);
 
