@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user';
 import { CompetitionService } from '../service/competition.service';
-import { NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-student-list',
@@ -19,7 +19,7 @@ export class StudentListComponent implements OnInit {
 
   currentTab: string = 'add-student';
 
-  constructor(private competitionService: CompetitionService, private router: Router) {
+  constructor(private competitionService: CompetitionService, private router: Router, private route: ActivatedRoute) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
@@ -43,7 +43,8 @@ export class StudentListComponent implements OnInit {
   }
 
   addStudent(): void {
-    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId } });
+    const competitionName = this.route.snapshot.paramMap.get('competitionName');
+    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId, professorName: this.professorName, competitionName: competitionName } });
   }
 
   setTab(tab: string) {

@@ -3,6 +3,7 @@ import { NewUser } from '../models/new-user';
 import { Observer } from 'rxjs';
 import { AuthService } from '../service/auth.service';
 import { CompetitionService } from '../service/competition.service';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-student',
@@ -12,6 +13,8 @@ import { CompetitionService } from '../service/competition.service';
 export class NewStudentComponent implements OnInit {
 
   competitionId!: number;
+  competitionName: string = '';
+  professorName: string = '';
 
   newUser!: NewUser;
   userName!: string;
@@ -19,10 +22,20 @@ export class NewStudentComponent implements OnInit {
   password!: string;
   errMsj!: string;
 
-  constructor(private authService: AuthService, private competitionService: CompetitionService) { }
+  constructor(private authService: AuthService, private competitionService: CompetitionService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        if (event.navigationTrigger == 'popstate') {
+          this.router.navigate(['/' + this.competitionName + '/alumnos'], { state: { professorName: this.professorName, competitionId: this.competitionId } });
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
+    this.competitionName = history.state.competitionName;
+    this.professorName = history.state.professorName;
   }
 
   onRegister(): void {
