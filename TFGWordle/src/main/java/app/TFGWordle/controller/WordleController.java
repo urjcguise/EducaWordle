@@ -349,7 +349,8 @@ public class WordleController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Folder folder = folderService.getById(folderId);
-        return ResponseEntity.status(HttpStatus.OK).body(new FolderDTO(folder));    }
+        return ResponseEntity.status(HttpStatus.OK).body(new FolderDTO(folder));
+    }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFoldersInsideFolder/{folderId}")
