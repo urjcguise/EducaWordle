@@ -28,6 +28,9 @@ public class WordleStateLog {
         this.state = state;
     }
 
+    public WordleStateLog() {
+    }
+
     public String getUserName() {
         return userName;
     }

@@ -6,7 +6,6 @@ import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.dto.WordleStateLog;
 import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
-import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.*;
