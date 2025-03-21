@@ -556,7 +556,7 @@ class ContestControllerTest {
     @WithMockUser(roles = {"STUDENT"})
     void createContestLogSuccess() throws Exception {
         Long contestId = 1L;
-        Integer wordlePosition = 0;
+        int wordlePosition = 0;
         String userName = "studentUser";
 
         Contest contest = new Contest();
@@ -587,7 +587,7 @@ class ContestControllerTest {
     @WithMockUser(roles = {"STUDENT"})
     void createContestLogContestNotFound() throws Exception {
         Long contestId = 1L;
-        Integer wordlePosition = 0;
+        int wordlePosition = 0;
         String userName = "studentUser";
         WordleStateLog wordleStateLog = new WordleStateLog();
 
@@ -603,7 +603,7 @@ class ContestControllerTest {
     @WithMockUser(roles = {"STUDENT"})
     void createContestLogUserNotFound() throws Exception {
         Long contestId = 1L;
-        Integer wordlePosition = 0;
+        int wordlePosition = 0;
         String userName = "studentUser";
         WordleStateLog wordleStateLog = new WordleStateLog();
 
@@ -703,5 +703,155 @@ class ContestControllerTest {
         verify(userService).getByUserName(userName);
         verify(contestStateService).getAllLogsByContestAndUser(contestId, user.getId());
         verifyNoMoreInteractions(contestStateService);
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void getAllContestStateLogsSuccess() throws Exception {
+        Long contestId = 1L;
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        List<String> contestLogsIds = Arrays.asList("log1", "log2");
+        WordleStateLog log1 = new WordleStateLog();
+        WordleStateLog log2 = new WordleStateLog();
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(contestStateService.getAllLogsByContest(contestId)).thenReturn(contestLogsIds);
+        when(contestStateService.getStateLog("log1")).thenReturn(log1);
+        when(contestStateService.getStateLog("log2")).thenReturn(log2);
+
+        mockMvc.perform(get(BASE_PATH + "/getAllContestStateLogs/" + contestId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void getAllContestStateLogsContestNotFound() throws Exception {
+        Long contestId = 1L;
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(get(BASE_PATH + "/getAllContestStateLogs/" + contestId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void getAllContestStateLogsEmpty() throws Exception {
+        Long contestId = 1L;
+
+        List<String> contestStateLogs = new ArrayList<>();
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+
+        mockMvc.perform(get(BASE_PATH + "/getAllContestStateLogs/" + contestId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void existsInDictionaryTrue() throws Exception {
+        String word = "word";
+
+        when(dictionaryService.existsInGlobalDictionary(word)).thenReturn(true);
+
+        mockMvc.perform(get(BASE_PATH + "/existsInDictionary/" + word))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void existsInDictionaryFalse() throws Exception {
+        String word = "word";
+
+        when(dictionaryService.existsInGlobalDictionary(word)).thenReturn(false);
+
+        mockMvc.perform(get(BASE_PATH + "/existsInDictionary/" + word))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void saveExternalDictionarySuccess() throws Exception {
+        Long contestId = 1L;
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        List<String> words = Arrays.asList("palabra1", "palabra2");
+        List<DictionaryExternal> savedWords = Arrays.asList(
+                new DictionaryExternal("palabra1"),
+                new DictionaryExternal("palabra2")
+        );
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(dictionaryService.saveExternal(anyList())).thenReturn(savedWords);
+
+        mockMvc.perform(post(BASE_PATH + "/saveExternalDictionary/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(words)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void saveExternalDictionaryContestNotFound() throws Exception {
+        Long contestId = 1L;
+
+        List<String> words = Arrays.asList("palabra1", "palabra2");
+        List<DictionaryExternal> savedWords = Arrays.asList(
+                new DictionaryExternal("palabra1"),
+                new DictionaryExternal("palabra2")
+        );
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/saveExternalDictionary/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(words)))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void existsInExternalDictionaryTrue() throws Exception {
+        Long contestId = 1L;
+        String wordle = "test";
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(dictionaryService.existsInExternalDictionary(wordle, contestId)).thenReturn(true);
+
+        mockMvc.perform(get(BASE_PATH + "/existsInExternalDictionary/" + contestId + "/" + wordle))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void existsInExternalDictionaryFalse() throws Exception {
+        Long contestId = 1L;
+        String wordle = "test";
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(dictionaryService.existsInExternalDictionary(wordle, contestId)).thenReturn(false);
+
+        mockMvc.perform(get(BASE_PATH + "/existsInExternalDictionary/" + contestId + "/" + wordle))
+                .andExpect(status().isOk());
     }
 }

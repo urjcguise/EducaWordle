@@ -28,14 +28,6 @@ public class ContestService {
         return contestRepository.findByCompetition(competition);
     }
 
-    public boolean existsByName(String name) {
-        return contestRepository.findByName(name).isPresent();
-    }
-
-    public Contest getByName(String contestName) {
-        return contestRepository.findByName(contestName).get();
-    }
-
     public boolean existsById(Long id) {
         return contestRepository.existsById(id);
     }
