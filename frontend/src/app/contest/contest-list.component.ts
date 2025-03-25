@@ -93,7 +93,7 @@ export class ContestListComponent implements OnInit {
   }
 
   navigateToEditContest(contestId: number) {
-    this.router.navigate([`/${contestId}/editarConcurso`], { state: { competitionName: this.competitionName } });
+    this.router.navigate([`/${contestId}/editarConcurso`], { state: { competitionName: this.competitionName, professorName: this.professorName } });
   }
 
   navigateToCreateContest() {

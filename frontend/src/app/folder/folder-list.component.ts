@@ -46,9 +46,9 @@ export class FolderListComponent implements OnInit {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
           if (this.parentFolderId != 0)
-            this.router.navigate([this.parentFolderId + '/wordles']);
+            this.router.navigate([this.parentFolderId + '/wordles'], { state: { professorName: this.professorName } });
           else
-            this.router.navigate(['/wordles']);
+            this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
         }
       }
     });

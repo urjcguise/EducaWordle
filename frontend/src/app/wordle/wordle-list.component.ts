@@ -257,5 +257,7 @@ export class WordleListComponent implements OnInit {
     } else {
       console.log('No hay Wordles seleccionados para eliminar.');
     }
+
+    this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
   }
 }

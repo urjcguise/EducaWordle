@@ -42,8 +42,7 @@ export class EditContestComponent {
   }
 
   ngOnInit(): void {
-    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
-      this.professorName = this.tokenService.getUserName()!;
+    this.professorName = history.state.professorName;
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.loadContest();
     this.getWordles();

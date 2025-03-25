@@ -17,7 +17,7 @@ export class WordleComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/wordles']);
+          this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
         }
       }
     });
