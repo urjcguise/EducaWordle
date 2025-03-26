@@ -38,7 +38,6 @@ class ContestServiceTest {
         Contest contest = new Contest();
         contest.setId(contestId);
 
-
         contestService.deleteContest(contestId);
 
         verify(contestRepository, times(1)).deleteById(contestId);

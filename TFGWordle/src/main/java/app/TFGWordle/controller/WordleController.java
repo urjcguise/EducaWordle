@@ -273,7 +273,7 @@ public class WordleController {
 
         folderService.save(newFolder);
 
-        return new ResponseEntity<>(newFolder, HttpStatus.OK);
+        return new ResponseEntity<>(newFolder, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -365,7 +365,7 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getWordlesInsideFolder/{folderId}")
-    public ResponseEntity<List<Wordle>> getWordlesByFolderName(@PathVariable Long folderId) {
+    public ResponseEntity<List<Wordle>> getWordlesByFolderId(@PathVariable Long folderId) {
         if(!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
