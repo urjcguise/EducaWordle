@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,38 +53,45 @@ public class AuthController {
     private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     @PostMapping("/login")
-    public ResponseEntity<JwtDto> login(@RequestBody LoginUser loginUser, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
+    public ResponseEntity<JwtDto> login(@RequestBody LoginUser loginUser, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity("Campos mal puestos", HttpStatus.BAD_REQUEST);
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUserName(), loginUser.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtProvider.generateToken(authentication);
-        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
-        JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
-        return new ResponseEntity(jwtDto, HttpStatus.OK);
+        }
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUserName(), loginUser.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtProvider.generateToken(authentication);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
+            return new ResponseEntity<>(jwtDto, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity("Campos mal puestos", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/newUser")
-    public ResponseEntity<?> newUser(@RequestBody NewUser newUser, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
+    public ResponseEntity<?> newUser(@RequestBody NewUser newUser, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
             return new ResponseEntity<>("Campos mal puestos o email inválido", HttpStatus.BAD_REQUEST);
-        if(userService.existsByUserName(newUser.getName()))
+        if (userService.existsByUserName(newUser.getName()))
             return new ResponseEntity<>("Ese nombre ya existe", HttpStatus.BAD_REQUEST);
-        if(userService.existsByEmail(newUser.getEmail()))
+        if (userService.existsByEmail(newUser.getEmail()))
             return new ResponseEntity<>("Ese email ya existe", HttpStatus.BAD_REQUEST);
 
         User user = new User(newUser.getName(), newUser.getEmail(), passwordEncoder.encode(newUser.getPassword()));
 
         Set<Rol> roles = new HashSet<>();
-        for(String rolName : newUser.getRoles()){
+        for (String rolName : newUser.getRoles()) {
             logger.info(rolName);
-            if(Objects.equals(rolName, "admin"))
+            if (Objects.equals(rolName, "admin") && rolService.getRol(RolName.ROLE_ADMIN).isPresent()) {
                 roles.add(rolService.getRol(RolName.ROLE_ADMIN).get());
-            if(Objects.equals(rolName, "professor"))
+            }
+            if (Objects.equals(rolName, "professor") && rolService.getRol(RolName.ROLE_PROFESSOR).isPresent()) {
                 roles.add(rolService.getRol(RolName.ROLE_PROFESSOR).get());
-            if(Objects.equals(rolName, "student"))
+            }
+            if (Objects.equals(rolName, "student") && rolService.getRol(RolName.ROLE_STUDENT).isPresent()) {
                 roles.add(rolService.getRol(RolName.ROLE_STUDENT).get());
+            }
         }
 
         user.setRoles(roles);
