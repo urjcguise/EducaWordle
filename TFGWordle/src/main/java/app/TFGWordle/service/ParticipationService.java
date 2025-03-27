@@ -14,10 +14,6 @@ public class ParticipationService {
     @Autowired
     private ParticipationRepository participationRepository;
 
-    public boolean existByid(Long id) {
-        return participationRepository.existsById(id);
-    }
-
     public List<User> findStudentsByCompetition(Long competitionId) {
         return participationRepository.findByCompetitionId(competitionId);
     }
