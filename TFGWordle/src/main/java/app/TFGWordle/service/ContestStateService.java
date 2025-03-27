@@ -19,6 +19,7 @@ public class ContestStateService {
 
     @Autowired
     private ContestStateRepository contestStateRepository;
+
     @Autowired
     private ContestStateLogRepository contestStateLogRepository;
 

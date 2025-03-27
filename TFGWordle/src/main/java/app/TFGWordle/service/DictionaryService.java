@@ -29,7 +29,6 @@ public class DictionaryService {
         return dictionaryRepository.existsWordle(word);
     }
 
-
     public List<DictionaryExternal> saveExternal(List<DictionaryExternal> dictionary) {
         return externalRepository.saveAll(dictionary);
     }
