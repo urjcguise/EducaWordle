@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class UserController {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     private final UserService userService;
     private final ParticipationService participationService;
 
 
-    public UserController(UserService userService, ParticipationService participationService) {
+    public UserController(PasswordEncoder passwordEncoder, UserService userService, ParticipationService participationService) {
+        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.participationService = participationService;
     }

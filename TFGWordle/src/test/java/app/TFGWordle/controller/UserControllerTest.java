@@ -9,7 +9,10 @@ import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.ParticipationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -28,14 +31,15 @@ class UserControllerTest {
 
     private final UserService userService = mock(UserService.class);
 
+    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+
     private final ParticipationService participationService = mock(ParticipationService.class);
 
-    private final UserController userController = new UserController(userService, participationService);
+    private final UserController userController = new UserController(passwordEncoder, userService, participationService);
 
     private final MockMvc mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
 
-    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @WithMockUser(roles = {"ADMIN"})
@@ -95,20 +99,27 @@ class UserControllerTest {
     @Test
     @WithMockUser(roles = {"ADMIN"})
     void updateUserSuccess() throws Exception {
-        User user = new User("user", "user@gmail.com", "password");
+        String oldUserName = "oldUser";
         NewUser uploadUser = new NewUser();
         uploadUser.setName("newUser");
-        uploadUser.setEmail("newUser@gmail.com");
+        uploadUser.setEmail("newUser@example.com");
         uploadUser.setPassword("newPassword");
 
-        when(userService.getByUserName("user")).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(uploadUser.getPassword())).thenReturn("encodedPassword");
-        doNothing().when(userService).save(any(User.class));
+        User userToUpdate = new User();
+        userToUpdate.setUsername(oldUserName);
+        userToUpdate.setEmail("oldUser@example.com");
 
-        mockMvc.perform(post(BASE_PATH + "/updateUser/" + user.getUsername())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(uploadUser)))
+        when(userService.getByUserName(oldUserName)).thenReturn(Optional.of(userToUpdate));
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedPassword");
+
+        mockMvc.perform(post(BASE_PATH + "/updateUser/" + oldUserName)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(uploadUser)))
                 .andExpect(status().isOk());
+
+        verify(userService, times(1)).getByUserName(oldUserName);
+        verify(userService, times(1)).save(any(User.class));
+        verify(passwordEncoder, times(1)).encode("newPassword");
     }
 
     @Test
