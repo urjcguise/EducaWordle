@@ -9,12 +9,19 @@ import app.TFGWordle.service.ContestService;
 import app.TFGWordle.service.ContestStateService;
 import app.TFGWordle.service.FolderService;
 import app.TFGWordle.service.WordleService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 class WordleControllerTest {
 
     private final String BASE_PATH = "/api/wordle";
@@ -43,11 +51,18 @@ class WordleControllerTest {
 
     private final WordleController wordleController = new WordleController(wordleService, contestService, userService, folderService, contestStateService);
 
-    private final MockMvc mockMvc = MockMvcBuilders.standaloneSetup(wordleController).build();
+    private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final Authentication authentication = mock(Authentication.class);
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        mockMvc = MockMvcBuilders.standaloneSetup(wordleController).build();
+    }
 
     @Test
     @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
@@ -162,8 +177,8 @@ class WordleControllerTest {
         when(wordleService.getById(2L)).thenReturn(wordle2);
 
         mockMvc.perform(delete(BASE_PATH + "/deleteWordles")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(wordlesToDelete)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordlesToDelete)))
                 .andExpect(status().isOk());
 
         verify(wordleService, times(2)).delete(any(Wordle.class));
@@ -335,57 +350,6 @@ class WordleControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    /*
-    @Test
-    void getWordlesByContest_UserNotFound() throws Exception {
-        Long contestId = 1L;
-        String username = "unknownUser";
-
-        Contest contest = new Contest();
-        contest.setId(contestId);
-
-        Authentication authentication = mock(Authentication.class);
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-
-        when(contestService.existsById(contestId)).thenReturn(true);
-        when(contestService.getById(contestId)).thenReturn(contest);
-        when(userService.getByUserName(username)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get(BASE_PATH + "/getWordlesByContest/" + contestId))
-                .andExpect(status().isNotFound());
-
-        verify(wordleService, never()).findByContestId(anyLong());
-    }
-
-    @Test
-    void getWordlesByContest_StudentNotFinishedGames() throws Exception {
-        Long contestId = 1L;
-        String username = "studentUser";
-
-        Contest contest = new Contest();
-        contest.setId(contestId);
-        contest.setWordles(List.of(new Wordle(), new Wordle()));
-
-        User student = new User();
-        student.setUsername(username);
-        student.setId(1L);
-
-        JsonNode mockState = objectMapper.readTree("{\"games\":[{\"finished\":true},{\"finished\":false}]}");
-
-        when(contestService.existsById(contestId)).thenReturn(true);
-        when(contestService.getById(contestId)).thenReturn(contest);
-        when(userService.getByUserName(username)).thenReturn(Optional.of(student));
-        when(contestStateService.getContestState(contestId, student.getId())).thenReturn(new ContestState());
-
-        mockMvc.perform(get(BASE_PATH + "/getWordlesByContest/" + contestId))
-                .andExpect(status().isBadRequest());
-
-    }
-*/
-
     @Test
     @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
     void getWordlesByProfessorSuccess() throws Exception {
@@ -517,42 +481,41 @@ class WordleControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    /*
+
     @Test
     @WithMockUser(roles = {"STUDENT"})
     void getWordleInContestSuccess() throws Exception {
         Long contestId = 1L;
-        int wordleIndex = 0;
-        String userName = "user";
-
-        User user = new User();
-        user.setUsername(userName);
-
+        Integer wordleIndex = 0;
         Contest contest = new Contest();
         contest.setId(contestId);
-        Wordle wordle = new Wordle();
-        wordle.setWord("test");
-        contest.setWordles(List.of(wordle));
+        List<Wordle> wordles = new ArrayList<>();
+        wordles.add(new Wordle());
+        contest.setWordles(wordles);
 
-        JsonNode stateNode = mock(JsonNode.class);
-        ObjectNode gamesNode = mock(ObjectNode.class);
-        when(gamesNode.get("finished")).thenReturn(mock(BooleanNode.class));
-        when(gamesNode.get("finished").asBoolean()).thenReturn(true);
-        when(stateNode.get("games")).thenReturn(gamesNode);
+        User user = new User();
+        user.setId(10L);
 
+        UserDetails userDetails = mock(UserDetails.class);
         ContestState contestState = new ContestState();
-        contestState.setState(stateNode);
+        JsonNode jsonNode = objectMapper.readTree("{\"games\":[{\"finished\":true}]}");
+        contestState.setState(jsonNode);
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_STUDENT"));
 
         when(contestService.existsById(contestId)).thenReturn(true);
-        when(userService.getByUserName(userName)).thenReturn(Optional.of(user));
-        when(contestStateService.getContestState(contestId, user.getId())).thenReturn(contestState);
         when(contestService.getById(contestId)).thenReturn(contest);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn("testUser");
+        when(userService.getByUserName("testUser")).thenReturn(Optional.of(user));
+        when(contestStateService.getContestState(contestId, user.getId())).thenReturn(contestState);
 
-        mockMvc.perform(get(BASE_PATH + "/getWordleInContest/" + contestId + "/" + wordleIndex))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.word").value("test"));
+        mockMvc.perform(get(BASE_PATH + "/getWordleInContest/" + contestId + "/" + wordleIndex)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
-    */
+
 
     @Test
     @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
@@ -816,8 +779,8 @@ class WordleControllerTest {
         when(folderService.existsById(oldFolderId)).thenReturn(false);
 
         mockMvc.perform(post(BASE_PATH + "/editFolder/" + oldFolderId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(newFolderName));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newFolderName));
     }
 
     @Test
