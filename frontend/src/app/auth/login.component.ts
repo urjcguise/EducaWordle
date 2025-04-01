@@ -18,19 +18,19 @@ export class LoginComponent implements OnInit {
   userName!: string;
   password!: string;
   roles!: string[];
-  errMsj!: string;  
+  errMsj!: string;
 
-  constructor(
-    private tokenService: TokenService,
-    private authService: AuthService,
-    private router: Router
-  ) { }
+  constructor(private tokenService: TokenService, private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     if (this.tokenService.getToken()) {
       this.isLogged = true;
       this.isLoginFail = false;
       this.roles = this.tokenService.getAuthorities();
+      if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+        this.router.navigate(['/usuarios']);
+      else
+        this.router.navigate(['/competiciones']);
     }
   }
 
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
         if (data.authorities.map((auth: any) => auth.authority).includes("ROLE_ADMIN"))
           this.router.navigate(['/usuarios']);
         else
-        this.router.navigate(['/competiciones']);
+          this.router.navigate(['/competiciones']);
       }),
       catchError((err) => {
         this.isLogged = false;
@@ -65,5 +65,4 @@ export class LoginComponent implements OnInit {
       })
     ).subscribe();
   }
-
 }

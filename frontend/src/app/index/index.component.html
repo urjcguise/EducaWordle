@@ -1,28 +1,12 @@
-<app-menu></app-menu>
-<div class="container text-center">
-    <div *ngIf="isLogged else loggedOut">
-        <h2>Bienvenido {{userName}}</h2>
+<div class="body">
+    <div class="header">
+        <app-menu></app-menu>
     </div>
-    <ng-template #loggedOut>
-        <h2>No has iniciado sesión</h2>
-    </ng-template>
-
-    <div class="mt-3" *ngIf="isAdmin">
-        <button class="btn btn-outline-success btn-lg" routerLink="/usuarios">
-            <i class="fas fa-plus-circle"></i> Ver usuarios
-        </button>
+    <div class="login">
+        <div class="login-box">
+            <img src="https://live.staticflickr.com/281/18733086121_83befebf2f_t.jpg" alt="Logo URJC">
+            <a href="/login" class="login-button">Acceso usuarios URJC</a>
+        </div>
     </div>
-    <div class="mt-3" *ngIf="isProfessor">
-        <button class="btn btn-outline-success btn-lg" routerLink="/competiciones">
-            <i class="fas fa-eye"></i> Ver competiciones
-        </button>
-        <button class="btn btn-outline-success btn-lg" routerLink="/wordles">
-            <i class="fas fa-eye"></i> Ver wordles
-        </button>
-    </div>
-    <div class="mt-3" *ngIf="isStudent">
-        <button class="btn btn-outline-success btn-lg" routerLink="/competiciones">
-            <i class="fas fa-eye"></i> Ver competiciones
-        </button>
-    </div>
+    <app-footer></app-footer>
 </div>

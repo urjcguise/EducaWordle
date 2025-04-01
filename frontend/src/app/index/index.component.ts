@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TokenService } from '../service/token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index',
@@ -8,34 +9,14 @@ import { TokenService } from '../service/token.service';
 })
 export class IndexComponent implements OnInit {
 
-  isLogged = false;
-  userName = '';
-
-  roles!: string[];
-  authority!: string;
-  isAdmin = false;
-  isProfessor = false;
-  isStudent = false;
-
-  constructor(private tokenService: TokenService) { }
+  constructor(private tokenService: TokenService, private router: Router) { }
 
   ngOnInit(): void {
-    this.roles = this.tokenService.getAuthorities();
-    this.roles.forEach(rol => {
-      if (rol === 'ROLE_ADMIN') {
-        this.isAdmin = true;
-      } else if (rol === 'ROLE_PROFESSOR') {
-        this.isProfessor = true;
-      } else if (rol === 'ROLE_STUDENT') {
-        this.isStudent = true;
-      }
-    })
     if (this.tokenService.getToken()) {
-      this.isLogged = true;
-      this.userName = this.tokenService.getUserName() ?? '';
-    } else {
-      this.isLogged = false;
-      this.userName = '';
+      if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+        this.router.navigate(['/usuarios']);
+      else
+        this.router.navigate(['/competiciones']);
     }
   }
 }
