@@ -1,41 +1,89 @@
-<div class="competition-list">
-  <h2>Competiciones Disponibles</h2>
-  <div *ngIf="isProfessor || isAdmin">
-    <button class="btn btn-primary btn-sm ml-3" (click)="createCompetition()">
-      <i class="fas fa-plus-circle"></i> Comenzar competición
+<div class="body">
+  <div class="header">
+    <app-menu [showBackButton]="showBackButton"></app-menu>
+  </div>
+
+  <div *ngIf="isProfessor || isAdmin" class="new-competition">
+    <button class="new-competition-button" (click)="createCompetition()">
+      Comenzar competición
     </button>
-    <br>
-    <br>
-    <ul>
-      <li *ngFor="let competition of competitions" class="competition-item">
-        <span>{{ competition.competitionName }}</span>
-        <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
-          <i class="far fa-eye"></i>
-          Ver Concursos
-        </button>
-        <button class="btn btn-primary btn-sm ml-3" (click)="viewStudents(competition.competitionName, competition.id)">
-          <i class="far fa-user"></i>
-          Ver Alumnos
-        </button>
-        <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
-          <i class="far fa-trash-alt"></i>
-          Borrar Competición
-        </button>
-      </li>
-    </ul>
   </div>
-  <div *ngIf="isStudent">
-    <div *ngIf="noCompetitions">
-      <h4>No estás en ninguna competición</h4>
-    </div>
-    <div *ngIf="!noCompetitions">
-      <li *ngFor="let competition of competitions" class="competition-item list-margin">
-        <span>{{ competition.competitionName }}</span>
-        <button class="btn btn-primary btn-sm ml-3" (click)="viewContests(competition.competitionName, competition.id)">
-          <i class="far fa-eye"></i>
-          Ver Concursos
-        </button>
-      </li>
+
+  <div *ngIf="isStudent" class="no-competition">
+    <h4 *ngIf="noCompetitions">No estás en ninguna competición</h4>
+  </div>
+
+  <div class="competition-list-container">
+    <div class="competition-list">
+      <div *ngFor="let competition of competitions" class="competition-item">
+        <div class="competition-header" (click)="toggleCompetition(competition)">
+          <i class="arrow fa fa-fw" [class.fa-chevron-right]="!competition.isOpen"
+            [class.fa-chevron-down]="competition.isOpen" aria-hidden="true"></i>
+          <h3><strong>{{ competition.name }}</strong></h3>
+          <div *ngIf="isProfessor || isAdmin">
+            <button class="competition-buttons" (click)="createContest(competition.name, competition.id)">
+              <p>Nuevo concurso</p>
+            </button>
+            <button class="competition-buttons" (click)="deleteCompetition(competition.id)">
+              <p>Eliminar competición</p>
+            </button>
+            <button class="competition-buttons" (click)="viewStudents(competition.name, competition.id)">
+              <p>Ver alumnos</p>
+            </button>
+          </div>
+        </div>
+        <div class="contest-list" *ngIf="competition.isOpen">
+          <ul>
+            <li *ngFor="let contest of competition.contests" class="contest-item">
+              {{ contest.contestName }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
+  <app-footer></app-footer>
 </div>
+
+
+<!--
+    <div *ngIf="isProfessor || isAdmin">
+      <button class="btn btn-primary btn-sm ml-3" (click)="createCompetition()">
+        <i class="fas fa-plus-circle"></i> Comenzar competición
+      </button>
+      <ul>
+        <li *ngFor="let competition of competitions" class="competition-item">
+          <span>{{ competition.competitionName }}</span>
+          <button class="btn btn-primary btn-sm ml-3"
+            (click)="viewContests(competition.competitionName, competition.id)">
+            <i class="far fa-eye"></i>
+            Ver Concursos
+          </button>
+          <button class="btn btn-primary btn-sm ml-3"
+            (click)="viewStudents(competition.competitionName, competition.id)">
+            <i class="far fa-user"></i>
+            Ver Alumnos
+          </button>
+          <button class="btn btn-danger btn-sm ml-2" (click)="deleteCompetition(competition.id)">
+            <i class="far fa-trash-alt"></i>
+            Borrar Competición
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="isStudent">
+      <div *ngIf="noCompetitions">
+        <h4>No estás en ninguna competición</h4>
+      </div>
+      <div *ngIf="!noCompetitions">
+        <li *ngFor="let competition of competitions" class="competition-item list-margin">
+          <span>{{ competition.competitionName }}</span>
+          <button class="btn btn-primary btn-sm ml-3"
+            (click)="viewContests(competition.competitionName, competition.id)">
+            <i class="far fa-eye"></i>
+            Ver Concursos
+          </button>
+        </li>
+      </div>
+    </div>
+    -->
