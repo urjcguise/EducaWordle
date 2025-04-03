@@ -1,18 +1,35 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-  <a class="navbar-brand" href="#"></a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
-    aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav ml-auto">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+  rel="stylesheet">
 
-      <li class="nav-item" *ngIf="!isLogged">
-        <a class="nav-link" routerLink="/login"><i class="far fa-list-alt"></i> Iniciar Sesión</a>
-      </li>
-      <li class="nav-item" *ngIf="isLogged" (click)="onLogOut()">
-        <a class="nav-link" style="cursor: pointer;"><i class="fas fa-door-open"></i> Cerrar Sesión</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+<div class="header">
+  <img src="../../assets/sin_fondo_negro_zoom.png" alt="Logo Universidad" class="logo">
+
+  <ng-container *ngIf="isLogged">
+    <button class="nav-button" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      Página Principal
+      <div class="underline"></div>
+    </button>
+
+    <button class="nav-button" routerLinkActive="active" *ngIf="!isAdmin">
+      Ver Wordles
+      <div class="underline"></div>
+    </button>
+
+    <button class="nav-button" *ngIf="showBackButton" (click)="goBack()">
+      <img src="../../assets/flecha.png" alt="Atrás" class="arrow">
+      Atrás
+      <div class="underline"></div>
+    </button>
+
+    <div class="spacer"></div>
+
+    <button class="nav-button" (click)="onLogOut()">
+      Cerrar Sesión
+      <div class="underline"></div>
+    </button>
+  </ng-container>
+
+</div>

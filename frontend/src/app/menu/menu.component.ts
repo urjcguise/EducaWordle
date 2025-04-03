@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TokenService } from '../service/token.service';
 
 @Component({
@@ -8,20 +8,30 @@ import { TokenService } from '../service/token.service';
 })
 export class MenuComponent implements OnInit {
 
+  @Input() showBackButton: boolean = true;
+  @Output() backClicked = new EventEmitter<void>();
+
   isLogged = false;
+  isAdmin = false;
 
   constructor(private tokenService: TokenService) { }
 
   ngOnInit(): void {
-    if (this.tokenService.getToken()) {
+    if (this.tokenService.getToken())
       this.isLogged = true;
-    } else {
+    else
       this.isLogged = false;
-    }
+
+    if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
+      this.isAdmin = true;
   }
 
   onLogOut(): void {
     this.tokenService.logOut();
     window.location.reload();
+  }
+
+  goBack() {
+    this.backClicked.emit();
   }
 }

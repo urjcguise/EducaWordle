@@ -5,7 +5,7 @@
 }
 
 .login {
-    background: url(C:\Users\migue\OneDrive\Escritorio\TFG\TFG\frontend\src\assets\bg-ball.svg) no-repeat #f5f5f5;
+    background: url('../../assets/bg-ball.svg') no-repeat #f5f5f5;
     background-size: 550px;
 }
 
