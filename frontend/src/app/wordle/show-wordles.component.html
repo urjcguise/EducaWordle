@@ -1,0 +1,107 @@
+<div class="wordle-container">
+    <h2>Wordles activos</h2>
+
+    <div class="button-bar">
+        <ng-container *ngIf="!editingWordle">
+            <button *ngIf="selectedWordles.length === 0" (click)="openAddModal()">Añadir</button>
+
+            <ng-container *ngIf="selectedWordles.length === 1">
+                <button (click)="editWordle()">Editar</button>
+                <button (click)="deleteWordle()" class="delete-button">Borrar</button>
+            </ng-container>
+
+            <button *ngIf="selectedWordles.length > 1" (click)="deleteWordle()" class="delete-button">Borrar</button>
+        </ng-container>
+
+        <ng-container *ngIf="editingWordle">
+            <span class="editing-indicator">Editando: {{ editingWordle }}</span> <button (click)="saveEdit()"
+                class="save-button">Guardar</button>
+            <button (click)="cancelEdit()" class="cancel-button">Cancelar</button>
+        </ng-container>
+    </div>
+
+    <div class="wordle-list-area">
+        <div *ngIf="wordles.length === 0 && !editingWordle; else wordleListOrEdit" class="empty-message">
+            No hay wordles todavía.
+        </div>
+
+        <ng-template #wordleListOrEdit>
+            <ul>
+                <li *ngFor="let wordle of wordles" (click)="toggleSelection(wordle)" [ngClass]="{
+                        'selected': isSelected(wordle),
+                        'editing': editingWordle === wordle,
+                        'disabled': editingWordle && editingWordle !== wordle
+                    }">
+
+                    <span *ngIf="editingWordle !== wordle">{{ wordle }}</span>
+
+                    <input #editInput *ngIf="editingWordle === wordle" type="text" [(ngModel)]="editedValue"
+                        (keyup.enter)="saveEdit()" (keyup.escape)="cancelEdit()" (click)="$event.stopPropagation()"
+                        class="edit-input" />
+                </li>
+            </ul>
+        </ng-template>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeModal()">
+    <div class="modal-content" (click)="onModalContentClick($event)">
+
+        <h3>{{ isCreatingNewWordle ? 'Crear Nuevo Wordle' : 'Selecciona Wordles para añadir' }}</h3>
+
+        <div class="modal-create-button-area" *ngIf="!isCreatingNewWordle">
+            <button (click)="startCreateNewWordle()">+ Crear nuevo</button>
+        </div>
+
+        <div class="modal-list">
+
+            <div *ngIf="isLoadingModalData" class="loading-message">
+                Cargando disponibles... <i class="fas fa-spinner fa-spin"></i>
+            </div>
+
+            <div *ngIf="!isLoadingModalData && availableRootWordles.length === 0 && folders.length === 0 && !isCreatingNewWordle"
+                class="empty-message">
+                No hay wordles ni carpetas disponibles.
+            </div>
+
+            <ul *ngIf="!isLoadingModalData && !isCreatingNewWordle">
+
+                <li *ngFor="let rootWordleObj of availableRootWordles" class="wordle-item root-item"
+                    (click)="toggleWordleToAdd(rootWordleObj)"
+                    [ngClass]="{'selected': isWordleToAddSelected(rootWordleObj)}">
+                    <i class="fas fa-file-alt wordle-icon"></i>
+                    <span class="node-name">{{ rootWordleObj }}</span>
+                    <i class="fas fa-check selection-check" *ngIf="isWordleToAddSelected(rootWordleObj)"></i>
+                </li>
+
+                <app-folder-tree-node *ngFor="let folder of folders" [folder]="folder" [level]="0"
+                    [contestWordles]="wordles" [selectedForAddition]="wordlesToAddSelection"
+                    (wordleToggled)="toggleWordleToAdd($event)">
+                </app-folder-tree-node>
+
+            </ul>
+
+            <div *ngIf="isCreatingNewWordle" class="create-new-input-area">
+                <input #createInput type="text" placeholder="Nombre del nuevo Wordle" [(ngModel)]="newWordleValue"
+                    (keyup.enter)="saveCreatedWordle()" (keyup.escape)="cancelCreateNewWordle()"
+                    (click)="$event.stopPropagation()" class="edit-input" />
+            </div>
+
+        </div>
+        <div class="modal-actions">
+            <ng-container *ngIf="!isCreatingNewWordle">
+                <button (click)="closeModal()">Cancelar</button>
+                <button (click)="saveNewWordles()" class="save-button" [disabled]="wordlesToAddSelection.length === 0">
+                    Añadir seleccionados
+                </button>
+            </ng-container>
+            <ng-container *ngIf="isCreatingNewWordle">
+                <button (click)="cancelCreateNewWordle()" class="cancel-button">Cancelar creación</button>
+                <button (click)="saveCreatedWordle()" class="create-button" [disabled]="newWordleValue.trim() === ''">
+                    Crear Wordle
+                </button>
+            </ng-container>
+        </div>
+
+    </div>
+</div>

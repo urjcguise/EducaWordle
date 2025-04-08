@@ -36,6 +36,16 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'editContest', requestBody);
   }
 
+
+  public addWordlesToContest(contestId: number, wordles: string[]) {
+    return this.httpClient.post<any>(this.apiUrl + 'addWordlesToContest/' + contestId, wordles);
+  }
+
+  public deleteWordlesInContest(contestId: number, wordles: string[]) {
+    return this.httpClient.post<any>(this.apiUrl + 'deleteWordlesInContest/' + contestId, wordles);
+  }
+
+
   public getContestById(contestId: number) {
     return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');
   }

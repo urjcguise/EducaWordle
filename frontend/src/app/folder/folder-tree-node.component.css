@@ -1,0 +1,124 @@
+.folder-container-root {
+    border-bottom: none;
+    padding: 0;
+}
+
+/* Nodo de carpeta */
+.folder-node {
+    display: flex;
+    align-items: center;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.15s ease-in-out;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.folder-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Icono para expandir/colapsar */
+.node-toggle-icon {
+    width: 20px;
+    text-align: center;
+    color: #6c757d;
+    margin-right: 5px;
+    transition: transform 0.2s ease-in-out;
+    flex-shrink: 0;
+}
+
+.node-toggle-icon.invisible {
+    opacity: 0;
+    cursor: default;
+}
+
+.node-toggle-icon {
+    font-size: 0.8em;
+    color: #bdadad;
+}
+
+/* Icono de Carpeta */
+.folder-icon {
+    margin-right: 8px;
+    color: #ffc107;
+    flex-shrink: 0;
+}
+
+/* Icono de Wordle */
+.wordle-icon {
+    color: #424ac1;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.node-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95em;
+}
+
+/* Item Wordle */
+.wordle-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Wordle raíz */
+.root-item {
+    padding-left: 20px !important;
+}
+
+.wordle-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Wordle seleccionado */
+.wordle-item.selected {
+    background-color: #cfe2ff;
+    color: #052c65;
+    font-weight: 500;
+}
+
+.wordle-item.selected:hover {
+    background-color: #b6d4fe;
+}
+
+.wordle-item.selected .wordle-icon {
+    color: #052c65;
+}
+
+.selection-check {
+    margin-left: auto;
+    color: #28a745;
+    padding-right: 10px;
+    flex-shrink: 0;
+}
+
+/* Mensaje de carga */
+.loading-message {
+    text-align: center;
+    padding: 30px 15px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.loading-message i {
+    margin-left: 8px;
+}
+
+.folder-content ul,
+.folder-content li {
+    list-style-type: none;
+}

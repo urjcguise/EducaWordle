@@ -130,6 +130,59 @@ public class ContestController {
         return ResponseEntity.ok(contestService.save(contestDTO.getContest()));
     }
 
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/deleteWordlesInContest/{contestId}")
+    public ResponseEntity<?> deleteWordlesInContest(@PathVariable Long contestId, @RequestBody List<String> wordles) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+
+        for (String word: wordles) {
+            if (!wordleService.existsByWord(word))
+                return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
+
+            Wordle wordle = wordleService.getByWord(word);
+            contest.getWordles().remove(wordle);
+            wordle.getContests().remove(contest);
+
+            wordleService.save(wordle);
+        }
+        contest.calculateWordlesLength();
+        contestService.save(contest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/addWordlesToContest/{contestId}")
+    public ResponseEntity<?> addWordlesToContest(@PathVariable Long contestId, @RequestBody List<String> wordles) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+
+        for (String word: wordles) {
+            if (!wordleService.existsByWord(word))
+                return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
+
+            Wordle wordle = wordleService.getByWord(word);
+
+            if (wordle.getContests().contains(contest))
+                return new ResponseEntity<>("Wordle ya existente en el concurso", HttpStatus.CONFLICT);
+
+            contest.getWordles().add(wordle);
+            contest.calculateWordlesLength();
+
+            wordle.getContests().add(contest);
+            wordleService.save(wordle);
+        }
+
+        contestService.save(contest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/{contestId}/contest")
     public ResponseEntity<Contest> getContestById(@PathVariable Long contestId) {
         if (!contestService.existsById(contestId))

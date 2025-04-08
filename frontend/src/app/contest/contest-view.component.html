@@ -1,0 +1,51 @@
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
+    </div>
+    <div class="contest-info">
+        <h3 class="competition-title">{{ competitionName }}</h3>
+
+        <div class="contest-header">
+            <span class="contest-name">{{ contest.contestName }}</span>
+            <button *ngIf="isProfessor" class="edit-button" (click)="editContest()">Editar</button>
+        </div>
+
+        <div class="contest-navbar">
+            <ul class="nav-tabs">
+                <li class="tab-item" [class.active]="activeTab === 'info'" (click)="activeTab = 'info'">Información</li>
+                <li *ngIf="isProfessor" class="tab-item" [class.active]="activeTab === 'wordles'"
+                    (click)="activeTab = 'wordles'">Wordles
+                </li>
+                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking
+                </li>
+                <li *ngIf="isProfessor || (isStudent && studentFinished)" class="tab-item"
+                    [class.active]="activeTab === 'stats'" (click)="activeTab = 'stats'">Estadísticas
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div *ngIf="activeTab === 'info'" class="info-content">
+                    <p><strong>Fecha de inicio:</strong> {{ contest.startDate | date:'dd/MM/yyyy HH:mm' }}</p>
+                    <p><strong>Fecha de fin:</strong> {{ contest.endDate | date:'dd/MM/yyyy HH:mm' }}</p>
+                    <p><strong>Número de intentos:</strong> {{ contest.numTries }}</p>
+                    <p><strong>Usa diccionario:</strong> {{ contest.useDictionary ? 'Sí' : 'No' }}</p>
+                    <p *ngIf="contest.useDictionary"><strong>Usa diccionario externo:</strong> {{contest.useExternalFile
+                        ? 'Sí' : 'No' }}</p>
+                </div>
+
+                <div *ngIf="activeTab === 'wordles'">
+                    <app-show-wordles></app-show-wordles>
+                </div>
+
+                <div *ngIf="activeTab === 'ranking'">
+                    <app-contest-ranking></app-contest-ranking>
+                </div>
+
+                <div *ngIf="activeTab === 'stats'">
+                    <app-contest-statistics></app-contest-statistics>
+                </div>
+            </div>
+        </div>
+    </div>
+    <app-footer></app-footer>
+</div>

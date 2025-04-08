@@ -1,0 +1,26 @@
+<div class="folder-node" [style.padding-left.px]="level * 20">
+    <div class="folder-item" (click)="toggleExpansion($event)">
+        <i class="fas node-toggle-icon" [class.fa-chevron-down]="isExpanded" [class.fa-chevron-right]="!isExpanded"
+            [class.invisible]="!canExpand" (click)="toggleExpansion($event)"> </i>
+        <i class="fas fa-folder folder-icon"></i>
+        <span class="node-name">{{ folder.name }}</span>
+    </div>
+</div>
+
+<div *ngIf="isExpanded" class="folder-content">
+    <ul>
+        <li *ngFor="let wordle of displayableWordles" class="wordle-item"
+            (click)="toggleWordleSelection(wordle.word, $event)" [ngClass]="{'selected': isWordleSelected(wordle.word)}"
+            [style.padding-left.px]="(level + 1) * 20">
+            <i class="fas fa-file-alt wordle-icon"></i>
+            <span class="node-name">{{ wordle.word }}</span>
+            <i class="fas fa-check selection-check" *ngIf="isWordleSelected(wordle.word)"></i>
+        </li>
+
+        <li *ngFor="let subfolder of subFolders" class="subfolder-container">
+            <app-folder-tree-node [folder]="subfolder" [level]="level + 1" [contestWordles]="contestWordles"
+                [selectedForAddition]="selectedForAddition" (wordleToggled)="wordleToggled.emit($event)">
+            </app-folder-tree-node>
+        </li>
+    </ul>
+</div>

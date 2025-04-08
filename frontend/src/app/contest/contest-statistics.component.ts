@@ -215,8 +215,6 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       }
     });
 
-
-
     if (this.isProfessor || this.isAdmin) {
       this.contestService.getAllStateLog(this.contestId).subscribe({
         next: (logs) => {
@@ -293,6 +291,8 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel() {
+    if (this.studentsLog.length === 0)
+      return;
     this.contestService.exportLogsInExcel(this.contestId).subscribe({
       next: (docu) => {
         const blob = new Blob([docu], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

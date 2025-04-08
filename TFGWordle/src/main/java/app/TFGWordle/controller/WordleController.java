@@ -74,7 +74,7 @@ public class WordleController {
         if (!contests.isEmpty()) {
             Contest contestToSave = contests.get(0);
             contestToSave.updateWordles(toSave);
-            contestToSave.setWordlesLength(wordles.stream().map(String::length).toList());
+            contestToSave.calculateWordlesLength();
             contestService.save(contestToSave);
         }
 
@@ -100,6 +100,24 @@ public class WordleController {
                 }
             }
             wordleService.delete(wordleToEdit);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/editWordle/{wordle}")
+    public ResponseEntity<?> editWordle(@PathVariable String wordle, @RequestBody String newWordle) {
+        if (!wordleService.existsByWord(wordle))
+            return new ResponseEntity<>("No existe la palabra " + wordle, HttpStatus.NOT_FOUND);
+
+        Wordle wordleToEdit = wordleService.getByWord(wordle);
+        wordleToEdit.setWord(newWordle);
+        wordleService.save(wordleToEdit);
+
+        for (Contest contest : wordleToEdit.getContests()) {
+            contest.calculateWordlesLength();
+            contestService.save(contest);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

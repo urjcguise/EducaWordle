@@ -31,6 +31,9 @@ import { EditWordleComponent } from './wordle/edit-wordle.component';
 import { FolderListComponent } from './folder/folder-list.component';
 import { FolderComponent } from './folder/folder.component';
 import { FooterComponent } from './menu/footer.component';
+import { ContestViewComponent } from './contest/contest-view.component';
+import { ShowWordlesComponent } from './wordle/show-wordles.component';
+import { FolderTreeNodeComponent } from './folder/folder-tree-node.component';
 
 
 @NgModule({
@@ -58,7 +61,10 @@ import { FooterComponent } from './menu/footer.component';
     EditWordleComponent,
     FolderListComponent,
     FolderComponent,
-    FooterComponent
+    FooterComponent,
+    ContestViewComponent,
+    ShowWordlesComponent,
+    FolderTreeNodeComponent
   ],
   imports: [
     BrowserModule,

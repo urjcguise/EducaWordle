@@ -4,15 +4,12 @@
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
 }
 
-.contest-list h2 {
-    text-align: center;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
+.contest-list label {
+    margin-right: 5px;
 }
 
 table {
@@ -22,10 +19,11 @@ table {
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
+    font-family: "Inter", sans-serif;
 }
 
 thead th {
-    background-color: rgb(156, 2, 2);
+    background-color: #cb0017;
     color: white;
     font-weight: bold;
     padding: 10px;
@@ -49,19 +47,4 @@ tbody td {
 
 tbody tr:hover {
     background-color: #e9f5ff;
-}
-
-@media (max-width: 600px) {
-    .contest-list {
-        padding: 10px;
-    }
-
-    table {
-        font-size: 12px;
-    }
-
-    thead th,
-    tbody td {
-        padding: 8px;
-    }
 }
