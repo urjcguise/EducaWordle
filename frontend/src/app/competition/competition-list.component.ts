@@ -67,7 +67,7 @@ export class CompetitionListComponent implements OnInit {
               id: compe.id,
               name: compe.competitionName,
               contests: compe.contests.sort((a, b) => a.contestName.localeCompare(b.contestName)),
-              isOpen: false
+              isOpen: true
             })
           });
           this.noCompetitions = false;

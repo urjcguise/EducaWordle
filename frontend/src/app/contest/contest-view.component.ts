@@ -76,4 +76,15 @@ export class ContestViewComponent implements OnInit {
         return 'ongoing';
       });
   }
+
+  playWordle() {
+    this.router.navigate(['/wordle'], {
+      state: {
+        contestId: this.contest.id,
+        wordleIndex: 0,
+        competitionName: this.competitionName
+      }
+    });
+  }
+
 }
