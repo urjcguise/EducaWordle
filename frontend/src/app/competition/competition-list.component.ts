@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Competition } from '../models/competition';
 import { CompetitionService } from '../service/competition.service';
 import { NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
@@ -67,7 +66,7 @@ export class CompetitionListComponent implements OnInit {
             this.competitions.push({
               id: compe.id,
               name: compe.competitionName,
-              contests: compe.contests,
+              contests: compe.contests.sort((a, b) => a.contestName.localeCompare(b.contestName)),
               isOpen: false
             })
           });
@@ -89,7 +88,7 @@ export class CompetitionListComponent implements OnInit {
           this.competitions.push({
             id: compe.id,
             name: compe.competitionName,
-            contests: compe.contests,
+            contests: compe.contests.sort((a, b) => a.contestName.localeCompare(b.contestName)),
             isOpen: true
           })
         });
@@ -107,11 +106,6 @@ export class CompetitionListComponent implements OnInit {
   createContest(name: string, id: number) {
     this.router.navigate(['/nuevoConcurso'], { state: { competitionName: name, competitionId: id } });
   }
-
-  /*
-  viewContests(competitionName: string, competitionId: number): void {
-    this.router.navigate(['/' + competitionName + '/concursos'], { state: { competitionId, professorName: this.professorName } });
-  }*/
 
   deleteCompetition(id: number): void {
     const confirmDelete = confirm('¿Está seguro de que desea eliminar esta competición?');
@@ -133,5 +127,9 @@ export class CompetitionListComponent implements OnInit {
 
   toggleCompetition(competition: any) {
     competition.isOpen = !competition.isOpen;
+  }
+
+  viewContest(contestId: number, competitionName: string) {
+    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: this.professorName } });
   }
 }

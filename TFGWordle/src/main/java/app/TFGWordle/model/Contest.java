@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class Contest {
@@ -151,6 +152,13 @@ public class Contest {
 
     public void setWordlesLength(List<Integer> wordlesLength) {
         this.wordlesLength = wordlesLength;
+    }
+
+    public void calculateWordlesLength() {
+        this.wordlesLength.clear();
+        this.wordlesLength = this.wordles.stream()
+                .map(w -> w.getWord().length())
+                .collect(Collectors.toList());
     }
 
     @Converter

@@ -345,7 +345,6 @@ export class PlayWordleComponent {
 
   private updateContestState(): void {
     const currentGame = this.wordleState.games[this.currentWordleIndex];
-    console.log('Current game: ' + currentGame);
 
     currentGame.finished = this.finished;
     currentGame.won = this.won;
