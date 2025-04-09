@@ -1,36 +1,47 @@
-<div class="container mt-4">
-    <h1>Alumnos participando</h1>
-
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <button class="nav-link" [class.active]="currentTab === 'add-student'" (click)="setTab('add-student')">
-                Añadir Alumno
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" [class.active]="currentTab === 'upload-file'" (click)="setTab('upload-file')">
-                Subir Archivo Excel
-            </button>
-        </li>
-    </ul>
-
-    <div *ngIf="currentTab === 'add-student'" class="mt-3">
-        <button class="btn btn-primary btn-sm ml-3" (click)="addStudent()">
-            Añadir Alumno
-        </button>
-    </div>
-    <div *ngIf="currentTab === 'upload-file'" class="mt-3">
-        <form (submit)="addStudentExcel()">
-            <input type="file" accept=".xlsx" (change)="onFileSelected($event)" class="form-control-file" />
-            <button class="btn btn-primary btn-sm ml-3" type="submit" [disabled]="!selectedFile">
-                Subir Archivo
-            </button>
-        </form>
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
     </div>
 
-    <ul class="mt-4">
-        <li *ngFor="let student of students" class="contest-item d-flex align-items-center">
-            <span class="student-name">{{ student.username }}</span>
-        </li>
-    </ul>
+    <div class="container">
+        <h1 class="page-title">Alumnos participando en {{ competitionName }}</h1>
+
+        <ul class="nav-tabs">
+            <li>
+                <button class="tab-button" [class.active]="currentTab === 'add-student'"
+                    (click)="setTab('add-student')">
+                    Añadir Alumno
+                </button>
+            </li>
+            <li>
+                <button class="tab-button" [class.active]="currentTab === 'upload-file'"
+                    (click)="setTab('upload-file')">
+                    Subir Archivo Excel
+                </button>
+            </li>
+        </ul>
+
+        <div *ngIf="currentTab === 'add-student'" class="tab-content">
+            <button class="btn primary" (click)="addStudent()">
+                + Añadir Alumno
+            </button>
+        </div>
+
+        <div *ngIf="currentTab === 'upload-file'" class="tab-content">
+            <form (submit)="addStudentExcel()" class="upload-form">
+                <input type="file" accept=".xlsx" (change)="onFileSelected($event)" />
+                <button class="btn primary" type="submit" [disabled]="!selectedFile">
+                    Subir Archivo
+                </button>
+            </form>
+        </div>
+
+        <ul class="student-list">
+            <li *ngFor="let student of students" class="student-item">
+                <span class="student-name">{{ student.username }}</span>
+            </li>
+        </ul>
+    </div>
+
+    <app-footer></app-footer>
 </div>

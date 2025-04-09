@@ -11,6 +11,7 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 export class StudentListComponent implements OnInit {
 
   professorName: string = '';
+  competitionName: string = '';
 
   students: User[] = [];
   competitionId!: number;
@@ -23,7 +24,7 @@ export class StudentListComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
+          this.goBack();
         }
       }
     });
@@ -32,6 +33,7 @@ export class StudentListComponent implements OnInit {
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
     this.professorName = history.state.professorName;
+    this.competitionName = this.route.snapshot.paramMap.get('competitionName') || '';
     this.competitionService.getStudentsByCompetition(this.competitionId).subscribe({
       next: (stdts) => {
         this.students = stdts;
@@ -43,8 +45,7 @@ export class StudentListComponent implements OnInit {
   }
 
   addStudent(): void {
-    const competitionName = this.route.snapshot.paramMap.get('competitionName');
-    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId, professorName: this.professorName, competitionName: competitionName } });
+    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId, professorName: this.professorName, competitionName: this.competitionName } });
   }
 
   setTab(tab: string) {
@@ -68,5 +69,9 @@ export class StudentListComponent implements OnInit {
   }
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
+  }
+
+  goBack() {
+    this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
   }
 }
