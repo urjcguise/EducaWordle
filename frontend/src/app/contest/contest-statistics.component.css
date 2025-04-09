@@ -14,7 +14,6 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0 0 30px 0;
-  /* Margen inferior para separar tablas */
   background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -22,126 +21,119 @@
   font-size: 14px;
 }
 
-/* Cabecera de la tabla */
 .info-table thead th {
   background-color: #f8f9fa;
   color: #495057;
   text-align: left;
-  padding: 12px 15px;
-  font-size: 13px;
+  padding: 12px 10px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #dee2e6;
-}
-
-/* Título principal de la tabla */
-.info-table thead .table-title {
-  background-color: #cb0018;
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: normal;
-  text-align: center;
-  padding: 15px;
-  border-bottom: none;
-}
-
-.info-table thead .title-with-button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
-}
-
-/* Cuerpo de la tabla */
-.info-table tbody tr {
-  border-bottom: 1px solid #dee2e6;
-}
-
-/* Sin borde en la última fila */
-.info-table tbody tr:last-child {
-  border-bottom: none;
+  font-size: 14px;
 }
 
 .info-table tbody td {
-  padding: 12px 15px;
-  text-align: left;
-  vertical-align: middle;
-  color: #343a40;
+  padding: 10px 8px;
+  border-top: 1px solid #dee2e6;
+  font-size: 13px;
 }
 
-.info-table tbody tr:hover {
-  background-color: #e9ecef;
-}
-
-.info-table .text-center {
+.text-center {
   text-align: center;
 }
 
-.info-table .text-right {
-  text-align: right;
-}
-
-/* Estilo para celdas sin datos */
-.info-table .no-data {
-  color: #888;
-  font-style: italic;
-  font-family: "Inter", sans-serif;
-  padding: 20px;
-}
-
-
-/* Estilos para el botón de exportar */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 6px;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  text-decoration: none;
-}
-
-.btn-export {
-  background-color: #000000;
-  color: #fff;
-  margin-left: 10px;
-}
-
-.btn-export:hover {
-  background-color: #357abd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Icono dentro del botón */
-.btn svg {
-  margin-right: 4px;
+.table-title {
+  font-size: 16px !important;
+  text-align: center !important;
+  padding: 14px 10px !important;
+  background-color: #cb0017 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
 }
 
 .status-badge {
-  display: block;
-  margin: 25px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 10px;
   font-weight: 600;
-  line-height: 1.2;
-  text-align: center;
+  display: inline-block;
+  min-width: 60px;
 }
 
 .status-yes {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: #28a745;
+  background-color: #d4edda;
+  color: #155724;
 }
 
 .status-no {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.no-data {
+  font-style: italic;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.btn.btn-export {
+  margin-left: 15px;
+  background-color: #007bff;
+  color: white;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.btn.btn-export:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 1200px) {
+  .contest-list-container {
+    padding: 20px;
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+
+  .info-table {
+    font-size: 13px;
+  }
+
+  .info-table thead th,
+  .info-table tbody td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .table-title {
+    font-size: 14px;
+    padding: 10px 8px;
+  }
+
+  .btn.btn-export {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 992px) {
+  .contest-list-container {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .contest-list-container {
+    transform: scale(0.7);
+  }
+}
+
+@media (max-width: 576px) {
+  .contest-list-container {
+    transform: scale(0.6);
+  }
 }

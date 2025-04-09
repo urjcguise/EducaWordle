@@ -11,13 +11,13 @@
 }
 
 .competition-list-container {
-  /* Ancho de la lista */
-  min-width: 1600px;
+  width: 100%;
+  max-width: 1200px;
   margin: 20px auto;
   padding: 0 15px;
   font-family: "Inter", sans-serif;
-  justify-self: center;
 }
+
 
 .competition-list {
   border-radius: 4px;

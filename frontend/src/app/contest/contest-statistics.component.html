@@ -5,7 +5,7 @@
         <th colspan="6" class="table-title">Resumen</th>
       </tr>
       <tr>
-        <th>Palabra</th>
+        <th class="text-center">Palabra</th>
         <th class="text-center">Aciertos</th>
         <th class="text-center">Intentando</th>
         <th class="text-center">Fallada</th>
@@ -15,7 +15,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let wordle of wordlesData">
-        <td>{{ wordle.wordle }}</td>
+        <td class="text-center">{{ wordle.wordle }}</td>
         <td class="text-center">{{ convertPercentage(wordle.success) }}%</td>
         <td class="text-center">{{ convertPercentage(wordle.trying) }}%</td>
         <td class="text-center">{{ convertPercentage(wordle.wrong) }}%</td>
