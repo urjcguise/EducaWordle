@@ -1,67 +1,60 @@
-<div class="container">
-
-    <div>
-        <label for="contestName">Nombre del Concurso:</label>
-        <input type="text" id="contestName" [(ngModel)]="contest.contestName" class="name-input" />
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
     </div>
 
-    <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex">
-        <input type="text" placeholder="Nuevo Wordle" [(ngModel)]="wordles[i].word" class="wordle-input" />
-        <button type="button" class="delete-wordle-button" (click)="removeWordle(i)">
-            🗑️
-        </button>
-    </div>
-    <button (click)="addWordle()" [disabled]="wordles.length >= 3">
-        Añadir Wordle
-    </button>
+    <div class="container">
+        <h2 class="title">Editar {{contest.contestName}}</h2>
 
-    <div>
-        <label for="numTries">Número de intentos</label>
-        <select name="tries" id="numTries" [(ngModel)]="numTries">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="numTries">Número de intentos</label>
+            <select id="numTries" [(ngModel)]="numTries">
+                <option *ngFor="let try of [2,3,4,5,6]" [value]="try">{{ try }}</option>
+            </select>
+        </div>
 
+        <div class="form-group">
+            <label for="startDateTime">Fecha y hora de inicio</label>
+            <input type="datetime-local" id="startDateTime" [(ngModel)]="formattedStartDate" class="date-input" />
+        </div>
 
-    <div>
-        <label for="startDateTime">Fecha y hora de inicio:</label>
-        <input type="datetime-local" id="startDateTime" [(ngModel)]="formattedStartDate" class="date-input" />
-    </div>
+        <div class="form-group">
+            <label for="endDateTime">Fecha y hora de fin</label>
+            <input type="datetime-local" id="endDateTime" [(ngModel)]="formattedEndDate" class="date-input" />
+        </div>
 
-    <div>
-        <label for="endDateTime">Fecha y hora de fin:</label>
-        <input type="datetime-local" id="endDateTime" [(ngModel)]="formattedEndDate" class="date-input" />
-    </div>
+        <div class="checkbox-group">
+            <p>¿Desea utilizar diccionario?</p>
+            <label>
+                <input type="checkbox" (change)="useDictionary(true)" [checked]="dictionary" />
+                Sí
+            </label>
+            <label>
+                <input type="checkbox" (change)="useDictionary(false)" [checked]="!dictionary" />
+                No
+            </label>
+        </div>
 
-    <div class="checkbox-group">
-        <p>¿Desea utilizar diccionario?</p>
-        <label>
-            <input type="checkbox" (change)="useDictionary(true)" [checked]="dictionary" />
-            Sí
-        </label>
-        <label>
-            <input type="checkbox" (change)="useDictionary(false)" [checked]="!dictionary" />
-            No
-        </label>
-    </div>
+        <div *ngIf="dictionary" class="checkbox-group">
+            <p>¿Desea importar un fichero de diccionario?</p>
+            <label>
+                <input type="checkbox" (change)="useFile(true)" [checked]="file" />
+                Sí
+            </label>
+            <label>
+                <input type="checkbox" (change)="useFile(false)" [checked]="!file" />
+                No
+            </label>
 
-    <div *ngIf="dictionary" class="checkbox-group">
-        <p>¿Desea importar un fichero de diccionario?</p>
-        <label>
-            <input type="checkbox" (change)="useFile(true)" [checked]="file" />
-            Sí
-        </label>
-        <label>
-            <input type="checkbox" (change)="useFile(false)" [checked]="!file" />
-            No
-        </label>
-        <div *ngIf="file">
-            <input type="file" accept=".txt" (change)="selectFile($event)" />
+            <div *ngIf="file" class="form-group">
+                <input type="file" accept=".txt" (change)="selectFile($event)" />
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-primary" (click)="updateContest()">Guardar Concurso</button>
         </div>
     </div>
-    <button (click)="updateContest()">Guardar Concurso</button>
+
+    <app-footer></app-footer>
 </div>

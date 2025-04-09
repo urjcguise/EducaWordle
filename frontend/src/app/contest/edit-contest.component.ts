@@ -2,11 +2,8 @@ import { Component } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
-import { Wordle } from '../models/wordle';
 import { WordleService } from '../service/wordle.service';
 import { Competition } from '../models/competition';
-import { TokenService } from '../service/token.service';
-import { Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-edit-contest',
@@ -21,8 +18,6 @@ export class EditContestComponent {
   contestId: number = 0;
   dictionary: boolean = false;
   file: boolean = false;
-  wordles: Wordle[] = [];
-  initialWordles: Wordle[] = [];
   numTries: number = 0;
 
   formattedStartDate: string = "";
@@ -30,12 +25,12 @@ export class EditContestComponent {
 
   competitionName: string = '';
 
-  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private tokenService: TokenService, private router: Router) {
+  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private router: Router) {
     this.competitionName = history.state.competitionName;
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
+          this.goBack();
         }
       }
     });
@@ -45,7 +40,6 @@ export class EditContestComponent {
     this.professorName = history.state.professorName;
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.loadContest();
-    this.getWordles();
   }
 
   loadContest(): void {
@@ -62,21 +56,6 @@ export class EditContestComponent {
     });
   }
 
-  getWordles(): void {
-    this.wordleService.getWordlesByContest(this.contestId).subscribe({
-      next: (data: Wordle[]) => {
-        if (data && data.length > 0) {
-          this.wordles = JSON.parse(JSON.stringify(data));
-          this.initialWordles = JSON.parse(JSON.stringify(data));
-        } else {
-          this.wordles = [];
-          this.initialWordles = [];
-        }
-      },
-      error: (err) => console.error('Error al obtener Wordles', err)
-    });
-  }
-
   formatDateForInput(date: Date | string): string {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -85,12 +64,6 @@ export class EditContestComponent {
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  addWordle() {
-    if (this.wordles.length < 3) {
-      this.wordles.push(new Wordle(''));
-    }
   }
 
   useDictionary(value: boolean) {
@@ -127,45 +100,17 @@ export class EditContestComponent {
   }
 
   updateContest() {
-    for (const word of this.wordles) {
-      if (word.word == "") {
-        alert('No se puede guardar un wordle vacío');
-        return;
-      }
-    }
+    const updatedContest: Contest = {
+      ...this.contest,
+      contestName: this.contest.contestName,
+      startDate: new Date(this.formattedStartDate),
+      endDate: new Date(this.formattedEndDate),
+      numTries: this.numTries,
+      useDictionary: this.dictionary,
+      useExternalFile: this.file
+    };
 
-    const commonWordles = this.wordles.filter(wordle =>
-      this.initialWordles.some(initial => initial.word === wordle.word)
-    );
-
-    const removedWordles = this.initialWordles.filter(wordle =>
-      !this.wordles.some(current => current.word === wordle.word)
-    );
-
-    const addedWordles = this.wordles.filter(wordle =>
-      !this.initialWordles.some(initial => initial.word === wordle.word)
-    );
-
-
-    this.deleteWordles(removedWordles);
-
-    this.saveWordles(addedWordles).pipe(
-      switchMap(() => {
-        const updatedWordles: Wordle[] = [...commonWordles, ...addedWordles];
-
-        const updatedContest: Contest = {
-          ...this.contest,
-          contestName: this.contest.contestName,
-          startDate: new Date(this.formattedStartDate),
-          endDate: new Date(this.formattedEndDate),
-          numTries: this.numTries,
-          useDictionary: this.dictionary,
-          useExternalFile: this.file
-        };
-
-        return this.contestService.editContest(updatedContest, updatedWordles);
-      })
-    ).subscribe({
+    this.contestService.editContest(updatedContest).subscribe({
       next: () => {
         alert('Concurso guardado con éxito');
         this.ngOnInit();
@@ -174,29 +119,7 @@ export class EditContestComponent {
     });
   }
 
-  deleteWordles(wordlesToDelete: Wordle[]) {
-    if (wordlesToDelete.length == 0)
-      return;
-    this.wordleService.deleteWordles(wordlesToDelete).subscribe({
-      next: () => {
-        console.log('Wordles eliminados con éxito');
-      },
-      error: (err) => console.error('Error al eliminar Wordles', err)
-    });
-  }
-
-  saveWordles(wordlesToSave: Wordle[]): Observable<any> {
-    if (wordlesToSave.length == 0)
-      return of(null);
-    const nameWordles = wordlesToSave.map(w => w.word);
-    return this.wordleService.saveWordles(nameWordles, this.contest.id, this.professorName, 0);
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  removeWordle(index: number) {
-    this.wordles.splice(index, 1);
+  goBack() {
+    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/concurso'], { state: { professorName: this.professorName } });
   }
 }

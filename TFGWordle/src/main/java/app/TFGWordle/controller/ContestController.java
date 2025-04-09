@@ -113,21 +113,13 @@ public class ContestController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/editContest")
-    public ResponseEntity<?> editContest(@RequestBody EditContestDTO contestDTO) {
-        if (!contestService.existsById(contestDTO.getContest().getId()))
+    public ResponseEntity<?> editContest(@RequestBody Contest contest) {
+        if (!contestService.existsById(contest.getId()))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
-        List<Wordle> wordles = new ArrayList<>();
-        List<Integer> wordleLength = new ArrayList<>();
+        contest.setCompetition(contestService.getById(contest.getId()).getCompetition());
 
-        for (Wordle w: contestDTO.getWordles()) {
-            wordleLength.add(w.getWord().length());
-            wordles.add(wordleService.getByWord(w.getWord()));
-        }
-        contestDTO.getContest().setCompetition(contestService.getById(contestDTO.getContest().getId()).getCompetition());
-        contestDTO.getContest().setWordles(wordles);
-        contestDTO.getContest().setWordlesLength(wordleLength);
-        return ResponseEntity.ok(contestService.save(contestDTO.getContest()));
+        return ResponseEntity.ok(contestService.save(contest));
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")

@@ -28,12 +28,8 @@ export class ContestService {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteContest/' + contestId);
   }
 
-  public editContest(updatedContest: Contest, updatedWordles: Wordle[]) {
-    const requestBody = {
-      contest: updatedContest,
-      wordles: updatedWordles
-    };
-    return this.httpClient.post<any>(this.apiUrl + 'editContest', requestBody);
+  public editContest(updatedContest: Contest) {
+    return this.httpClient.post<any>(this.apiUrl + 'editContest', updatedContest);
   }
 
 
