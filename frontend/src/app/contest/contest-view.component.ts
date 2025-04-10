@@ -18,9 +18,10 @@ export class ContestViewComponent implements OnInit {
   studentFinished: boolean = false;
 
   contest!: Contest;
+  contestId: number = 0;
 
   competitionName: string = '';
-  activeTab: string = 'info';
+  activeTab: string = '';
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private router: Router, private tokenService: TokenService) {
     this.router.events.subscribe(event => {
@@ -33,22 +34,24 @@ export class ContestViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.activeTab = history.state.activeTab || 'info';
     this.competitionName = history.state.competitionName;
+    this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.isProfessor = this.tokenService.getAuthorities().includes('ROLE_PROFESSOR') ||
       this.tokenService.getAuthorities().includes('ROLE_ADMIN');
     this.isStudent = this.tokenService.getAuthorities().includes('ROLE_STUDENT');
 
-    this.contestService.getContestById(Number(this.route.snapshot.paramMap.get('contestId'))).subscribe({
+    this.contestService.getContestById(this.contestId).subscribe({
       next: (cont) => {
         this.contest = cont;
+
+        if (this.isStudent)
+          this.checkIsFinished();
       },
       error: (e) => {
         console.error('Error obteniendo el concurso', e);
       }
     });
-
-    if (this.isStudent)
-      this.checkIsFinished();
   }
 
   editContest() {
@@ -60,6 +63,8 @@ export class ContestViewComponent implements OnInit {
   }
 
   checkIsFinished() {
+    console.log(this.contest.id);
+    console.log(this.tokenService.getUserName()!);
     return firstValueFrom(this.contestService.getContestState(this.contest.id, this.tokenService.getUserName()!))
       .then((state) => {
         for (const game of state.games) {

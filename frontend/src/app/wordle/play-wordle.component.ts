@@ -78,7 +78,7 @@ export class PlayWordleComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate([this.competitionName + '/concursos']);
+          this.goBack();
         }
       }
     });
@@ -88,8 +88,8 @@ export class PlayWordleComponent {
         this.contest = cont;
         this.numTries = cont.numTries;
 
-       this.numWordles = cont.wordlesLength.length;
-       this.wordleLength = cont.wordlesLength;
+        this.numWordles = cont.wordlesLength.length;
+        this.wordleLength = cont.wordlesLength;
 
         for (let i = 0; i < this.numTries; i++) {
           const letters: Letter[] = [];
@@ -303,7 +303,7 @@ export class PlayWordleComponent {
                 console.error('No existe el usuario', e);
             }
           })
-          
+
         } else {
           this.updateContestState();
           this.uploadNewLog();
@@ -413,6 +413,10 @@ export class PlayWordleComponent {
   }
 
   navigateToStatistics() {
-    this.router.navigate(['/' + this.contest.id + '/verEstadisticas'], { state: { competitionName: this.competitionName } });
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats' } });
+  }
+
+  goBack() {
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName } });
   }
 }
