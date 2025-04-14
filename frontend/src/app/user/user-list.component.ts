@@ -10,6 +10,7 @@ import { NavigationStart, Router } from '@angular/router';
 })
 export class UserListComponent implements OnInit {
 
+  showBackButton: boolean = false;
   professorList: User[] = [];
   studentList: User[] = [];
 
@@ -17,7 +18,7 @@ export class UserListComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/']);
+          this.router.navigate(['/usuarios']);
         }
       }
     });
