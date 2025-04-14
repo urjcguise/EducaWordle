@@ -45,7 +45,7 @@ h3 {
 }
 
 button.nav-link {
-    background-color: #4CAF50;
+    background-color: #cb0017;
     color: white;
     border: none;
     padding: 0.6rem 1.2rem;
@@ -60,7 +60,7 @@ button.nav-link {
 }
 
 button.nav-link:hover {
-    background-color: #45a049;
+    background-color: #980011;
 }
 
 ul {
@@ -106,9 +106,4 @@ button.btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: none;
     cursor: pointer;
-}
-
-button.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }

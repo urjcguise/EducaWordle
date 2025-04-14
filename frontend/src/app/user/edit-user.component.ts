@@ -20,7 +20,7 @@ export class EditUserComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/usuarios']);
+          this.goBack();
         }
       }
     });
@@ -54,5 +54,9 @@ export class EditUserComponent implements OnInit {
         console.error('Error actualizando el usuario', e);
       }
     })
+  }
+
+  goBack() {
+    this.router.navigate(['/usuarios']);
   }
 }

@@ -1,0 +1,42 @@
+.body {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    grid-row: 1 / 2;
+}
+
+.registration-form-card {
+    max-width: 500px;
+    width: 100%;
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: .875em;
+    color: #dc3545;
+}
+
+.btn {
+    background-color: #cb0017;
+    border-color: #cb0017;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.btn:hover {
+    background-color: #980011;
+}

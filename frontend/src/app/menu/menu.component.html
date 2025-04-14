@@ -18,6 +18,11 @@
       <div class="underline"></div>
     </button>
 
+    <button class="nav-button" routerLink="/usuarios" routerLinkActive="active" *ngIf="isAdmin">
+      Ver Usuarios
+      <div class="underline"></div>
+    </button>
+
     <button class="nav-button" *ngIf="showBackButton" (click)="goBack()">
       <img src="../../assets/flecha.png" alt="Atrás" class="arrow">
       Atrás

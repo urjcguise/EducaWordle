@@ -20,7 +20,7 @@ export class NewProfessorComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/usuarios']);
+          this.goBack();
         }
       }
     });
@@ -42,5 +42,9 @@ export class NewProfessorComponent {
     };
 
     this.authService.new(this.newUser).subscribe(observer);
+  }
+
+  goBack() {
+    this.router.navigate(['/usuarios']);
   }
 }
