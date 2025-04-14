@@ -55,16 +55,12 @@
 
         <div class="modal-list">
 
-            <div *ngIf="isLoadingModalData" class="loading-message">
-                Cargando disponibles... <i class="fas fa-spinner fa-spin"></i>
-            </div>
-
-            <div *ngIf="!isLoadingModalData && availableRootWordles.length === 0 && folders.length === 0 && !isCreatingNewWordle"
+            <div *ngIf="availableRootWordles.length === 0 && folders.length === 0 && !isCreatingNewWordle"
                 class="empty-message">
                 No hay wordles ni carpetas disponibles.
             </div>
 
-            <ul *ngIf="!isLoadingModalData && !isCreatingNewWordle">
+            <ul *ngIf="!isCreatingNewWordle">
 
                 <li *ngFor="let rootWordleObj of availableRootWordles" class="wordle-item root-item"
                     (click)="toggleWordleToAdd(rootWordleObj)"

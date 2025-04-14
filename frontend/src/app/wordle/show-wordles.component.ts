@@ -30,7 +30,6 @@ export class ShowWordlesComponent implements OnInit {
 
   availableRootWordles: string[] = [];
   folders: Folder[] = [];
-  isLoadingModalData: boolean = false;
 
   constructor(private wordleService: WordleService, private route: ActivatedRoute, private tokenService: TokenService, private contestService: ContestService) { }
 
@@ -53,9 +52,6 @@ export class ShowWordlesComponent implements OnInit {
   }
 
   loadModalData(): void {
-    if (this.isLoadingModalData) return;
-    this.isLoadingModalData = true;
-    console.log('Cargando datos para el modal...');
 
     forkJoin({
       rootWordlesRaw: this.wordleService.getWordlesByProfessor(this.professorName),
@@ -72,11 +68,9 @@ export class ShowWordlesComponent implements OnInit {
         this.folders = rootFoldersRaw;
         console.log('Carpetas filtradas:', this.folders);
 
-        this.isLoadingModalData = false;
       },
       error: (e) => {
         console.error('Error obteniendo datos para modal (wordles/folders)', e);
-        this.isLoadingModalData = false;
         this.availableRootWordles = [];
         this.folders = [];
       }

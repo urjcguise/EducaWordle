@@ -11,11 +11,8 @@ export class FolderTreeNodeComponent implements OnInit, OnChanges {
 
   @Input({ required: true }) folder!: Folder;
   @Input() level: number = 0;
-
   @Input() contestWordles: string[] = [];
-
   @Input() selectedForAddition: string[] = [];
-
   @Output() wordleToggled = new EventEmitter<string>();
 
   isExpanded: boolean = false;

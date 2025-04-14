@@ -31,9 +31,7 @@ export class WordleListComponent implements OnInit {
   canDeleteWordle: boolean = false;
 
   isCreatingFolder: boolean = false;
-  isEditingFolder: boolean[] = [];
   folderName: string = '';
-  oldFolderNameId: number = 0;
 
   folderOptions: Folder[] = [];
   dropdownVisible: boolean = false;
@@ -42,10 +40,7 @@ export class WordleListComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          if (this.isAdmin)
-            this.router.navigate(['/usuarios']);
-          else
-            this.router.navigate(['/']);
+          this.goBack();
         }
       }
     });
@@ -63,7 +58,6 @@ export class WordleListComponent implements OnInit {
       next: (folders) => {
         this.folderList = folders;
         this.folderList.forEach(() => {
-          this.isEditingFolder.push(false);
           this.isExpanded.push(false);
         })
       },
@@ -87,7 +81,6 @@ export class WordleListComponent implements OnInit {
 
     if (!targetElement.closest('.wordle-list') && !targetElement.closest('.button-group')) {
       this.deselectAll();
-      this.isEditingFolder = this.isEditingFolder.map(() => false);
     }
   }
 
@@ -142,23 +135,6 @@ export class WordleListComponent implements OnInit {
     }
   }
 
-  editFolderPushed(i: number) {
-    this.oldFolderNameId = this.folderList[i].id;
-    this.isEditingFolder = this.isEditingFolder.map((_, index) => index === i);
-  }
-
-  editFolder(i: number) {
-    this.wordleService.editFolder(this.oldFolderNameId, this.folderList[i].name).subscribe({
-      next: () => {
-        console.log('Carpeta modificada correctamente');
-      },
-      error: (e) => {
-        console.error('Error modificando la carpeta', e);
-      }
-    });
-    this.isEditingFolder[i] = false;
-  }
-
   createFolderPushed() {
     this.isCreatingFolder = true;
   }
@@ -179,11 +155,11 @@ export class WordleListComponent implements OnInit {
     }
   }
 
-  enterFolder(i: number) {
-    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name, parentFolderId: 0 } });
-  }
-
   moveWordle() {
+    if (this.dropdownVisible) {
+      this.dropdownVisible = false;
+      return;
+    }
     this.wordleService.getFoldersByProfessor(this.professorName).subscribe({
       next: (folders) => {
         this.folderOptions = folders;
@@ -259,5 +235,12 @@ export class WordleListComponent implements OnInit {
     }
 
     this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
+  }
+
+  goBack() {
+    if (this.isAdmin)
+      this.router.navigate(['/usuarios']);
+    else
+      this.router.navigate(['/']);
   }
 }

@@ -24,7 +24,7 @@ public class FolderDTO {
 
         if (includeChildren) {
             this.folders = folder.getFolders().stream()
-                    .map(child -> new FolderDTO(child, false))
+                    .map(child -> new FolderDTO(child, true))
                     .collect(Collectors.toList());
         } else {
             this.folders = new ArrayList<>();

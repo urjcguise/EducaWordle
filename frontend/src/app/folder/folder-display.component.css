@@ -1,0 +1,77 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.folder-item:hover {
+    background-color: #f0f0f0;
+}
+
+.folder-item.selected {
+    background-color: #c9e6ff !important;
+    border-radius: 4px;
+}
+
+.folder-item .fa-folder {
+    color: #ffc107;
+}
+
+.folder-item .fa-chevron-down,
+.folder-item .fa-chevron-right {
+    color: #7d6c6c;
+    width: 1em;
+    text-align: center;
+}
+
+.folder-item .fa-fw {
+    width: 1em;
+    text-align: center;
+}
+
+.nested-list {
+    list-style: none;
+    padding-left: 25px;
+    margin: 0;
+}
+
+.nested-list li {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 4px;
+}
+
+.nested-list .wordle-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.nested-list .wordle-item:hover {
+    background-color: #e9ecef;
+}
+
+.nested-list .wordle-item .fa-file-alt {
+    color: #052c65;
+}
+
+.nested-list .wordle-item .fa-fw {
+    width: 1em;
+    text-align: center;
+}

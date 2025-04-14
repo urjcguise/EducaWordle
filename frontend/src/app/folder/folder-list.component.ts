@@ -45,10 +45,7 @@ export class FolderListComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          if (this.parentFolderId != 0)
-            this.router.navigate([this.parentFolderId + '/wordles'], { state: { professorName: this.professorName } });
-          else
-            this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
+          this.goBack();
         }
       }
     });
@@ -200,11 +197,6 @@ export class FolderListComponent implements OnInit {
     this.isEditingFolder[i] = false;
   }
 
-  enterFolder(i: number) {
-    this.parentsFoldersList = [];
-    this.router.navigate(['/' + this.folderList[i].id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folderList[i].name, parentFolderId: this.actualFolderId } });
-  }
-
   navigateToFolder(folder: Folder) {
     if (folder.name != '...') {
       this.router.navigate(['/' + folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: folder.id, parentFolderId: this.actualFolderId } });
@@ -297,5 +289,12 @@ export class FolderListComponent implements OnInit {
     } else {
       console.log('No hay Wordles seleccionados para eliminar');
     }
+  }
+
+  goBack() {
+    if (this.parentFolderId != 0)
+      this.router.navigate([this.parentFolderId + '/wordles'], { state: { professorName: this.professorName } });
+    else
+      this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
   }
 }

@@ -1,0 +1,21 @@
+<div class="folder-item" [class.selected]="isSelected" (click)="onFolderClick()" (dblclick)="onFolderDoubleClick()">
+    <i class="fas fa-fw" *ngIf="folder.folders?.length || folder.wordles?.length"
+        [ngClass]="isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'" (click)="toggleExpansion($event)"></i>
+    <i class="fas fa-fw" *ngIf="!folder.folders?.length && !folder.wordles?.length"></i>
+
+    <i class="fas fa-folder"></i>
+    <span *ngIf="!isEditingFolder" (dblclick)="editFolderPushed()">{{ folder.name }}</span>
+    <input *ngIf="isEditingFolder" type="text" [(ngModel)]="folder.name" (click)="$event.stopPropagation()"
+        (keyup.enter)="editFolder()" />
+</div>
+
+<ul *ngIf="isExpanded" class="nested-list">
+    <li *ngFor="let wordle of folder.wordles" class="wordle-item">
+        <i class="fas fa-fw"></i> <i class="fas fa-file-alt"></i>
+        <span>{{ wordle.word }}</span>
+    </li>
+
+    <li *ngFor="let subfolder of folder.folders" class="subfolder-item">
+        <app-folder-display [folder]="subfolder"></app-folder-display>
+    </li>
+</ul>

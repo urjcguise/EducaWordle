@@ -3,7 +3,6 @@
     padding: 0;
 }
 
-/* Nodo de carpeta */
 .folder-node {
     display: flex;
     align-items: center;
@@ -23,7 +22,6 @@
     background-color: #f8f9fa;
 }
 
-/* Icono para expandir/colapsar */
 .node-toggle-icon {
     width: 20px;
     text-align: center;
@@ -43,14 +41,12 @@
     color: #bdadad;
 }
 
-/* Icono de Carpeta */
 .folder-icon {
     margin-right: 8px;
     color: #ffc107;
     flex-shrink: 0;
 }
 
-/* Icono de Wordle */
 .wordle-icon {
     color: #424ac1;
     margin-right: 8px;
@@ -65,7 +61,6 @@
     font-size: 0.95em;
 }
 
-/* Item Wordle */
 .wordle-item {
     display: flex;
     align-items: center;
@@ -75,7 +70,6 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
-/* Wordle raíz */
 .root-item {
     padding-left: 20px !important;
 }
@@ -84,7 +78,6 @@
     background-color: #f8f9fa;
 }
 
-/* Wordle seleccionado */
 .wordle-item.selected {
     background-color: #cfe2ff;
     color: #052c65;
@@ -106,19 +99,11 @@
     flex-shrink: 0;
 }
 
-/* Mensaje de carga */
-.loading-message {
-    text-align: center;
-    padding: 30px 15px;
-    color: #6c757d;
-    font-style: italic;
-}
-
-.loading-message i {
-    margin-left: 8px;
-}
-
 .folder-content ul,
 .folder-content li {
     list-style-type: none;
+}
+
+.subfolder-container {
+    padding-left: 60;
 }

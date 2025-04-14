@@ -34,6 +34,7 @@ import { FooterComponent } from './menu/footer.component';
 import { ContestViewComponent } from './contest/contest-view.component';
 import { ShowWordlesComponent } from './wordle/show-wordles.component';
 import { FolderTreeNodeComponent } from './folder/folder-tree-node.component';
+import { FolderDisplayComponent } from './folder/folder-display.component';
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import { FolderTreeNodeComponent } from './folder/folder-tree-node.component';
     FooterComponent,
     ContestViewComponent,
     ShowWordlesComponent,
-    FolderTreeNodeComponent
+    FolderTreeNodeComponent,
+    FolderDisplayComponent
   ],
   imports: [
     BrowserModule,
