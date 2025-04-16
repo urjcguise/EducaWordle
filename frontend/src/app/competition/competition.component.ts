@@ -22,7 +22,7 @@ export class CompetitionComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/competiciones']);
+          this.goBack();
         }
       }
     });
@@ -43,5 +43,9 @@ export class CompetitionComponent {
         },
       });
     }
+  }
+
+  goBack() {
+    this.router.navigate(['/competiciones']);
   }
 }
