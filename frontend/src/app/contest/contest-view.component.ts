@@ -19,6 +19,7 @@ export class ContestViewComponent implements OnInit {
 
   contest!: Contest;
   contestId: number = 0;
+  contestFinished: boolean = false;
 
   competitionName: string = '';
   activeTab: string = '';
@@ -44,6 +45,11 @@ export class ContestViewComponent implements OnInit {
     this.contestService.getContestById(this.contestId).subscribe({
       next: (cont) => {
         this.contest = cont;
+
+        const endDate = new Date(cont.endDate);
+        const thisMoment = new Date();
+        if (endDate < thisMoment)
+          this.contestFinished = true;
 
         if (this.isStudent)
           this.checkIsFinished();
