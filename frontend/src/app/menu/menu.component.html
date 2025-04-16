@@ -13,7 +13,12 @@
       <div class="underline"></div>
     </button>
 
-    <button class="nav-button" routerLink="/wordles" routerLinkActive="active" *ngIf="!isAdmin">
+    <button class="nav-button" routerLink="/wordles" routerLinkActive="active" *ngIf="isProfessor">
+      Ver Wordles
+      <div class="underline"></div>
+    </button>
+
+    <button class="nav-button" routerLink="/wordlesResueltos" routerLinkActive="active" *ngIf="isStudent">
       Ver Wordles
       <div class="underline"></div>
     </button>

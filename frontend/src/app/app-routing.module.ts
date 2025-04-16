@@ -23,6 +23,7 @@ import { EditWordleComponent } from './wordle/edit-wordle.component';
 import { FolderListComponent } from './folder/folder-list.component';
 import { ContestViewComponent } from './contest/contest-view.component';
 import { CompetitionRankingComponent } from './competition/competition-ranking.component';
+import { WordleListStudentComponent } from './wordle/wordle-list-student.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
@@ -34,6 +35,7 @@ const routes: Routes = [
   { path: 'competiciones', component: CompetitionListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: ':competitionName/ranking', component: CompetitionRankingComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: 'wordles', component: WordleListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
+  { path: 'wordlesResueltos', component: WordleListStudentComponent, canActivate: [prodGuard], data: { expectedRol: ['student'] } },
   { path: ':folderId/wordles', component: FolderListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':professorName/nuevosWordles', component: WordleComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':wordle/editarWordle', component: EditWordleComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },

@@ -13,6 +13,8 @@ export class MenuComponent implements OnInit {
 
   isLogged = false;
   isAdmin = false;
+  isProfessor = false;
+  isStudent = false;
 
   constructor(private tokenService: TokenService) { }
 
@@ -24,6 +26,10 @@ export class MenuComponent implements OnInit {
 
     if (this.tokenService.getAuthorities().includes("ROLE_ADMIN"))
       this.isAdmin = true;
+    if (this.tokenService.getAuthorities().includes("ROLE_PROFESSOR"))
+      this.isProfessor = true;
+    if (this.tokenService.getAuthorities().includes("ROLE_STUDENT"))
+      this.isStudent = true;
   }
 
   onLogOut(): void {

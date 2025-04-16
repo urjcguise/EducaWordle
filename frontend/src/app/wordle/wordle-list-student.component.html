@@ -1,0 +1,24 @@
+<div class="body">
+    <div class="header">
+      <app-menu></app-menu>
+    </div>
+  
+    <div class="wordle-list">
+      <div class="competition-card" *ngFor="let competition of competitionList">
+        <h2 class="competition-title">{{ competition.competition.competitionName }}</h2>
+  
+        <div class="contest-card" *ngFor="let contest of competition.contestsInfo">
+          <h3 class="contest-title">{{ contest.contest.contestName }}</h3>
+  
+          <div class="wordle-container">
+            <div class="wordle-item" *ngFor="let wordle of contest.wordles">
+              <p class="wordle-text">{{ wordle.word }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <app-footer></app-footer>
+  </div>
+  

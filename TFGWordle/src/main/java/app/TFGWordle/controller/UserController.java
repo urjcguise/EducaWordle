@@ -1,5 +1,6 @@
 package app.TFGWordle.controller;
 
+import app.TFGWordle.dto.WordlesStudentDTO;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.dto.NewUser;
@@ -7,7 +8,6 @@ import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.ParticipationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -108,6 +108,24 @@ public class UserController {
                 .stream()
                 .map(Participation::getCompetition)
                 .collect(Collectors.toList());
+
+        return new ResponseEntity<>(toReturn, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/getAllWordles/{userName}")
+    public ResponseEntity<List<WordlesStudentDTO>> getAllWordles(@PathVariable String userName) {
+        User student = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        List<Competition> competitions = participationService.findParticipationsByStudent(student.getId())
+                .stream()
+                .map(Participation::getCompetition)
+                .toList();
+
+        List<WordlesStudentDTO> toReturn = competitions.stream()
+                .map(WordlesStudentDTO::new)
+                .toList();
 
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }

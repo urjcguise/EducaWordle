@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { Competition } from "../models/competition";
 import { User } from "../models/user";
 import { NewUser } from "../models/new-user";
+import { WordlesStudentDTO } from "../models/wordles-student";
 
 @Injectable({
   providedIn: 'root'
@@ -40,5 +41,9 @@ export class UserService {
 
   public getEmail(userName: string) {
     return this.httpClient.get(this.apiUrl + 'getUserEmail/' + userName, { responseType: 'text' });
+  }
+
+  public getAllWordles(userName: string) {
+    return this.httpClient.get<WordlesStudentDTO[]>(this.apiUrl + 'getAllWordles/' + userName);
   }
 }
