@@ -35,6 +35,7 @@ import { ContestViewComponent } from './contest/contest-view.component';
 import { ShowWordlesComponent } from './wordle/show-wordles.component';
 import { FolderTreeNodeComponent } from './folder/folder-tree-node.component';
 import { FolderDisplayComponent } from './folder/folder-display.component';
+import { CompetitionRankingComponent } from './competition/competition-ranking.component';
 
 
 @NgModule({
@@ -66,7 +67,8 @@ import { FolderDisplayComponent } from './folder/folder-display.component';
     ContestViewComponent,
     ShowWordlesComponent,
     FolderTreeNodeComponent,
-    FolderDisplayComponent
+    FolderDisplayComponent,
+    CompetitionRankingComponent
   ],
   imports: [
     BrowserModule,

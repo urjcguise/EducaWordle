@@ -132,4 +132,8 @@ export class CompetitionListComponent implements OnInit {
   viewContest(contestId: number, competitionName: string) {
     this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: this.professorName } });
   }
+
+  viewCompetitionRanking(competitionName: string) {
+    this.router.navigate(['/' + competitionName + '/ranking'], { state: { professorName: this.professorName } });
+  }
 }

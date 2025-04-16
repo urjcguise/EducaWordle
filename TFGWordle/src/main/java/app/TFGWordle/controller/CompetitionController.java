@@ -101,11 +101,10 @@ public class CompetitionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
-    @GetMapping("/getStudents/{competitionId}")
-    public ResponseEntity<List<User>> getStudents(@PathVariable Long competitionId) {
-        return competitionService.existsCompetition(competitionId)
-                ? new ResponseEntity<>(participationService.findStudentsByCompetition(competitionId), HttpStatus.OK)
+    @GetMapping("/getStudents/{competitionName}")
+    public ResponseEntity<List<User>> getStudents(@PathVariable String competitionName) {
+        return competitionService.existsCompetitionByName(competitionName)
+                ? new ResponseEntity<>(participationService.findStudentsByCompetition(competitionName), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 

@@ -245,7 +245,6 @@ public class ContestController {
         return new ResponseEntity<>(contestStateService.save(newContestState), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getContestState/{contestId}/{userName}")
     public ResponseEntity<WordleState> getContestState(@PathVariable Long contestId, @PathVariable String userName) {
         if (!contestService.existsById(contestId))

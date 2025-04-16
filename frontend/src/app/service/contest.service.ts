@@ -5,7 +5,6 @@ import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
 import { UserState } from '../models/user-state';
 import { WordleStateLog } from '../models/wordle-state-log';
-import { Wordle } from '../models/wordle';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +31,6 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'editContest', updatedContest);
   }
 
-
   public addWordlesToContest(contestId: number, wordles: string[]) {
     return this.httpClient.post<any>(this.apiUrl + 'addWordlesToContest/' + contestId, wordles);
   }
@@ -40,7 +38,6 @@ export class ContestService {
   public deleteWordlesInContest(contestId: number, wordles: string[]) {
     return this.httpClient.post<any>(this.apiUrl + 'deleteWordlesInContest/' + contestId, wordles);
   }
-
 
   public getContestById(contestId: number) {
     return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');

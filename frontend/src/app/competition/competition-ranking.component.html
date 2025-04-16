@@ -1,0 +1,40 @@
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
+    </div>
+
+    <div class="main-ranking">
+        <h2>Ranking de la competición: {{competitionName}}</h2>
+
+        <div>
+            <label for="sort_option">Ordenar</label>
+            <select name="sort_option" id="sort_option" (change)="onSortChange($event)">
+                <option value="moreSuccess">Aciertos (más aciertos)</option>
+                <option value="lessSuccess">Aciertos (menos aciertos)</option>
+                <option value="quicker">Tiempo (más rápido)</option>
+                <option value="slowest">Tiempo (más lento)</option>
+            </select>
+        </div>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Participante</th>
+                    <th>Nº de aciertos</th>
+                    <th>Total de intentos</th>
+                    <th>Tiempo total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let student of studentsRanking">
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.rightGuess }}</td>
+                    <td>{{ student.totalTries }}</td>
+                    <td>{{ formatTime(student.totalTime) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <app-footer></app-footer>
+</div>

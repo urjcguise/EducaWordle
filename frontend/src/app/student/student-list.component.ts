@@ -34,7 +34,7 @@ export class StudentListComponent implements OnInit {
     this.competitionId = history.state.competitionId;
     this.professorName = history.state.professorName;
     this.competitionName = this.route.snapshot.paramMap.get('competitionName') || '';
-    this.competitionService.getStudentsByCompetition(this.competitionId).subscribe({
+    this.competitionService.getStudentsByCompetition(this.competitionName).subscribe({
       next: (stdts) => {
         this.students = stdts;
       },

@@ -31,6 +31,9 @@
               <p>Ver alumnos</p>
             </button>
           </div>
+          <button class="competition-buttons" (click)="viewCompetitionRanking(competition.name)">
+            <p>Ver ranking</p>
+          </button>
         </div>
         <div class="contest-list" *ngIf="competition.isOpen">
           <ul>
