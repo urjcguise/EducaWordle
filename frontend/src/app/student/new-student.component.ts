@@ -26,7 +26,7 @@ export class NewStudentComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/' + this.competitionName + '/alumnos'], { state: { professorName: this.professorName, competitionId: this.competitionId } });
+          this.goBack();
         }
       }
     });
@@ -60,5 +60,9 @@ export class NewStudentComponent implements OnInit {
     };
 
     this.authService.new(this.newUser).subscribe(observer);
+  }
+
+  goBack() {
+    this.router.navigate(['/' + this.competitionName + '/alumnos'], { state: { professorName: this.professorName, competitionId: this.competitionId } });
   }
 }

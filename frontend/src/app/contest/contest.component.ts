@@ -25,7 +25,7 @@ export class ContestComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate([this.competitionName + '/concursos']);
+          this.goBack();
         }
       }
     });
@@ -59,5 +59,9 @@ export class ContestComponent implements OnInit {
       },
       error: (err) => console.error('Error al crear concurso', err)
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/competiciones']);
   }
 }
