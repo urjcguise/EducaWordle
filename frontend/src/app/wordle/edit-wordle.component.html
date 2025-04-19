@@ -1,20 +1,52 @@
-<div class="wordle-container">
-    <h2>Editar Wordle</h2>
-
-    <div>
-        <input type="text" id="wordle" [(ngModel)]="wordle" class="name-input" />
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
     </div>
 
-    <div *ngFor="let competition of competitionWithContest">
-        <strong>{{competition.competition.competitionName}}</strong>
-        <div *ngFor="let contest of competition.contests" class="contest-item">
-            <input type="checkbox" [checked]="isContestSelected(contest.contest)"
-                (change)="toggleContestSelection(contest.contest)" />
-            <span>{{contest.contest.contestName}}</span>
+    <div class="content-wrapper">
+        <div class="card shadow-sm edit-wordle-card p-4">
+            <div class="card-body">
+                <h2 class="main-title text-center mb-4">Editar Wordle</h2>
+
+                <div class="edit-section mb-4">
+                    <label for="wordle" class="edit-section-title edit-word-tittle">Palabra</label> <input type="text"
+                        id="wordle" [(ngModel)]="wordle" class="form-control form-control-lg"
+                        placeholder="Escribe la palabra del Wordle" />
+                </div>
+
+                <hr class="my-4">
+                <div class="edit-section mb-4">
+                    <label class="edit-section-title edit-contest-tittle">Asignar a Competiciones</label>
+                    <div class="competitions-list-container mt-3">
+                        <div *ngFor="let competition of competitionWithContest; let i = index">
+                            <hr *ngIf="i > 0" class="my-3">
+                            <h6 class="competition-name mb-2">{{ competition.competition.competitionName }}</h6>
+                            <div *ngFor="let contest of competition.contests" class="contest-item ms-3 mb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                        id="contest-{{ contest.contest.id }}"
+                                        [checked]="isContestSelected(contest.contest)"
+                                        (change)="toggleContestSelection(contest.contest)" />
+                                    <label class="form-check-label" for="contest-{{ contest.contest.id }}"> {{
+                                        contest.contest.contestName }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="!competitionWithContest || competitionWithContest.length === 0"
+                            class="text-muted text-center mt-3">
+                            No hay competiciones disponibles.
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <div class="mt-3 text-center">
+                    <button type="button" class="btn btn-primary btn-lg" (click)="updateWordle()"> <i
+                            class="fas fa-save me-2"></i> Guardar Wordle
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div>
-        <button (click)="updateWordle()">Guardar wordle</button>
-    </div>
+    </div> <app-footer></app-footer>
 </div>

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
-import { WordleService } from '../service/wordle.service';
 import { Competition } from '../models/competition';
 
 @Component({
@@ -25,7 +24,7 @@ export class EditContestComponent {
 
   competitionName: string = '';
 
-  constructor(private route: ActivatedRoute, private contestService: ContestService, private wordleService: WordleService, private router: Router) {
+  constructor(private route: ActivatedRoute, private contestService: ContestService, private router: Router) {
     this.competitionName = history.state.competitionName;
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {

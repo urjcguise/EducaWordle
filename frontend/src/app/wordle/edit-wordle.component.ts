@@ -30,7 +30,7 @@ export class EditWordleComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/wordles']);
+          this.goBack();
         }
       }
     });
@@ -102,5 +102,9 @@ export class EditWordleComponent implements OnInit {
         console.error('Error editando el wordle', e);
       }
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/wordles']);
   }
 }
