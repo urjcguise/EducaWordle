@@ -17,7 +17,7 @@ export class WordleComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
+          this.goBack();
         }
       }
     });
@@ -58,5 +58,9 @@ export class WordleComponent implements OnInit {
         console.error('Error guardando los wordle', e);
       }
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
   }
 }
