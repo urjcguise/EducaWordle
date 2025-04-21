@@ -32,10 +32,7 @@ export class ContestRankingComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          if (this.isAdmin)
-            this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
-          else
-            this.router.navigate([this.competitionName + '/concursos']);
+          this.goBack();
         }
       }
     });
@@ -128,5 +125,9 @@ export class ContestRankingComponent implements OnInit {
       default:
         console.warn('Opción de ordenación no válida');
     }
+  }
+
+  goBack() {
+    this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
   }
 }

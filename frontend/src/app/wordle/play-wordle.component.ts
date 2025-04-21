@@ -290,19 +290,7 @@ export class PlayWordleComponent {
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.updateContestState();
           this.uploadNewLog();
-          this.wordleService.getWordleInContest(this.contest.id, this.currentWordleIndex).subscribe({
-            next: (wordle) => {
-              this.showInfoMessage(`La palabra era: ${wordle.word.toUpperCase()}`);
-            },
-            error: (e) => {
-              if (e.status === 404)
-                console.error('No existe ese concurso', e);
-              if (e.status === 401)
-                console.error('No puedes realizar esa llamada', e);
-              if (e.status === 400)
-                console.error('No existe el usuario', e);
-            }
-          })
+          
 
         } else {
           this.updateContestState();
@@ -316,6 +304,21 @@ export class PlayWordleComponent {
     })
   }
 
+  lostGame() {
+    this.wordleService.getWordleInContest(this.contest.id, this.currentWordleIndex).subscribe({
+      next: (wordle) => {
+        this.showInfoMessage(`La palabra era: ${wordle.word.toUpperCase()}`);
+      },
+      error: (e) => {
+        if (e.status === 404)
+          console.error('No existe ese concurso', e);
+        if (e.status === 401)
+          console.error('No puedes realizar esa llamada', e);
+        if (e.status === 400)
+          console.error('No existe el usuario', e);
+      }
+    });
+  }
 
   handleNextWord() {
     if (this.currentWordleIndex + 1 < this.numWordles) {
@@ -371,6 +374,8 @@ export class PlayWordleComponent {
     this.contestService.updateContestState(history.state.contestId, this.tokenService.getUserName()!, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso actualizado correctamente');
+        if (this.finished && !this.won)
+          this.lostGame();
       },
       error: (error) => {
         console.error('Error actualizando el estado del concurso', error);
@@ -405,11 +410,14 @@ export class PlayWordleComponent {
     this.contestService.createContestLog(this.contest.id, this.currentWordleIndex, this.tokenService.getUserName()!, this.wordleStateLog).subscribe({
       next: () => {
         console.log('Creado nuevo log correctamente');
+        if (this.finished && !this.won)
+          this.lostGame();
       },
       error: (error) => {
         console.error('Error creando el nuevo log del concurso', error);
       },
     });
+    
   }
 
   navigateToStatistics() {

@@ -85,10 +85,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
-          if (this.isAdmin)
-            this.router.navigate([this.competitionName + '/concursos'], { state: { professorName: this.professorName } });
-          else
-            this.router.navigate([this.competitionName + '/concursos']);
+          this.goBack();
         }
       }
     });
@@ -192,6 +189,9 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
                       wrongPlace: log.wrongPosition,
                       wrong: log.wrong
                     });
+                  });
+                  this.studentInformation.forEach( (elem) => {
+                    elem.info.sort((a, b) => a.nunTry - b.nunTry);
                   });
                 },
                 error: (e) => {
@@ -307,5 +307,9 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
         console.error('Error obteniendo el Excel para su descarga', e);
       }
     })
+  }
+
+  goBack() {
+    this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
   }
 }
