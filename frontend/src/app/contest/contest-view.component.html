@@ -7,8 +7,13 @@
 
         <div class="contest-header">
             <span class="contest-name">{{ contest.contestName }}</span>
-            <button *ngIf="isProfessor && !contestFinished" class="edit-button" (click)="editContest()">Editar</button>
-        </div>
+          
+            <div class="button-group">
+              <button *ngIf="isProfessor && !contestFinished" class="contest-button" (click)="editContest()">Editar</button>
+              <button *ngIf="isProfessor" class="contest-button" (click)="deleteContest()">Eliminar</button>
+              <button *ngIf="isProfessor" class="contest-button" (click)="copyContest()">Copiar</button>
+            </div>
+          </div>
 
         <div class="contest-navbar">
             <ul class="nav-tabs">

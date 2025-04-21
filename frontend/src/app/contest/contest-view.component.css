@@ -16,14 +16,13 @@
     margin-bottom: 10px;
 }
 
-/* Fila para el nombre del concurso y el botón */
+/* Fila para el nombre del concurso y los botones */
 .contest-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
     flex-wrap: wrap;
-    gap: 10px;
 }
 
 /* Nombre del Concurso */
@@ -33,8 +32,15 @@
     font-weight: bold;
 }
 
-/* Botón Editar */
-.edit-button {
+/* Contenedor para los botones */
+.button-group {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+/* Botones */
+.contest-button {
     background-color: #cb0017;
     border-color: #cb0017;
     color: white;
@@ -46,8 +52,8 @@
     transition: background-color 0.3s ease;
 }
 
-.edit-button:hover {
-    background-color: #980011;
+.contest-button:hover {
+    background-color: #a50013;
 }
 
 .contest-navbar {

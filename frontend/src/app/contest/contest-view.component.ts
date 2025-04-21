@@ -64,13 +64,31 @@ export class ContestViewComponent implements OnInit {
     this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/editarConcurso'], { state: { professorName: history.state.professorName } });
   }
 
-  goBack() {
-    this.router.navigate(['/competiciones']);
+  deleteContest() {
+    const confirmDelete = confirm('¿Está seguro de que desea eliminar este concurso?');
+    if (confirmDelete) {
+      this.contestService.deleteContest(this.contestId).subscribe({
+        next: () => {
+          alert('Concurso eliminado con éxito');
+          this.router.navigate(['/competiciones']);
+        },
+        error: (err) => console.error('Error al eliminar el concurso:', err)
+      });
+    }
+  }
+
+  copyContest() {
+    this.contestService.copyContest(this.contestId).subscribe({
+      next: () => {
+        alert('Concurso y wordles copiados correctamente');
+      },
+      error: (e) => {
+        console.error('Error copiando el concurso', e);
+      }
+    });
   }
 
   checkIsFinished() {
-    console.log(this.contest.id);
-    console.log(this.tokenService.getUserName()!);
     return firstValueFrom(this.contestService.getContestState(this.contest.id, this.tokenService.getUserName()!))
       .then((state) => {
         for (const game of state.games) {
@@ -96,6 +114,10 @@ export class ContestViewComponent implements OnInit {
         competitionName: this.competitionName
       }
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/competiciones']);
   }
 
 }
