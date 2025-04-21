@@ -18,6 +18,7 @@ export class EditContestComponent {
   dictionary: boolean = false;
   file: boolean = false;
   numTries: number = 0;
+  contestName: string = '';
 
   formattedStartDate: string = "";
   formattedEndDate: string = "";
@@ -45,6 +46,7 @@ export class EditContestComponent {
     this.contestService.getContestById(this.contestId).subscribe({
       next: (data: Contest) => {
         this.contest = data;
+        this.contestName = data.contestName;
         this.dictionary = data.useDictionary || false;
         this.file = data.useExternalFile || false;
         this.numTries = data.numTries;
@@ -101,7 +103,7 @@ export class EditContestComponent {
   updateContest() {
     const updatedContest: Contest = {
       ...this.contest,
-      contestName: this.contest.contestName,
+      contestName: this.contestName,
       startDate: new Date(this.formattedStartDate),
       endDate: new Date(this.formattedEndDate),
       numTries: this.numTries,
@@ -112,7 +114,7 @@ export class EditContestComponent {
     this.contestService.editContest(updatedContest).subscribe({
       next: () => {
         alert('Concurso guardado con éxito');
-        this.ngOnInit();
+        this.goBack();
       },
       error: (err) => console.error('Error al editar concurso', err)
     });
