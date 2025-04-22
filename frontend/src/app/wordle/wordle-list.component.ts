@@ -36,6 +36,8 @@ export class WordleListComponent implements OnInit {
   folderOptions: Folder[] = [];
   dropdownVisible: boolean = false;
 
+  modalVisible: boolean = false;
+
   constructor(private wordleService: WordleService, private tokenService: TokenService, private router: Router) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
@@ -122,10 +124,6 @@ export class WordleListComponent implements OnInit {
     this.canEditFolder = this.selectedFolders.length == 1;
     this.canMoveWordle = this.selectedWordles.length > 0 && this.selectedFolders.length == 0 && this.folderList.length > 0;
     this.canDeleteWordle = this.selectedWordles.length > 0 || this.selectedFolders.length > 0;
-  }
-
-  createWordle() {
-    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderId: Number(0) } });
   }
 
   editWordle() {
@@ -236,6 +234,14 @@ export class WordleListComponent implements OnInit {
     }
 
     this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
+  }
+
+  createWordle() {
+    this.modalVisible = true;
+  }
+
+  closeModal() {
+    this.modalVisible = false;
   }
 
   goBack() {

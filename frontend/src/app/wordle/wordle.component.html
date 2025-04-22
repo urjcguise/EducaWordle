@@ -1,46 +1,35 @@
-<div class="body">
-    <div class="header">
-        <app-menu (backClicked)="goBack()"></app-menu>
-    </div>
+    <div class="card shadow-sm wordle-creation-card padding-regular">
+        <div class="card-body">
+            <h3 class="card-title text-center fw-bold mb-2">Crear Nuevos Wordles</h3>
+            <p class="card-subtitle text-center text-muted mb-4">
+                Puedes añadir hasta 10 wordles ({{ wordles.length }} / 10)
+            </p>
 
-    <div class="content-wrapper">
-        <div class="card shadow-sm wordle-creation-card padding-regular">
-            <div class="card-body">
-                <h3 class="card-title text-center fw-bold mb-2">Crear Nuevos Wordles</h3>
-                <p class="card-subtitle text-center text-muted mb-4">
-                    Puedes añadir hasta 10 wordles ({{ wordles.length }} / 10)
-                </p>
-
-                <div class="wordle-list margin-bottom-lg">
-                    <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex" class="wordle-input-row">
-                        <input type="text" placeholder="Nueva Palabra ({{ i + 1 }})" [(ngModel)]="wordles[i]"
-                            class="form-control wordle-input" />
-                        <button type="button" class="btn delete-button" (click)="removeWordle(i)"
-                            title="Eliminar palabra">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-
-                    <div *ngIf="wordles.length === 0" class="text-muted text-center fst-italic">
-                        Añade la primera palabra abajo
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn add-wordle-button" (click)="addWordle()"
-                        [disabled]="wordles.length >= 10" title="Añadir una nueva palabra">
-                        <i class="fas fa-plus me-1"></i> Añadir Palabra
-                    </button>
-
-                    <button type="button" class="btn save-wordles-button" (click)="createWordles()"
-                        [disabled]="wordles.length === 0" title="Guardar todas las palabras">
-                        <i class="fas fa-save"></i> Guardar Wordles
+            <div class="wordle-list margin-bottom-lg">
+                <div *ngFor="let wordle of wordles; index as i; trackBy: trackByIndex" class="wordle-input-row">
+                    <input type="text" placeholder="Nueva Palabra ({{ i + 1 }})" [(ngModel)]="wordles[i]"
+                        class="form-control wordle-input" />
+                    <button type="button" class="btn delete-button" (click)="removeWordle(i)" title="Eliminar palabra">
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
 
+                <div *ngIf="wordles.length === 0" class="text-muted text-center fst-italic">
+                    Añade la primera palabra abajo
+                </div>
             </div>
+
+            <div class="button-group">
+                <button type="button" class="btn add-wordle-button" (click)="addWordle()"
+                    [disabled]="wordles.length >= 10" title="Añadir una nueva palabra">
+                    <i class="fas fa-plus me-1"></i> Añadir Palabra
+                </button>
+
+                <button type="button" class="btn save-wordles-button" (click)="createWordles()"
+                    [disabled]="wordles.length === 0" title="Guardar todas las palabras">
+                    <i class="fas fa-save"></i> Guardar Wordles
+                </button>
+            </div>
+
         </div>
     </div>
-
-    <app-footer></app-footer>
-</div>
