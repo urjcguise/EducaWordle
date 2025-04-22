@@ -8,37 +8,32 @@
   <img src="../../assets/sin_fondo_negro_zoom.png" alt="Logo Universidad" class="logo">
 
   <ng-container *ngIf="isLogged">
-    <button class="nav-button" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+    <button class="nav-button" routerLink="/competiciones" routerLinkActive="active"
+      [routerLinkActiveOptions]="{exact: true}">
       Página Principal
-      <div class="underline"></div>
     </button>
 
     <button class="nav-button" routerLink="/wordles" routerLinkActive="active" *ngIf="isProfessor">
       Ver Wordles
-      <div class="underline"></div>
     </button>
 
     <button class="nav-button" routerLink="/wordlesResueltos" routerLinkActive="active" *ngIf="isStudent">
       Ver Wordles
-      <div class="underline"></div>
     </button>
 
     <button class="nav-button" routerLink="/usuarios" routerLinkActive="active" *ngIf="isAdmin">
       Ver Usuarios
-      <div class="underline"></div>
     </button>
 
     <button class="nav-button" *ngIf="showBackButton" (click)="goBack()">
       <img src="../../assets/flecha.png" alt="Atrás" class="arrow">
       Atrás
-      <div class="underline"></div>
     </button>
 
     <div class="spacer"></div>
 
     <button class="nav-button" (click)="onLogOut()">
       Cerrar Sesión
-      <div class="underline"></div>
     </button>
   </ng-container>
 
