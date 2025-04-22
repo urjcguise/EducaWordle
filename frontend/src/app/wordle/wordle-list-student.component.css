@@ -13,7 +13,6 @@
     padding-left: 25rem;
     padding-right: 25rem;
     padding-top: 1rem;
-
 }
 
 .competition-card {
@@ -24,41 +23,61 @@
     padding-bottom: 1.5rem;
 }
 
+/* Estilo para flechas */
+.arrow {
+    font-size: 1.2em;
+    margin-right: 10px;
+    display: inline-block;
+    border-radius: 100%;
+    transition: background-color 0.2s ease;
+}
+
+.competition-header:hover .arrow,
+.contest-header:hover .arrow {
+    background-color: #e9ecef;
+}
+
+.competition-header,
+.contest-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
 .competition-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: #1a1a1a;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #dc3545;
-    padding-bottom: 0.5rem;
+    margin: 0;
 }
 
 .contest-card {
-    background-color: #f0f4f8;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    margin-left: 20px;
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0.8rem 0;
 }
 
 .contest-title {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: #333;
-    margin-bottom: 0.8rem;
+    margin: 0;
 }
 
 .wordle-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.wordle-item {
-    background-color: #e2e8f0;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.wordle-text {
-    margin: 0;
-    color: #1f2937;
-}
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.5rem 0 0 50px;
+  }
+  
+  .wordle-item {
+    display: block;
+  }
+  
+  .wordle-badge {
+    background-color: transparent;
+    color: #015e79;
+    font-weight: 600;
+    padding: 0.4rem 0;
+    font-size: 1rem;
+  }
+  

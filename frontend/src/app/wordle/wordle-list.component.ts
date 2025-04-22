@@ -85,6 +85,7 @@ export class WordleListComponent implements OnInit {
   }
 
   deselectAll() {
+    this.isCreatingFolder = false;
     this.selectedFolders = [];
     this.selectedWordles = [];
     this.updateButtonStates();
@@ -241,6 +242,6 @@ export class WordleListComponent implements OnInit {
     if (this.isAdmin)
       this.router.navigate(['/usuarios']);
     else
-      this.router.navigate(['/']);
+      this.router.navigate(['/competiciones']);
   }
 }
