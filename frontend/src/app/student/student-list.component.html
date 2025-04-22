@@ -22,9 +22,17 @@
         </ul>
 
         <div *ngIf="currentTab === 'add-student'" class="tab-content">
-            <button class="btn primary" (click)="addStudent()">
+            <button class="btn primary" (click)="openStudentModal()">
                 + Añadir Alumno
             </button>
+
+            <div class="modal-backdrop" *ngIf="showModal" (click)="closeModalOnBackdropClick($event)">
+                <div class="modal">
+                    <app-new-student [competitionId]="competitionId" [professorName]="professorName"
+                        [competitionName]="competitionName">
+                    </app-new-student>
+                </div>
+            </div>
         </div>
 
         <div *ngIf="currentTab === 'upload-file'" class="tab-content">

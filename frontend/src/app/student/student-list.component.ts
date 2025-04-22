@@ -20,6 +20,8 @@ export class StudentListComponent implements OnInit {
 
   currentTab: string = 'add-student';
 
+  showModal: boolean = false;
+
   constructor(private competitionService: CompetitionService, private router: Router, private route: ActivatedRoute) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
@@ -44,10 +46,6 @@ export class StudentListComponent implements OnInit {
     });
   }
 
-  addStudent(): void {
-    this.router.navigate(['/nuevoAlumno'], { state: { competitionId: this.competitionId, professorName: this.professorName, competitionName: this.competitionName } });
-  }
-
   setTab(tab: string) {
     this.currentTab = tab;
   }
@@ -67,8 +65,22 @@ export class StudentListComponent implements OnInit {
       }
     });
   }
+
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
+  }
+
+  openStudentModal(): void {
+    this.showModal = true;
+  }
+
+  closeStudentModal(): void {
+    this.showModal = false;
+  }
+
+  closeModalOnBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget)
+      this.closeStudentModal();
   }
 
   goBack() {

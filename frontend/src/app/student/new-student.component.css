@@ -1,11 +1,3 @@
-.body {
-    display: grid;
-    min-height: 100vh;
-    grid-template-rows: auto 1fr auto;
-    background-color: #f9f9f9;
-    font-family: 'Inter', sans-serif;
-}
-
 .registration-card {
     max-width: 500px;
     width: 100%;

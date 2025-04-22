@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NewUser } from '../models/new-user';
 import { Observer } from 'rxjs';
 import { AuthService } from '../service/auth.service';
@@ -10,11 +10,11 @@ import { NavigationStart, Router } from '@angular/router';
   templateUrl: './new-student.component.html',
   styleUrls: ['./new-student.component.css']
 })
-export class NewStudentComponent implements OnInit {
+export class NewStudentComponent {
 
-  competitionId!: number;
-  competitionName: string = '';
-  professorName: string = '';
+  @Input() competitionId!: number;
+  @Input() professorName!: string;
+  @Input() competitionName!: string;
 
   newUser!: NewUser;
   userName!: string;
@@ -30,12 +30,6 @@ export class NewStudentComponent implements OnInit {
         }
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.competitionId = history.state.competitionId;
-    this.competitionName = history.state.competitionName;
-    this.professorName = history.state.professorName;
   }
 
   onRegister(): void {
