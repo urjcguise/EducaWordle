@@ -16,6 +16,7 @@ export class ContestViewComponent implements OnInit {
   isStudent: boolean = false;
 
   studentFinished: boolean = false;
+  studentPlaying: boolean = false;
 
   contest!: Contest;
   contestId: number = 0;
@@ -94,6 +95,7 @@ export class ContestViewComponent implements OnInit {
         for (const game of state.games) {
           if (!game.finished) {
             this.studentFinished = false;
+            this.studentPlaying = true;
             return;
           }
         }

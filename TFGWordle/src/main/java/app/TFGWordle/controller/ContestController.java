@@ -1,9 +1,6 @@
 package app.TFGWordle.controller;
 
-import app.TFGWordle.dto.EditContestDTO;
-import app.TFGWordle.dto.UserState;
-import app.TFGWordle.dto.WordleState;
-import app.TFGWordle.dto.WordleStateLog;
+import app.TFGWordle.dto.*;
 import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.jwt.JwtTokenFilter;
@@ -209,6 +206,120 @@ public class ContestController {
 
         contestService.save(newContest);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/resumeContest/{contestId}/{userName}")
+    public ResponseEntity<ResumeContestDTO> resumeContest(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        User user = userService.getByUserName(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Contest contest = contestService.getById(contestId);
+
+        if (!contestStateService.existsState(contest.getId(), user.getId())) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<WordleState.Game> games = contestStateService.getState(contest.getId(), user.getId()).getGames();
+        int firstUnfinished = -1;
+
+        for (int i = 0; i < games.size(); i++) {
+            WordleState.Game game = games.get(i);
+            boolean finished = game.isFinished();
+
+            if (!finished) {
+                firstUnfinished = i;
+                break;
+            }
+        }
+
+        List<String> logs = contestStateService.getAllLogsByContestAndUser(contest.getId(), user.getId());
+
+        ResumeContestDTO resumeContestDTO = new ResumeContestDTO();
+        resumeContestDTO.setWordlePosition(firstUnfinished);
+        resumeContestDTO.setWordleState(contestStateService.getState(contest.getId(), user.getId()));
+
+        if (logs.isEmpty()) {
+            resumeContestDTO.setTryPosition(0);
+            resumeContestDTO.setCharPosition(0);
+            resumeContestDTO.setTries(new ArrayList<>());
+            return new ResponseEntity<>(resumeContestDTO, HttpStatus.OK);
+        }
+
+        List<WordleStateLog> logsInWordle = new ArrayList<>();
+        for (String csLog : logs) {
+            WordleStateLog toAdd = contestStateService.getStateLog(csLog);
+            if (toAdd.getWordlePosition() == (firstUnfinished + 1))
+                logsInWordle.add(toAdd);
+        }
+
+        resumeContestDTO.setTries(new ArrayList<>());
+
+        if (logsInWordle.isEmpty()) {
+            resumeContestDTO.setTryPosition(0);
+            resumeContestDTO.setCharPosition(0);
+            return new ResponseEntity<>(resumeContestDTO, HttpStatus.OK);
+        }
+
+        resumeContestDTO.setTryPosition(logsInWordle.size());
+
+        final String wordleToSolve = contest.getWordles().get(firstUnfinished).getWord();
+        final int charPosition = logsInWordle.size() * wordleToSolve.length();
+        resumeContestDTO.setCharPosition(charPosition);
+
+        List<ResumeContestDTO.Try> tries = new ArrayList<>();
+
+        Map<Character, Integer> originalMap = contestStateService
+                .getContestState(contestId, user.getId())
+                .getLetterCountsList()
+                .get(firstUnfinished);
+
+        for (WordleStateLog log : logsInWordle) {
+            ResumeContestDTO.Try newTry = new ResumeContestDTO.Try();
+            Map<Character, Integer> letterCounts = new HashMap<>(originalMap);
+            List<ResumeContestDTO.Try.Letter> letters = new ArrayList<>();
+
+            String wordleInserted = log.getWordleInserted();
+
+            for (int i = 0; i < wordleToSolve.length(); i++) {
+                char expected = wordleToSolve.charAt(i);
+                char got = Character.toLowerCase(wordleInserted.charAt(i));
+
+                ResumeContestDTO.Try.Letter newLetter = new ResumeContestDTO.Try.Letter();
+                newLetter.setLetter(got);
+
+                if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+                    newLetter.setState(2);
+                    letterCounts.put(got, letterCounts.get(got) - 1);
+                }
+                else
+                    newLetter.setState(3);
+
+                letters.add(newLetter);
+            }
+
+            for (int i = 0; i < wordleToSolve.length(); i++) {
+                char got = Character.toLowerCase(wordleInserted.charAt(i));
+
+                if (letters.get(i).getState() == 3 && wordleToSolve.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+                    letters.get(i).setState(1);
+                    letterCounts.put(got, letterCounts.get(got) - 1);
+                }
+            }
+
+            for (int i = 0; i < wordleToSolve.length(); i++) {
+                if (letters.get(i).getState() == 3)
+                    letters.get(i).setState(0);
+            }
+
+            newTry.setLetters(letters);
+            tries.add(newTry);
+        }
+
+        resumeContestDTO.setTries(tries);
+
+        return new ResponseEntity<>(resumeContestDTO, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('STUDENT')")

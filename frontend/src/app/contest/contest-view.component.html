@@ -6,7 +6,7 @@
         <h3 class="competition-title">{{ competitionName }}</h3>
 
         <div class="contest-header">
-            <span class="contest-name">{{ contest.contestName }}</span>
+            <span class="contest-name" *ngIf="contest">{{ contest.contestName }}</span>
           
             <div class="button-group">
               <button *ngIf="isProfessor && !contestFinished" class="contest-button" (click)="editContest()">Editar</button>
@@ -29,15 +29,18 @@
             </ul>
 
             <div class="tab-content">
-                <div *ngIf="activeTab === 'info'" class="info-content">
+                <div *ngIf="activeTab === 'info' && contest" class="info-content">
                     <p><strong>Fecha de inicio:</strong> {{ contest.startDate | date:'dd/MM/yyyy HH:mm' }}</p>
                     <p><strong>Fecha de fin:</strong> {{ contest.endDate | date:'dd/MM/yyyy HH:mm' }}</p>
                     <p><strong>Número de intentos:</strong> {{ contest.numTries }}</p>
                     <p><strong>Usa diccionario:</strong> {{ contest.useDictionary ? 'Sí' : 'No' }}</p>
                     <p *ngIf="contest.useDictionary"><strong>Usa diccionario externo:</strong> {{contest.useExternalFile
                         ? 'Sí' : 'No' }}</p>
-                    <div *ngIf="isStudent && !studentFinished" class="mt-3">
+                    <div *ngIf="isStudent && !studentFinished && !studentPlaying" class="mt-3">
                         <button class="btn btn-success" (click)="playWordle()">🎮 Jugar</button>
+                    </div>
+                    <div *ngIf="isStudent && !studentFinished && studentPlaying" class="mt-3">
+                        <button class="btn btn-success" (click)="playWordle()">🎮 Reanudar</button>
                     </div>
                 </div>
 

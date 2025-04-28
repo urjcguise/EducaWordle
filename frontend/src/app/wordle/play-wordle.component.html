@@ -39,12 +39,12 @@
             </div>
 
             <div *ngIf="hasMoreWords && finished" class="next-word-button-container">
-                <button (click)="handleNextWord()" class="next-word-button">Siguiente palabra</button>
+                <button (click)="handleNextWord()" class="button-action">Siguiente palabra</button>
             </div>
 
             <div *ngIf="!hasMoreWords" class="completion-message">
                 ¡Has completado todas las palabras!
-                <button (click)="navigateToStatistics()" class="navigate-statistics-button">Ver estadísticas</button>
+                <button (click)="navigateToStatistics()" class="button-action">Ver estadísticas</button>
             </div>
 
             <div class="info-msg" [class.show]="infoMsg !== ''" [class.fade-out]="fadeOutInfoMessage">

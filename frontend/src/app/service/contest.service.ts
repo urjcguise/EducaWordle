@@ -5,6 +5,7 @@ import { Contest } from '../models/contest';
 import { WordleState } from '../models/wordle-state';
 import { UserState } from '../models/user-state';
 import { WordleStateLog } from '../models/wordle-state-log';
+import { ResumeContestDTO } from '../models/resume-contest';
 
 @Injectable({
   providedIn: 'root'
@@ -47,16 +48,12 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'copyContest/' + oldContestId, null);
   }
 
+  public resumeContest(contestId: number, userName: string) {
+    return this.httpClient.get<ResumeContestDTO>(this.apiUrl + 'resumeContest/' + contestId + '/' + userName);
+  }
+
   public createContestState(contestId: number, userName: string, wordleState: WordleState): Observable<any> {
-    return this.httpClient.post<any>(this.apiUrl + 'newContestState/' + contestId + '/' + userName, wordleState).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 409) {
-          console.log('El estado del concurso ya existe. No se creará nuevamente.');
-          return EMPTY;
-        }
-        return throwError(() => error);
-      })
-    );
+    return this.httpClient.post<any>(this.apiUrl + 'newContestState/' + contestId + '/' + userName, wordleState);
   }
 
   public getContestState(contestId: number, userName: string) {
@@ -84,11 +81,11 @@ export class ContestService {
   }
 
   public existsInDictionary(word: string) {
-    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInDictionary/' + word);
+    return this.httpClient.get<boolean>(this.apiUrl + 'existsInDictionary/' + word);
   }
 
   public existsInExternalDictionary(word: string, contestId: number) {
-    return this.httpClient.get<Boolean>(this.apiUrl + 'existsInExternalDictionary/' + contestId + '/' + word);
+    return this.httpClient.get<boolean>(this.apiUrl + 'existsInExternalDictionary/' + contestId + '/' + word);
   }
 
   public saveExternalDictionary(words: string[], contestId: number) {

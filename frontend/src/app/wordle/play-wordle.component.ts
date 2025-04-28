@@ -72,6 +72,7 @@ export class PlayWordleComponent {
   numTries!: number;
 
   userEmail: string = '';
+  userName: string = '';
 
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
     this.competitionName = history.state.competitionName;
@@ -98,6 +99,8 @@ export class PlayWordleComponent {
           }
           this.tries.push({ letters });
         }
+
+        this.userName = this.tokenService.getUserName() || '';
         this.setTargetWord();
         this.initializeState();
       },
@@ -109,7 +112,7 @@ export class PlayWordleComponent {
 
   private initializeState() {
 
-    this.userService.getEmail(this.tokenService.getUserName()!).subscribe({
+    this.userService.getEmail(this.userName).subscribe({
       next: (email) => {
         this.userEmail = email;
       },
@@ -125,12 +128,15 @@ export class PlayWordleComponent {
 
     this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     this.wordleState = new WordleState(this.numWordles, this.games);
-    this.contestService.createContestState(history.state.contestId, this.tokenService.getUserName()!, this.wordleState).subscribe({
+    this.contestService.createContestState(history.state.contestId, this.userName, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
       },
       error: (error) => {
-        console.error('Error creando el estado del concurso', error);
+        if (error.status === 409)
+          this.resumeGame();
+        else
+          console.error('Error creando el estado del concurso', error);
       },
     });
   }
@@ -290,7 +296,7 @@ export class PlayWordleComponent {
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.updateContestState();
           this.uploadNewLog();
-          
+
 
         } else {
           this.updateContestState();
@@ -371,7 +377,7 @@ export class PlayWordleComponent {
     });
     currentGame.state = newState;
 
-    this.contestService.updateContestState(history.state.contestId, this.tokenService.getUserName()!, this.wordleState).subscribe({
+    this.contestService.updateContestState(history.state.contestId, this.userName, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso actualizado correctamente');
         if (this.finished && !this.won)
@@ -395,7 +401,7 @@ export class PlayWordleComponent {
     );
 
     this.wordleStateLog = {
-      userName: this.tokenService.getUserName()!,
+      userName: this.userName,
       email: this.userEmail,
       dateLog: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
       wordleToGuess: '',
@@ -407,7 +413,7 @@ export class PlayWordleComponent {
       wrong: counts.wrong,
       state: this.won
     };
-    this.contestService.createContestLog(this.contest.id, this.currentWordleIndex, this.tokenService.getUserName()!, this.wordleStateLog).subscribe({
+    this.contestService.createContestLog(this.contest.id, this.currentWordleIndex, this.userName, this.wordleStateLog).subscribe({
       next: () => {
         console.log('Creado nuevo log correctamente');
         if (this.finished && !this.won)
@@ -417,7 +423,30 @@ export class PlayWordleComponent {
         console.error('Error creando el nuevo log del concurso', error);
       },
     });
-    
+  }
+
+  resumeGame() {
+    this.contestService.resumeContest(this.contest.id, this.userName).subscribe({
+      next: (resumeContestDTO) => {
+        this.curLetterIndex = resumeContestDTO.charPosition;
+        this.numSubmittedTries = resumeContestDTO.tryPosition;
+        this.currentWordleIndex = resumeContestDTO.wordlePosition;
+        this.wordleState = resumeContestDTO.wordleState;
+        this.setTargetWord();
+        if (resumeContestDTO.tries.length > 0) {
+          for (let i = 0; i < resumeContestDTO.tries.length; i++) {
+            const letters = resumeContestDTO.tries[i].letters;
+            for (let j = 0; j < this.wordleLength[this.currentWordleIndex]; j++) {
+              this.tries[i].letters[j].text = letters[j].letter;
+              this.tries[i].letters[j].state = letters[j].state;
+            }
+          }
+        }
+      },
+      error: (e) => {
+        console.error('Error reanudando el concurso', e);
+      }
+    });
   }
 
   navigateToStatistics() {
