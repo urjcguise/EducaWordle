@@ -40,8 +40,9 @@ export class FolderListComponent implements OnInit {
   folderOptions: Folder[] = [];
   dropdownVisible: boolean = false;
 
-  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router) {
+  modalVisible: boolean = false;
 
+  constructor(private route: ActivatedRoute, private wordleService: WordleService, private router: Router) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
@@ -148,10 +149,6 @@ export class FolderListComponent implements OnInit {
     this.canDeleteWordle = this.selectedWordles.length > 0 || this.selectedFolders.length > 0;
   }
 
-  createWordle() {
-    this.router.navigate([`/${this.professorName}/nuevosWordles`], { state: { folderId: this.actualFolderId } });
-  }
-
   editWordle(): void {
     if (this.selectedWordles.length === 1) {
       const selectedIndex = this.selectedWordles[0];
@@ -174,7 +171,7 @@ export class FolderListComponent implements OnInit {
       this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.actualFolderId).subscribe({
         next: () => {
           console.log('Carpeta creada correctamente');
-          this.ngOnInit();
+          this.loadFolders();
         },
         error: (e) => {
           console.error('Error creando la carpeta', e);
@@ -183,6 +180,23 @@ export class FolderListComponent implements OnInit {
       this.isCreatingFolder = false;
       this.newFolderName = '';
     }
+  }
+
+  private loadFolders() {
+    this.wordleService.getFoldersInsideFolder(this.actualFolderId).subscribe({
+      next: (folders) => {
+        this.folderList = folders;
+        this.isEditingFolder = [];
+        this.isExpanded = [];
+        this.folderList.forEach(() => {
+          this.isEditingFolder.push(false);
+          this.isExpanded.push(false);
+        });
+      },
+      error: (e) => {
+        console.error('Error obteniendo las carpetas', e);
+      }
+    });
   }
 
   editFolder(i: number) {
@@ -199,7 +213,7 @@ export class FolderListComponent implements OnInit {
 
   navigateToFolder(folder: Folder) {
     if (folder.name != '...') {
-      this.router.navigate(['/' + folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: folder.id, parentFolderId: this.actualFolderId } });
+      this.router.navigate(['/' + folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: folder.id } });
     } else {
       this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
     }
@@ -289,6 +303,15 @@ export class FolderListComponent implements OnInit {
     } else {
       console.log('No hay Wordles seleccionados para eliminar');
     }
+  }
+
+  createWordle() {
+    this.modalVisible = true;
+  }
+
+  closeModal() {
+    this.modalVisible = false;
+    this.ngOnInit();
   }
 
   goBack() {

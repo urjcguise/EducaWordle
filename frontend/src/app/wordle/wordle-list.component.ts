@@ -242,6 +242,7 @@ export class WordleListComponent implements OnInit {
 
   closeModal() {
     this.modalVisible = false;
+    this.ngOnInit();
   }
 
   goBack() {

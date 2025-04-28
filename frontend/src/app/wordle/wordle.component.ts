@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { WordleService } from '../service/wordle.service';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { TokenService } from '../service/token.service';
 
 @Component({
   selector: 'app-wordle',
   templateUrl: './wordle.component.html',
   styleUrls: ['./wordle.component.css']
 })
-export class WordleComponent implements OnInit {
+export class WordleComponent {
+
+  @Input() folderId!: number;
+  @Input() professorName!: string;
 
   wordles: string[] = [''];
-  professorName: string = '';
-  folderId: number = 0;
 
-  constructor(private wordleService: WordleService, private route: ActivatedRoute, private router: Router) {
+  constructor(private wordleService: WordleService, private route: ActivatedRoute, private router: Router, private tokenService: TokenService) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
@@ -21,11 +23,6 @@ export class WordleComponent implements OnInit {
         }
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.folderId = history.state.folderId;
-    this.professorName = this.route.snapshot.paramMap.get('professorName') || '';
   }
 
   addWordle() {

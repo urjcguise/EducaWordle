@@ -39,7 +39,7 @@ export class FolderDisplayComponent {
   }
 
   onFolderDoubleClick(): void {
-    this.router.navigate(['/' + this.folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folder.name, parentFolderId: 0 } });
+    this.router.navigate(['/' + this.folder.id + '/wordles'], { state: { professorName: this.professorName, folderName: this.folder.name } });
   }
 
   editFolderPushed() {
