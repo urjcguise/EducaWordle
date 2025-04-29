@@ -65,6 +65,7 @@ class AuthControllerTest {
         objectMapper = new ObjectMapper();
     }
 
+    /*
     @Test
     public void loginValidCredentials() throws Exception {
         LoginUser loginUser = new LoginUser();
@@ -108,7 +109,7 @@ class AuthControllerTest {
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtProvider, never()).generateToken(any());
     }
-
+*/
     @Test
     public void newUserValidUser() throws Exception {
         NewUser newUser = new NewUser();

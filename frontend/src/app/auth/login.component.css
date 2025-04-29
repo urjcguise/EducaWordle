@@ -52,3 +52,8 @@
     border-color: #CB0017;
     border-radius: 5px;
 }
+
+.form-group button:active {
+    background-color: #CB0017;
+    border-color: #CB0017;
+}

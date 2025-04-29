@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
   isLogged = false;
   isLoginFail = false;
   loginUser!: LoginUser;
-  userName!: string;
+  email!: string;
   password!: string;
   roles!: string[];
   errMsj!: string;
@@ -35,12 +35,12 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(): void {
-    this.loginUser = new LoginUser(this.userName, this.password);
+    this.loginUser = new LoginUser(this.email, this.password);
     this.authService.loginUser(this.loginUser).pipe(
       tap((data) => {
         this.isLogged = true;
         this.tokenService.setToken(data.token);
-        this.tokenService.setUserName(data.userName);
+        this.tokenService.setEmail(data.email);
         this.tokenService.setAuthorities(data.authorities);
         this.roles = data.authorities;
 
@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
         if (err && err.error && err.error.message) {
           this.errMsj = err.error.message;
         } else {
-          this.errMsj = "Error en el inicio de sesión, intente de nuevo";
+          this.errMsj = "Usuario o contraseña mal introducidos";
         }
 
         console.log(this.errMsj);

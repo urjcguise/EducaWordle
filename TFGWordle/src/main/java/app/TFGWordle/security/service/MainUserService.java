@@ -17,12 +17,12 @@ public class MainUserService implements UserDetailsService {
     UserService userService;
 
     @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        Optional<User> userOptional = userService.getByUserName(name);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> userOptional = userService.getByEmail(email);
         if (userOptional.isPresent()) {
             return MainUser.build(userOptional.get());
         } else {
-            throw new UsernameNotFoundException("Usuario no encontrado con el nombre: " + name);
+            throw new UsernameNotFoundException("Usuario no encontrado con el email: " + email);
         }
     }
 }

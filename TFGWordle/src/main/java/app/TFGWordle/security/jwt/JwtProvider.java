@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtProvider {
@@ -23,13 +25,17 @@ public class JwtProvider {
 
     public String generateToken(Authentication auth) {
         MainUser mainUser = (MainUser) auth.getPrincipal();
-        return Jwts.builder().setSubject(mainUser.getName())
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", mainUser.getUsername());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(mainUser.getEmail())
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000L))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
 
-    public String getUserNameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 

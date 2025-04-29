@@ -7,8 +7,8 @@
             <form #f="ngForm" (ngSubmit)="onLogin()" novalidate>
                 <img src="https://live.staticflickr.com/281/18733086121_83befebf2f_n.jpg" alt="Logo URJC" class="logo">
                 <div class="form-group">
-                    <label for="userName">Nombre Usuario</label>
-                    <input type="text" name="userName" id="userName" class="form-control" [(ngModel)]="userName"
+                    <label for="email">Email</label>
+                    <input type="text" name="email" id="email" class="form-control" [(ngModel)]="email"
                         required>
                 </div>
                 <div class="form-group">
@@ -17,7 +17,7 @@
                         required>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-outline-success btn-block" [disabled]="!f.valid">
+                    <button class="btn btn-block" [disabled]="!f.valid">
                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                     </button>
                 </div>
