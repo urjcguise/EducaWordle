@@ -1,0 +1,124 @@
+.body {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+}
+
+.competition-info {
+    padding: 20px 100px;
+    font-family: "Inter", sans-serif;
+}
+
+/* Título de la Competición */
+.competition-title {
+    color: black;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.competition-navbar {
+    border-top: 1px solid #eeeeee;
+    margin-top: 20px;
+}
+
+.nav-tabs {
+    border-top: 3px solid #cb0017;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.tab-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-right: 5px;
+    background-color: #ffffff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo para la pestaña activa */
+.tab-item.active {
+    background-color: #ffffff;
+    border-width: 1px 1px 2px 1px;
+    border-bottom: 3px solid #cb0017;
+    border-style: solid;
+    position: relative;
+    bottom: -1px;
+    color: #000000;
+    font-weight: bold;
+}
+
+/* Contenedor del contenido de las pestañas */
+.tab-content {
+    padding: 20px;
+    border-top: none;
+    min-height: 150px;
+}
+
+/* Estilos para el contenido de la pestaña concursos */
+.contest-name {
+    font-weight: 500;
+    font-size: 1em;
+    padding-bottom: 10px;
+    line-height: 1.75;
+    color: #015e79;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.new-contest-button {
+    margin-top: 5px;
+    background-color: white;
+    border-radius: 4px;
+    border-color: #cb0017;
+    transition: background-color 0.2s ease, transform 0.3s ease-out;
+}
+
+.new-contest-button:hover {
+    background-color: #980011;
+    color: white;
+}
+
+.delete-competition {
+    color: #e5534b;
+    background-color: white;
+    border: none;
+    border-radius: 4px;
+    float: right;
+}
+
+.delete-competition:hover {
+    background-color: #e5534b79;
+}
+
+.button-text {
+    margin-left: 2px;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 500px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+  
+  .modal-content {
+    position: relative;
+    border: none;
+  }

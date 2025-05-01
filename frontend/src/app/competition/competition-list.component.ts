@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CompetitionService } from '../service/competition.service';
 import { NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
@@ -13,6 +13,8 @@ import { Contest } from '../models/contest';
 export class CompetitionListComponent implements OnInit {
 
   showBackButton: boolean = false;
+
+  isModalOpen: boolean = false;
 
   isProfessor = false;
   isStudent = false;
@@ -99,6 +101,38 @@ export class CompetitionListComponent implements OnInit {
     });
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const targetElement = event.target as HTMLElement;
+
+    if (!targetElement.closest('.competition-list-container') && !targetElement.closest('.title-container')) {
+      this.closeModal();
+    }
+  }
+
+  toggleCompetition(competition: any) {
+    competition.isOpen = !competition.isOpen;
+  }
+
+  viewContest(contestId: number, competitionName: string) {
+    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: this.professorName } });
+  }
+
+  openCreateCompetition() {
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.competitions = [];
+    this.loadCompetitionsProfessor();
+  }
+
+  navigateToCompetitionView(competitionName: string, competitionId: number) {
+    this.router.navigate(['/competicion/' + competitionName], { state: { professorName: this.professorName, competitionId: competitionId } });
+  }
+
+  /*
   createCompetition() {
     this.router.navigate(['/nuevaCompeticion'], { state: { professorName: this.professorName } });
   }
@@ -125,15 +159,9 @@ export class CompetitionListComponent implements OnInit {
     this.router.navigate(['/' + competitionName + '/alumnos'], { state: { competitionId: competitionId, professorName: this.professorName } });
   }
 
-  toggleCompetition(competition: any) {
-    competition.isOpen = !competition.isOpen;
-  }
-
-  viewContest(contestId: number, competitionName: string) {
-    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: this.professorName } });
-  }
+  
 
   viewCompetitionRanking(competitionName: string) {
     this.router.navigate(['/' + competitionName + '/ranking'], { state: { professorName: this.professorName } });
-  }
+  }*/
 }

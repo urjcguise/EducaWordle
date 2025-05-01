@@ -1,0 +1,51 @@
+<div class="body">
+    <div class="header">
+        <app-menu (backClicked)="goBack()"></app-menu>
+    </div>
+
+    <div class="competition-info">
+        <h3 class="competition-tittle">{{ competitionName }}</h3>
+
+        <div class="competition-navbar">
+            <ul class="nav-tabs">
+                <li class="tab-item" [class.active]="activeTab === 'contests'" (click)="activeTab = 'contests'">Concursos</li>
+                <li *ngIf="isProfessor" class="tab-item" [class.active]="activeTab === 'students'"
+                    (click)="activeTab = 'students'">Alumnos
+                </li>
+                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking</li>
+            </ul>
+
+            <div class="tab-content">
+                <div *ngIf="activeTab === 'contests' && contests" class="contests-content">
+                    <div class="contests-list" *ngFor="let contest of contests">
+                        <span class="contest-name" (click)="navigateToViewContest(contest.id)">{{contest.contestName}}</span>
+                    </div>
+                    <div class="new-contest">
+                        <button class="new-contest-button" (click)="openCreateContest()">
+                            <span class="fa fa-plus"></span>
+                            <span class="button-text">Añadir nuevo concurso</span>
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="activeTab === 'students'">
+                    <app-student-list></app-student-list>
+                </div>
+                <div *ngIf="activeTab === 'ranking'">
+                    <app-competition-ranking></app-competition-ranking>    
+                </div>
+            </div>
+        </div>
+        <button class="delete-competition" (click)="deleteCompetition()">
+            <span class="fa fa-trash"></span>
+            <span class="button-text">Eliminar competición</span>
+        </button>
+    </div>
+    <app-footer></app-footer>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()"></div>
+<div class="modal" *ngIf="isModalOpen">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-contest [competitionId]="competitionId"></app-contest>
+    </div>
+  </div>

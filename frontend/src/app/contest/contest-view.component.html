@@ -21,8 +21,7 @@
                 <li *ngIf="isProfessor" class="tab-item" [class.active]="activeTab === 'wordles'"
                     (click)="activeTab = 'wordles'">Wordles
                 </li>
-                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking
-                </li>
+                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking</li>
                 <li *ngIf="isProfessor || (isStudent && studentFinished)" class="tab-item"
                     [class.active]="activeTab === 'stats'" (click)="activeTab = 'stats'">Estadísticas
                 </li>

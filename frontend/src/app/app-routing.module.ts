@@ -4,9 +4,7 @@ import { IndexComponent } from './index/index.component';
 import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
 import { prodGuard } from './guards/prod.guard';
-import { CompetitionComponent } from './competition/competition.component';
 import { CompetitionListComponent } from './competition/competition-list.component';
-import { ContestComponent } from './contest/contest.component';
 import { ContestListComponent } from './contest/contest-list.component';
 import { EditContestComponent } from './contest/edit-contest.component';
 import { PlayWordleComponent } from './wordle/play-wordle.component';
@@ -22,6 +20,7 @@ import { FolderListComponent } from './folder/folder-list.component';
 import { ContestViewComponent } from './contest/contest-view.component';
 import { CompetitionRankingComponent } from './competition/competition-ranking.component';
 import { WordleListStudentComponent } from './wordle/wordle-list-student.component';
+import { CompetitionViewComponent } from './competition/competition-view.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
@@ -29,14 +28,13 @@ const routes: Routes = [
   { path: 'registrar', component: RegisterComponent, canActivate: [prodGuard], data: { expectedRol: ['admin'] } },
   { path: 'usuarios', component: UserListComponent, canActivate: [prodGuard], data: { expectedRol: ['admin'] } },
   { path: 'wordle', component: PlayWordleComponent, canActivate: [prodGuard], data: { expectedRol: ['student'] } },
-  { path: 'nuevaCompeticion', component: CompetitionComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: 'competiciones', component: CompetitionListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
+  { path: 'competicion/:competitionName', component: CompetitionViewComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':competitionName/ranking', component: CompetitionRankingComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: 'wordles', component: WordleListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: 'wordlesResueltos', component: WordleListStudentComponent, canActivate: [prodGuard], data: { expectedRol: ['student'] } },
   { path: ':folderId/wordles', component: FolderListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':wordle/editarWordle', component: EditWordleComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
-  { path: 'nuevoConcurso', component: ContestComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':competitionName/concursos', component: ContestListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: ':contestId/concurso', component: ContestViewComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: ':contestId/editarConcurso', component: EditContestComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },

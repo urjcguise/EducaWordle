@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CompetitionService } from '../service/competition.service';
 import { Competition } from '../models/competition';
@@ -11,11 +11,12 @@ import { NavigationStart, Router } from '@angular/router';
 })
 export class CompetitionComponent {
 
-  competitionForm: FormGroup;
-  professorName: string = '';
+  @Input() professorName: string = '';
 
+
+  competitionForm: FormGroup;
+  
   constructor(private fb: FormBuilder, private competitionService: CompetitionService, private router: Router) {
-    this.professorName = history.state.professorName;
     this.competitionForm = this.fb.group({
       competitionName: ['', Validators.required]
     });

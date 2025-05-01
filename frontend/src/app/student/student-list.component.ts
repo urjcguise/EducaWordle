@@ -36,6 +36,10 @@ export class StudentListComponent implements OnInit {
     this.competitionId = history.state.competitionId;
     this.professorName = history.state.professorName;
     this.competitionName = this.route.snapshot.paramMap.get('competitionName') || '';
+    this.loadStudents();
+  }
+
+  loadStudents() {
     this.competitionService.getStudentsByCompetition(this.competitionName).subscribe({
       next: (stdts) => {
         this.students = stdts;
@@ -76,6 +80,8 @@ export class StudentListComponent implements OnInit {
 
   closeStudentModal(): void {
     this.showModal = false;
+    this.students = [];
+    this.loadStudents();
   }
 
   closeModalOnBackdropClick(event: MouseEvent) {

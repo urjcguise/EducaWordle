@@ -1,11 +1,7 @@
-.body {
-    display: grid;
-    min-height: 100vh;
-    grid-template-rows: auto 1fr auto;
-}
-
 .main-ranking {
     margin: 20px auto;
+    max-width: 800px;
+    font-family: "Inter", sans-serif;
 }
 
 .main-ranking label {
@@ -19,7 +15,7 @@
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
-    font-family: "Inter", sans-serif;
+    
 }
 
 .main-ranking thead th {
@@ -29,6 +25,7 @@
     padding: 10px;
     text-transform: uppercase;
     font-size: 14px;
+    text-align: center;
 }
 
 .main-ranking tbody tr {
@@ -43,6 +40,7 @@
     padding: 10px;
     font-size: 14px;
     color: #555;
+    text-align: center;
 }
 
 .main-ranking tbody tr:hover {

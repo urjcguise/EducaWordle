@@ -1,7 +1,4 @@
 <div class="body">
-    <div class="header">
-        <app-menu (backClicked)="goBack()"></app-menu>
-    </div>
     <div class="container">
         <h2>Crear Nueva Competición</h2>
         <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
@@ -16,5 +13,4 @@
             </button>
         </form>
     </div>
-    <app-footer></app-footer>
 </div>

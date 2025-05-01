@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -11,12 +11,11 @@ import { NavigationStart, Router } from '@angular/router';
 })
 export class ContestComponent implements OnInit {
 
+  @Input() competitionId!: number;
+
   contestForm!: FormGroup;
-  competitionId!: number;
-  competitionName: string = '';
 
   constructor(private fb: FormBuilder, private contestService: ContestService, private router: Router) {
-    this.competitionName = history.state.competitionName;
     this.contestForm = this.fb.group({
       contestName: ['', Validators.required],
       startDate: ['', Validators.required],

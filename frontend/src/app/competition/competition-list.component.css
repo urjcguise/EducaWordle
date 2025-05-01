@@ -2,22 +2,43 @@
   display: grid;
   min-height: 100vh;
   grid-template-rows: auto auto 1fr auto;
+  font-family: "Inter", sans-serif;
 }
 
-/* Cuando un alumno no está en ninguna competición */
+.title-container {
+  display: flex;
+  align-items: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px 15px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.title-container h1 {
+  margin: 0;
+  font-size: 2em;
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 330px;
+}
+
+.new-competition {
+  flex-shrink: 0;
+}
+
 .no-competition {
-  justify-content: flex-start;
-  margin: 15px;
+  margin: 15px 20px;
+  color: #6c757d;
 }
 
 .competition-list-container {
   width: 100%;
-  max-width: 1200px;
-  margin: 20px auto;
+  max-width: 800px;
+  margin: 0 auto 20px auto;
   padding: 0 15px;
-  font-family: "Inter", sans-serif;
 }
-
 
 .competition-list {
   border-radius: 4px;
@@ -25,41 +46,38 @@
 }
 
 .competition-item {
-  /* Línea separadora entre competiciones */
   margin-bottom: 10px;
 }
 
-/* Evita la línea doble al final */
-.competition-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0px;
-}
-
-
 .competition-header {
-  padding: 4px;
+  padding: 10px 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  /* Color de la línea separadora de competiciones */
   border-bottom: 1px solid #DEE2E6;
+  gap: 10px;
 }
 
 .competition-header h3 {
-  padding-top: 10px;
+  margin: 0;
+  flex-grow: 1;
+  font-size: 1.1em;
 }
 
-/* Estilo para la flecha */
+.competition-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .arrow {
-  font-size: 1.2em;
-  margin-right: 5px;
-  display: inline-block;
-  border-radius: 100%;
-  transition: background-color 0.2s ease;
+  font-size: 1.1em;
+  transition: background-color 0.2s ease, transform 0.3s ease-out;
+  padding: 5px;
+  border-radius: 50%;
+  line-height: 1;
 }
 
 .competition-header:hover .arrow {
-  /* Color para el hover de la flecha */
   background-color: #e9ecef;
 }
 
@@ -68,30 +86,23 @@
   padding: 0;
   margin: 0;
   margin-left: 28px;
-  transition: 0.3s ease-out;
 }
 
 .contest-item {
-  padding: 12px 15px 12px 40px;
-  /* Color de la línea separadora de concursos */
+  padding: 10px 15px 10px 40px;
   border-bottom: 1px solid #DEE2E6;
   font-size: 1em;
   background-color: #ffffff;
-  /* Color de la letra */
   color: #015e79;
 }
 
-.new-competition {
-  display: flex;
-  justify-content: flex-end;
-  padding: 15px 20px;
+.contest-link {
+  cursor: pointer;
 }
 
 .new-competition-button {
-  /* Color de fondo del botón */
   background-color: #cb0017;
   border-color: #cb0017;
-  /* Color del texto del botón */
   color: white;
   padding: 10px 20px;
   border: none;
@@ -102,34 +113,28 @@
 }
 
 .new-competition-button:hover {
-  /* Color del botón al pasar el ratón */
   background-color: #980011;
 }
 
-.competition-buttons {
-  /* Color de fondo del botón */
-  background-color: #cb0017;
-  border-color: #cb0017;
-  /* Color del texto del botón */
-  color: white;
-  padding: 8px 16px;
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 500px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-content {
+  position: relative;
   border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9em;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin-left: 10px;
-}
-
-.competition-buttons:hover {
-  /* Color del botón al pasar el ratón */
-  background-color: #980011;
-}
-
-.competition-buttons p {
-  margin: 0;
-}
-
-.contest-link {
-  cursor: pointer;
 }

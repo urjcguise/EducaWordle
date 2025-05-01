@@ -1,9 +1,3 @@
-.body {
-    display: grid;
-    min-height: 100vh;
-    grid-template-rows: auto 1fr auto;
-}
-
 .contest-creation-card {
     max-width: 600px;
     width: 100%;

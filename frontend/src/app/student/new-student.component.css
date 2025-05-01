@@ -1,3 +1,47 @@
+.create-student-navbar {
+    border-top: 1px solid #eeeeee;
+    margin-top: 20px;
+}
+
+.nav-tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.tab-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-right: 5px;
+    background-color: #ffffff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo para la pestaña activa */
+.tab-item.active {
+    background-color: #ffffff;
+    border-width: 1px 1px 2px 1px;
+    border-bottom: 3px solid #cb0017;
+    border-style: solid;
+    position: relative;
+    bottom: -1px;
+    color: #000000;
+    font-weight: bold;
+}
+
+/* Contenedor del contenido de las pestañas */
+.tab-content {
+    padding: 20px;
+    border-top: none;
+    min-height: 150px;
+}
+
 .registration-card {
     max-width: 500px;
     width: 100%;
@@ -29,4 +73,20 @@
 
 .btn-success:hover:not(:disabled) {
     background-color: #a30013;
+}
+
+.btn.primary {
+    margin-top: 10px;
+    background-color: #cb0017;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn.primary:hover {
+    background-color: #980011;
 }

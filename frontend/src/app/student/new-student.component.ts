@@ -1,9 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NewUser } from '../models/new-user';
 import { Observer } from 'rxjs';
 import { AuthService } from '../service/auth.service';
 import { CompetitionService } from '../service/competition.service';
-import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-student',
@@ -15,6 +14,7 @@ export class NewStudentComponent {
   @Input() competitionId!: number;
   @Input() professorName!: string;
   @Input() competitionName!: string;
+  @Output() close = new EventEmitter<void>();
 
   newUser!: NewUser;
   userName!: string;
@@ -22,18 +22,13 @@ export class NewStudentComponent {
   password!: string;
   errMsj!: string;
 
-  constructor(private authService: AuthService, private competitionService: CompetitionService, private router: Router) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
-        if (event.navigationTrigger == 'popstate') {
-          this.goBack();
-        }
-      }
-    });
-  }
+  selectedFile: File | null = null;
+
+  activeTab: string = 'single';
+
+  constructor(private authService: AuthService, private competitionService: CompetitionService) { }
 
   onRegister(): void {
-
     const roles: string[] = ['student'];
 
     this.newUser = new NewUser(this.userName, this.email, this.password, roles);
@@ -50,13 +45,30 @@ export class NewStudentComponent {
       },
       complete: () => {
         alert('Usuario creado correctamente');
+        this.close.emit();
       }
     };
 
     this.authService.new(this.newUser).subscribe(observer);
   }
 
-  goBack() {
-    this.router.navigate(['/' + this.competitionName + '/alumnos'], { state: { professorName: this.professorName, competitionId: this.competitionId } });
+  addStudentExcel() {
+    if (!this.selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile!);
+
+    this.competitionService.addByExcel(this.competitionId, formData).subscribe({
+      next: () => {
+        alert('Alumnos creados correctamente');
+      },
+      error: (error) => {
+        console.error('Error creando los alumnos', error);
+      }
+    });
+  }
+
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
   }
 }

@@ -1,55 +1,49 @@
-<div class="body">
-  <div class="header">
-    <app-menu (backClicked)="goBack()"></app-menu>
-  </div>
+<div class="container d-flex align-items-center justify-content-center flex-grow-1 py-4">
+  <div class="contest-creation-card p-4">
+    <div class="card-body">
+      <h4 class="card-title text-center mb-4">Crear Nuevo Concurso</h4>
 
-  <div class="container d-flex align-items-center justify-content-center flex-grow-1 py-4">
-    <div class="card shadow contest-creation-card p-4">
-      <div class="card-body">
-        <h4 class="card-title text-center mb-4">Crear Nuevo Concurso</h4>
-
-        <form [formGroup]="contestForm" (ngSubmit)="createContest()">
-          <div class="form-group mb-3">
-            <label for="contestName" class="form-label">Nombre del Concurso</label>
-            <input type="text" id="contestName" formControlName="contestName" class="form-control"
-              placeholder="Escribe el nombre del concurso"
-              [class.is-invalid]="contestForm.get('contestName')?.invalid && (contestForm.get('contestName')?.touched || contestForm.get('contestName')?.dirty)">
-            <div
-              *ngIf="contestForm.get('contestName')?.errors?.['required'] && (contestForm.get('contestName')?.touched || contestForm.get('contestName')?.dirty)"
-              class="invalid-feedback">
-              El nombre del concurso es obligatorio.
-            </div>
+      <form [formGroup]="contestForm" (ngSubmit)="createContest()">
+        <div class="form-group mb-3">
+          <label for="contestName" class="form-label">Nombre del Concurso</label>
+          <input type="text" id="contestName" formControlName="contestName" class="form-control"
+            placeholder="Escribe el nombre del concurso"
+            [class.is-invalid]="contestForm.get('contestName')?.invalid && (contestForm.get('contestName')?.touched || contestForm.get('contestName')?.dirty)">
+          <div
+            *ngIf="contestForm.get('contestName')?.errors?.['required'] && (contestForm.get('contestName')?.touched || contestForm.get('contestName')?.dirty)"
+            class="invalid-feedback">
+            El nombre del concurso es obligatorio.
           </div>
+        </div>
 
-          <div class="form-group mb-3">
-            <label for="startDate" class="form-label">Fecha y Hora de Inicio</label>
-            <input type="datetime-local" id="startDate" formControlName="startDate" class="form-control"
-              [class.is-invalid]="contestForm.get('startDate')?.invalid && (contestForm.get('startDate')?.touched || contestForm.get('startDate')?.dirty)">
-            <div
-              *ngIf="contestForm.get('startDate')?.errors?.['required'] && (contestForm.get('startDate')?.touched || contestForm.get('startDate')?.dirty)"
-              class="invalid-feedback">
-              La fecha de inicio es obligatoria.
-            </div>
+        <div class="form-group mb-3">
+          <label for="startDate" class="form-label">Fecha y Hora de Inicio</label>
+          <input type="datetime-local" id="startDate" formControlName="startDate" class="form-control"
+            [class.is-invalid]="contestForm.get('startDate')?.invalid && (contestForm.get('startDate')?.touched || contestForm.get('startDate')?.dirty)">
+          <div
+            *ngIf="contestForm.get('startDate')?.errors?.['required'] && (contestForm.get('startDate')?.touched || contestForm.get('startDate')?.dirty)"
+            class="invalid-feedback">
+            La fecha de inicio es obligatoria.
           </div>
+        </div>
 
-          <div class="form-group mb-4"> <label for="endDate" class="form-label">Fecha y Hora de Fin</label>
-            <input type="datetime-local" id="endDate" formControlName="endDate" class="form-control"
-              [class.is-invalid]="contestForm.get('endDate')?.invalid && (contestForm.get('endDate')?.touched || contestForm.get('endDate')?.dirty)">
-            <div
-              *ngIf="contestForm.get('endDate')?.errors?.['required'] && (contestForm.get('endDate')?.touched || contestForm.get('endDate')?.dirty)"
-              class="invalid-feedback">
-              La fecha de fin es obligatoria.
-            </div>
+        <div class="form-group mb-4"> <label for="endDate" class="form-label">Fecha y Hora de Fin</label>
+          <input type="datetime-local" id="endDate" formControlName="endDate" class="form-control"
+            [class.is-invalid]="contestForm.get('endDate')?.invalid && (contestForm.get('endDate')?.touched || contestForm.get('endDate')?.dirty)">
+          <div
+            *ngIf="contestForm.get('endDate')?.errors?.['required'] && (contestForm.get('endDate')?.touched || contestForm.get('endDate')?.dirty)"
+            class="invalid-feedback">
+            La fecha de fin es obligatoria.
           </div>
+        </div>
 
-          <div class="form-group text-center">
-            <button type="submit" class="btn btn-primary btn-lg" [disabled]="contestForm.invalid">
-              <i class="fas fa-plus me-2"></i> Crear Concurso
-            </button>
-          </div>
-        </form>
+        <div class="form-group text-center">
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="contestForm.invalid">
+            <i class="fas fa-plus me-2"></i> Crear Concurso
+          </button>
+        </div>
+      </form>
 
-      </div>
     </div>
-  </div> <app-footer></app-footer>
+  </div>
 </div>
