@@ -14,14 +14,14 @@
 }
 
 .button-bar button {
-    padding: 8px 15px;
-    margin-right: 10px;
-    border: 1px solid #dc3545;
-    background-color: #dc3545;
+    font-size: calc(0.90375rem + 0.045vw);
+    margin-right: 5px;
+    border-radius: 0.5rem;
     color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    background-color: #cb0017;
+    border-color: #cb0017;
+    padding: 0.375rem 0.75rem;
+    transition: background-color 0.3s;
 }
 
 .button-bar button:hover {
@@ -29,12 +29,12 @@
 }
 
 .button-bar button.delete-button {
-    border-color: #dc3545;
-    background-color: #dc3545;
+    background-color: #cb0017;
+    border-color: #cb0017;
 }
 
 .button-bar button.delete-button:hover {
-    background-color: #c82333;
+    border-color: #cb0017;
 }
 
 .button-bar button.save-button {
@@ -248,17 +248,17 @@ li.disabled:hover {
 }
 
 .modal-create-button-area button {
-    padding: 8px 15px;
-    background-color: #dc3545;
-    border: 1px solid #dc3545;
+    font-size: calc(0.90375rem + 0.045vw);
+    padding: 0.375rem 0.75rem;
+    background-color: #cb0017;
+    border-color: #cb0017;
     color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
 }
 
 .modal-create-button-area button:hover {
-    background-color: #c82333;
+    background-color: #980011;
 }
 
 .create-new-input-area {

@@ -41,19 +41,37 @@
 
 /* Botones */
 .contest-button {
+    font-size: calc(0.90375rem + 0.045vw);
     background-color: #cb0017;
     border-color: #cb0017;
     color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .contest-button:hover {
-    background-color: #a50013;
+    background-color: #980011;
+}
+
+.delete-button {
+    font-size: calc(0.90375rem + 0.045vw);
+    color: #e5534b;
+    background-color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    float: right;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #e5534b79;
+}
+
+.button-text {
+    margin-left: 2px;
 }
 
 .contest-navbar {

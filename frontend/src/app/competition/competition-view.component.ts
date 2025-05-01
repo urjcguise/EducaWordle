@@ -19,7 +19,7 @@ export class CompetitionViewComponent implements OnInit {
   competitionId: number = 0;
   contests: Contest[] = [];
 
-  activeTab: string = 'ranking';
+  activeTab: string = 'contests';
 
   isModalOpen: boolean = false;
 

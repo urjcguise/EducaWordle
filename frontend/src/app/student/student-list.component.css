@@ -7,12 +7,11 @@
 .btn.primary {
   margin-top: 10px;
   background-color: #cb0017;
+  border-color: #cb0017;
   color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 0.9em;
-  cursor: pointer;
+  font-size: calc(0.90375rem + 0.045vw);
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
   transition: background-color 0.3s;
 }
 

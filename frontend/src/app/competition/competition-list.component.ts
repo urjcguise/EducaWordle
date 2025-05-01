@@ -21,7 +21,7 @@ export class CompetitionListComponent implements OnInit {
   isAdmin = false;
   roles: string[] = [];
 
-  noCompetitions = true;
+  noCompetitions = false;
   competitions: {
     id: number;
     name: string;
