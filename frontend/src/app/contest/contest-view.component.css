@@ -90,23 +90,24 @@
 .tab-item {
     padding: 10px 20px;
     cursor: pointer;
-    border: 1px solid transparent;
-    border-bottom: none;
-    margin-right: 5px;
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: transparent;
     background-color: #ffffff;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     transition: background-color 0.3s ease;
 }
 
+.tab-item:hover {
+    background-color: #f8f9fa;
+    border-bottom: 3px solid #cb0017;
+}
+
 /* Estilo para la pestaña activa */
 .tab-item.active {
     background-color: #ffffff;
-    border-width: 1px 1px 2px 1px;
     border-bottom: 3px solid #cb0017;
-    border-style: solid;
-    position: relative;
-    bottom: -1px;
     color: #000000;
     font-weight: bold;
 }

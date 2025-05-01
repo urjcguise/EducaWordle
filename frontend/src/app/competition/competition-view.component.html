@@ -8,17 +8,20 @@
 
         <div class="competition-navbar">
             <ul class="nav-tabs">
-                <li class="tab-item" [class.active]="activeTab === 'contests'" (click)="activeTab = 'contests'">Concursos</li>
+                <li class="tab-item" [class.active]="activeTab === 'contests'" (click)="activeTab = 'contests'">
+                    Concursos</li>
                 <li *ngIf="isProfessor" class="tab-item" [class.active]="activeTab === 'students'"
                     (click)="activeTab = 'students'">Alumnos
                 </li>
-                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking</li>
+                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking
+                </li>
             </ul>
 
             <div class="tab-content">
                 <div *ngIf="activeTab === 'contests' && contests" class="contests-content">
                     <div class="contests-list" *ngFor="let contest of contests">
-                        <span class="contest-name" (click)="navigateToViewContest(contest.id)">{{contest.contestName}}</span>
+                        <span class="contest-name"
+                            (click)="navigateToViewContest(contest.id)">{{contest.contestName}}</span>
                     </div>
                     <div class="new-contest">
                         <button class="new-contest-button" (click)="openCreateContest()">
@@ -31,7 +34,7 @@
                     <app-student-list></app-student-list>
                 </div>
                 <div *ngIf="activeTab === 'ranking'">
-                    <app-competition-ranking></app-competition-ranking>    
+                    <app-competition-ranking></app-competition-ranking>
                 </div>
             </div>
         </div>
@@ -43,9 +46,8 @@
     <app-footer></app-footer>
 </div>
 
-<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()"></div>
-<div class="modal" *ngIf="isModalOpen">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <app-contest [competitionId]="competitionId"></app-contest>
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModalOnBackdropClick($event)">
+    <div class="modal">
+        <app-contest [competitionId]="competitionId"></app-contest>
     </div>
-  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
@@ -70,15 +70,6 @@ export class CompetitionViewComponent implements OnInit {
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
-    const targetElement = event.target as HTMLElement;
-
-    if (!targetElement.closest('.competition-navbar')) {
-      this.closeModal();
-    }
-  }
-
   openCreateContest() {
     this.isModalOpen = true;
   }
@@ -87,6 +78,11 @@ export class CompetitionViewComponent implements OnInit {
     this.isModalOpen = false;
     this.contests = [];
     this.loadContests();
+  }
+  
+  closeModalOnBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget)
+      this.closeModal();
   }
 
   goBack() {

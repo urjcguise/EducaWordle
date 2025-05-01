@@ -261,6 +261,10 @@ li.disabled:hover {
     background-color: #980011;
 }
 
+.button-text {
+    margin-left: 4px;
+}
+
 .create-new-input-area {
     padding: 15px 10px;
     margin: 10px 0 15px 0;

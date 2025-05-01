@@ -19,17 +19,19 @@
 }
 
 .delete-button {
-    height: 40px;
-    width: 40px;
-    padding: 0;
-    display: flex;
+    padding: 0.375rem 0.75rem;
+    transition: background-color 0.3s;
     justify-content: center;
     align-items: center;
     background-color: #cb0017;
     border: none;
     color: white;
-    font-size: 1rem;
-    border-radius: 0.25rem;
+    font-size: calc(0.90375rem + 0.045vw);
+    border-radius: 0.5rem;
+}
+
+.delete-button:hover {
+    background-color: #980011;
 }
 
 .button-group {
@@ -40,13 +42,14 @@
 }
 
 .add-wordle-button {
+    font-size: calc(0.90375rem + 0.045vw);
+    border-radius: 0.5rem;
     background-color: white;
     border-color: #cb0017;
     color: #cb0017;
     font-weight: 500;
-    font-size: 1rem;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.375rem 0.75rem;
+    transition: background-color 0.3s;
     display: flex;
     align-items: center;
 }

@@ -50,7 +50,10 @@
         <h3>{{ isCreatingNewWordle ? 'Crear Nuevo Wordle' : 'Selecciona Wordles para añadir' }}</h3>
 
         <div class="modal-create-button-area" *ngIf="!isCreatingNewWordle">
-            <button (click)="startCreateNewWordle()">+ Crear nuevo</button>
+            <button (click)="startCreateNewWordle()">
+                <span class="fa fa-plus"></span>
+                <span class="button-text">Crear nuevo</span>
+            </button>
         </div>
 
         <div class="modal-list">

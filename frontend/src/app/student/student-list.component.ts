@@ -16,10 +16,6 @@ export class StudentListComponent implements OnInit {
   students: User[] = [];
   competitionId!: number;
 
-  selectedFile: File | null = null;
-
-  currentTab: string = 'add-student';
-
   showModal: boolean = false;
 
   constructor(private competitionService: CompetitionService, private router: Router, private route: ActivatedRoute) {
@@ -48,30 +44,6 @@ export class StudentListComponent implements OnInit {
         console.error('Error consiguiendo los alumnos', error);
       }
     });
-  }
-
-  setTab(tab: string) {
-    this.currentTab = tab;
-  }
-
-  addStudentExcel() {
-    if (!this.selectedFile) return;
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile!);
-
-    this.competitionService.addByExcel(this.competitionId, formData).subscribe({
-      next: () => {
-        alert('Alumnos creados correctamente');
-      },
-      error: (error) => {
-        console.error('Error creando los alumnos', error);
-      }
-    });
-  }
-
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
   }
 
   openStudentModal(): void {
