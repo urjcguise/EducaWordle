@@ -49,7 +49,7 @@
                     <app-student-list></app-student-list>
                 </div>
                 <div *ngIf="activeTab === 'ranking'">
-                    <app-competition-ranking></app-competition-ranking>
+                    <app-competition-ranking [competitionId]="competitionId"></app-competition-ranking>
                 </div>
             </div>
         </div>

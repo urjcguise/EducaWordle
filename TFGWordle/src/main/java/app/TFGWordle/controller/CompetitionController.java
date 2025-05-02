@@ -58,7 +58,7 @@ public class CompetitionController {
         User professor = userService.getByUserName(professorName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (competitionService.existsCompetitionByName(competition.getCompetitionName()))
+        if (competitionService.existsCompetitionByNameAndProfesor(professor.getId(), competition.getCompetitionName()))
             return new ResponseEntity<>("Nombre ya utilizado", HttpStatus.CONFLICT);
 
         competition.setProfessor(professor);
@@ -112,10 +112,10 @@ public class CompetitionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/getStudents/{competitionName}")
-    public ResponseEntity<List<User>> getStudents(@PathVariable String competitionName) {
-        return competitionService.existsCompetitionByName(competitionName)
-                ? new ResponseEntity<>(participationService.findStudentsByCompetition(competitionName), HttpStatus.OK)
+    @GetMapping("/getStudents/{competitionId}")
+    public ResponseEntity<List<User>> getStudents(@PathVariable Long competitionId) {
+        return competitionService.existsCompetition(competitionId)
+                ? new ResponseEntity<>(participationService.findStudentsByCompetition(competitionId), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 

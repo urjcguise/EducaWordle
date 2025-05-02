@@ -65,7 +65,7 @@ public class WordleController {
         List<Wordle> toSave = new ArrayList<>();
 
         for (String wordle : wordles) {
-            Wordle newWordle = new Wordle(wordle, contests, professor);
+            Wordle newWordle = new Wordle(wordle.toUpperCase(), contests, professor);
             if (folderId != 0)
                 newWordle.setFolder(folderService.getById(folderId));
             toSave.add(newWordle);
@@ -112,7 +112,7 @@ public class WordleController {
             return new ResponseEntity<>("No existe la palabra " + wordle, HttpStatus.NOT_FOUND);
 
         Wordle wordleToEdit = wordleService.getByWord(wordle);
-        wordleToEdit.setWord(newWordle);
+        wordleToEdit.setWord(newWordle.toUpperCase());
         wordleService.save(wordleToEdit);
 
         for (Contest contest : wordleToEdit.getContests()) {
@@ -134,7 +134,7 @@ public class WordleController {
         Wordle wordle = wordleService.getByWord(wordInitial);
         List<Contest> oldContests = new ArrayList<>(wordle.getContests());
 
-        wordle.setWord(wordUpdated);
+        wordle.setWord(wordUpdated.toUpperCase());
         wordle.setContests(contests);
 
         for (Contest oldContest : oldContests) {
@@ -233,7 +233,7 @@ public class WordleController {
 
         for (int i = 0; i < wordle.length(); i++) {
             char expected = wordle.charAt(i);
-            char got = Character.toLowerCase(word.charAt(i));
+            char got = Character.toUpperCase(word.charAt(i));
 
             if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                 toReturn.add(2);
@@ -244,7 +244,7 @@ public class WordleController {
         }
 
         for (int i = 0; i < wordle.length(); i++) {
-            char got = Character.toLowerCase(word.charAt(i));
+            char got = Character.toUpperCase(word.charAt(i));
             if (toReturn.get(i) == 3 && wordle.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                 toReturn.set(i, 1);
                 letterCounts.put(got, letterCounts.get(got) - 1);

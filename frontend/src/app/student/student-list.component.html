@@ -14,7 +14,7 @@
 <div class="modal-backdrop" *ngIf="showModal" (click)="closeModalOnBackdropClick($event)">
     <div class="modal">
         <app-new-student [competitionId]="competitionId" [professorName]="professorName"
-            [competitionName]="competitionName" (close)="closeStudentModal()">
+            [competitionId]="competitionId" (close)="closeStudentModal()">
         </app-new-student>
     </div>
 </div>

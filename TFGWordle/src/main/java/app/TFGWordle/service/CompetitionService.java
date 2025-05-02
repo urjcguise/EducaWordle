@@ -44,6 +44,10 @@ public class CompetitionService {
         return competitionRepository.existsByName(name);
     }
 
+    public boolean existsCompetitionByNameAndProfesor(Long professorId, String competitionName) {
+        return competitionRepository.existsByNameAndProfesor(professorId, competitionName);
+    }
+
     public List<Participation> getParticipations(Long id) {
         return competitionRepository.getParticipationsById(id);
     }

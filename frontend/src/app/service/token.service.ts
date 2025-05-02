@@ -28,8 +28,7 @@ export class TokenService {
 
     try {
       const payload = token.split('.')[1];
-      const decodedPayload = atob(payload);
-      const parsedPayload = JSON.parse(decodedPayload);
+      const parsedPayload = JSON.parse(decodeJwtPayload(payload));
       return parsedPayload.username || '';
     } catch (e) {
       return '';
@@ -63,4 +62,15 @@ export class TokenService {
   public logOut(): void {
     window.sessionStorage.clear();
   }
+}
+
+function decodeJwtPayload(payload: string): string {
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+    .split('')
+    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)) 
+    .join('')
+  );
+  return jsonPayload;
 }

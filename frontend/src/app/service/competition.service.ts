@@ -30,8 +30,8 @@ export class CompetitionService {
     return this.httpClient.delete<Contest>(this.apiUrl + 'deleteCompetition/' + id);
   }
 
-  public getStudentsByCompetition(competitionName: string): Observable<User[]> {
-    return this.httpClient.get<User[]>(this.apiUrl + 'getStudents/' + competitionName);
+  public getStudentsByCompetition(competitionId: number): Observable<User[]> {
+    return this.httpClient.get<User[]>(this.apiUrl + 'getStudents/' + competitionId);
   }
 
   public createUser(competitionId: number, userId: number): Observable<any> {

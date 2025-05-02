@@ -14,8 +14,8 @@ public class ParticipationService {
     @Autowired
     private ParticipationRepository participationRepository;
 
-    public List<User> findStudentsByCompetition(String competitionName) {
-        return participationRepository.findByCompetitionName(competitionName);
+    public List<User> findStudentsByCompetition(Long competitionId) {
+        return participationRepository.findByCompetitionId(competitionId);
     }
 
     public List<Participation> findParticipationsByStudent(Long studentId) {

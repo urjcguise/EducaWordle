@@ -8,9 +8,6 @@ import java.util.Optional;
 
 public interface WordleRepository extends JpaRepository<Wordle, Long> {
     Optional<Wordle> findByWord(String word);
-    void deleteByContestsId(Long id);
-
     List<Wordle> findByContestsId(Long id);
-
     List<Wordle> findByUserId(Long id);
 }

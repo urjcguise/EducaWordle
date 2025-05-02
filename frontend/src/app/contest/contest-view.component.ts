@@ -62,7 +62,7 @@ export class ContestViewComponent implements OnInit {
   }
 
   editContest() {
-    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/editarConcurso'], { state: { professorName: history.state.professorName } });
+    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/editarConcurso'], { state: { professorName: history.state.professorName, competitionName: this.competitionName } });
   }
 
   deleteContest() {

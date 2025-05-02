@@ -46,7 +46,7 @@ export class CompetitionViewComponent implements OnInit {
   }
 
   loadContests() {
-    this.contestService.getContestsByCompetition(this.competitionName).subscribe({
+    this.contestService.getContestsByCompetition(this.competitionId).subscribe({
       next: (cont) => {
         this.contests = cont;
       },

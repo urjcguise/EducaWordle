@@ -64,6 +64,7 @@ export class CompetitionListComponent implements OnInit {
     this.userService.getCompetitionsByUserName(this.tokenService.getUserName()!).subscribe({
       next: (data) => {
         if (data.length != 0) {
+          this.competitions = [];
           data.forEach(compe => {
             this.competitions.push({
               id: compe.id,
@@ -87,6 +88,7 @@ export class CompetitionListComponent implements OnInit {
     this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (data) => {
         data.forEach(compe => {
+          this.competitions = [];
           this.competitions.push({
             id: compe.id,
             name: compe.competitionName,
@@ -131,37 +133,4 @@ export class CompetitionListComponent implements OnInit {
   navigateToCompetitionView(competitionName: string, competitionId: number) {
     this.router.navigate(['/competicion/' + competitionName], { state: { professorName: this.professorName, competitionId: competitionId } });
   }
-
-  /*
-  createCompetition() {
-    this.router.navigate(['/nuevaCompeticion'], { state: { professorName: this.professorName } });
-  }
-
-  createContest(name: string, id: number) {
-    this.router.navigate(['/nuevoConcurso'], { state: { competitionName: name, competitionId: id } });
-  }
-
-  deleteCompetition(id: number): void {
-    const confirmDelete = confirm('¿Está seguro de que desea eliminar esta competición?');
-    if (confirmDelete) {
-      this.competitionService.deleteCompetition(id).subscribe({
-        next: () => {
-          alert('Competición eliminada con éxito');
-          this.competitions = [];
-          this.loadCompetitionsProfessor();
-        },
-        error: (err) => console.error('Error al eliminar la competición:', err)
-      });
-    }
-  }
-
-  viewStudents(competitionName: string, competitionId: number): void {
-    this.router.navigate(['/' + competitionName + '/alumnos'], { state: { competitionId: competitionId, professorName: this.professorName } });
-  }
-
-  
-
-  viewCompetitionRanking(competitionName: string) {
-    this.router.navigate(['/' + competitionName + '/ranking'], { state: { professorName: this.professorName } });
-  }*/
 }

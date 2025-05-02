@@ -262,7 +262,7 @@ export class PlayWordleComponent {
       return;
     }
 
-    this.lastWordle = wordFromCurTry;
+    this.lastWordle = wordFromCurTry.toUpperCase();
 
     this.wordleService.checkWordleAttempt(this.contest.id, wordFromCurTry, this.currentWordleIndex, this.userEmail).subscribe({
       next: (checkStates) => {
@@ -358,7 +358,7 @@ export class PlayWordleComponent {
     currentGame.finished = this.finished;
     currentGame.won = this.won;
     currentGame.tryCount = this.numSubmittedTries;
-    currentGame.lastWordle = this.lastWordle;
+    currentGame.lastWordle = this.lastWordle.toUpperCase();
     currentGame.timeGuess = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
     const newState = new State();
@@ -405,7 +405,7 @@ export class PlayWordleComponent {
       email: this.userEmail,
       dateLog: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
       wordleToGuess: '',
-      wordleInserted: this.lastWordle,
+      wordleInserted: this.lastWordle.toUpperCase(),
       numTry: this.numSubmittedTries,
       wordlePosition: this.currentWordleIndex + 1,
       correct: counts.fullMatch,

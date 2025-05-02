@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
@@ -12,6 +12,8 @@ import { catchError, forkJoin, of } from 'rxjs';
   styleUrls: ['./competition-ranking.component.css']
 })
 export class CompetitionRankingComponent implements OnInit {
+
+  @Input() competitionId: number = 0;
 
   competitionName: string = '';
 
@@ -38,11 +40,11 @@ export class CompetitionRankingComponent implements OnInit {
   ngOnInit() {
     this.competitionName = this.route.snapshot.paramMap.get('competitionName') || '';
 
-    this.competitionService.getStudentsByCompetition(this.competitionName).subscribe({
+    this.competitionService.getStudentsByCompetition(this.competitionId).subscribe({
       next: (users) => {
         this.students = users;
 
-        this.contestService.getContestsByCompetition(this.competitionName).subscribe({
+        this.contestService.getContestsByCompetition(this.competitionId).subscribe({
           next: (list) => {
             this.contests = list;
 

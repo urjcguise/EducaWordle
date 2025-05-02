@@ -72,12 +72,12 @@ public class ContestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
     }
 
-    @GetMapping("/{competitionName}/contests")
-    public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable String competitionName) {
-        if (!competitionService.existsCompetitionByName(competitionName))
+    @GetMapping("/{competitionId}/contests")
+    public ResponseEntity<List<Contest>> getContestsByCompetition(@PathVariable Long competitionId) {
+        if (!competitionService.existsCompetition(competitionId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Competition competition = competitionService.getCompetitionByName(competitionName);
+        Competition competition = competitionService.getCompetitionById(competitionId);
         List<Contest> contests = contestService.getContestsByCompetition(competition);
         return new ResponseEntity<>(contests, HttpStatus.OK);
     }
@@ -420,7 +420,7 @@ public class ContestController {
         Wordle wordle = contest.getWordles().get(wordlePosition);
 
         ContestStateLog contestStateLog = new ContestStateLog(contest, user);
-        wordleStateLog.setWordleToGuess(wordle.getWord());
+        wordleStateLog.setWordleToGuess(wordle.getWord().toUpperCase());
         try {
             JsonNode jsonNode = objectMapper.valueToTree(wordleStateLog);
             contestStateLog.setState(jsonNode);
@@ -480,7 +480,7 @@ public class ContestController {
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/existsInDictionary/{word}")
     public ResponseEntity<Boolean> existsInDictionary(@PathVariable String word) {
-        return new ResponseEntity<>(dictionaryService.existsInGlobalDictionary(word), HttpStatus.OK);
+        return new ResponseEntity<>(dictionaryService.existsInGlobalDictionary(word.toLowerCase()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")

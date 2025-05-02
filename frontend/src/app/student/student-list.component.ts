@@ -11,7 +11,6 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 export class StudentListComponent implements OnInit {
 
   professorName: string = '';
-  competitionName: string = '';
 
   students: User[] = [];
   competitionId!: number;
@@ -31,12 +30,11 @@ export class StudentListComponent implements OnInit {
   ngOnInit(): void {
     this.competitionId = history.state.competitionId;
     this.professorName = history.state.professorName;
-    this.competitionName = this.route.snapshot.paramMap.get('competitionName') || '';
     this.loadStudents();
   }
 
   loadStudents() {
-    this.competitionService.getStudentsByCompetition(this.competitionName).subscribe({
+    this.competitionService.getStudentsByCompetition(this.competitionId).subscribe({
       next: (stdts) => {
         this.students = stdts;
       },

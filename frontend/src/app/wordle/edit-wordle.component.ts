@@ -47,7 +47,7 @@ export class EditWordleComponent implements OnInit {
     this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (competitions) => {
         competitions.forEach((competition) => {
-          this.contestService.getContestsByCompetition(competition.competitionName).subscribe({
+          this.contestService.getContestsByCompetition(competition.id).subscribe({
             next: (contests) => {
               const now = new Date();
               const formattedContests = contests
