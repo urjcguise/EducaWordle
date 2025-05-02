@@ -3,7 +3,6 @@ package app.TFGWordle.service;
 import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.repository.CompetitionRepository;
-import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

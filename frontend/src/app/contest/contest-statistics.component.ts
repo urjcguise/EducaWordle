@@ -6,7 +6,7 @@ import { UserState } from '../models/user-state';
 import { Wordle } from '../models/wordle';
 import { TokenService } from '../service/token.service';
 import { WordleStateLog } from '../models/wordle-state-log';
-import { interval, Subscription, switchMap, tap } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { WordleService } from '../service/wordle.service';
 
 @Component({

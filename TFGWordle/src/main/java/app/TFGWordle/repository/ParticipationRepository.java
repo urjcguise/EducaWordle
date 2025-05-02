@@ -1,6 +1,5 @@
 package app.TFGWordle.repository;
 
-import app.TFGWordle.model.Competition;
 import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

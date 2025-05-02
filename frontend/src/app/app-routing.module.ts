@@ -5,7 +5,6 @@ import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
 import { prodGuard } from './guards/prod.guard';
 import { CompetitionListComponent } from './competition/competition-list.component';
-import { ContestListComponent } from './contest/contest-list.component';
 import { EditContestComponent } from './contest/edit-contest.component';
 import { PlayWordleComponent } from './wordle/play-wordle.component';
 import { StudentListComponent } from './student/student-list.component';
@@ -35,7 +34,6 @@ const routes: Routes = [
   { path: 'wordlesResueltos', component: WordleListStudentComponent, canActivate: [prodGuard], data: { expectedRol: ['student'] } },
   { path: ':folderId/wordles', component: FolderListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':wordle/editarWordle', component: EditWordleComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
-  { path: ':competitionName/concursos', component: ContestListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: ':contestId/concurso', component: ContestViewComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: ':contestId/editarConcurso', component: EditContestComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'admin'] } },
   { path: ':userName/editarUsuario', component: EditUserComponent, canActivate: [prodGuard], data: { expectedRol: ['admin'] } },

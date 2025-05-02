@@ -24,11 +24,9 @@ export class WordleService {
     });
   }
 
-
   public editWordle(wordle: string, newWordle: string): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + 'editWordle/' + wordle, newWordle);
   }
-
 
   public updateWordle(wordInitial: string, wordUpdated: string, contests: Contest[]): Observable<any> {
     return this.httpClient.post<any>(this.apiUrl + "updateWordle/" + wordInitial + '/' + wordUpdated, contests);

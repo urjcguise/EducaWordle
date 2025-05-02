@@ -15,7 +15,6 @@ import { interceptorProvider } from './interceptors/prod-interceptor.service';
 import { CompetitionComponent } from './competition/competition.component';
 import { CompetitionListComponent } from './competition/competition-list.component';
 import { ContestComponent } from './contest/contest.component';
-import { ContestListComponent } from './contest/contest-list.component';
 import { EditContestComponent } from './contest/edit-contest.component';
 import { PlayWordleComponent } from './wordle/play-wordle.component';
 import { StudentListComponent } from './student/student-list.component';
@@ -50,7 +49,6 @@ import { CompetitionViewComponent } from './competition/competition-view.compone
     CompetitionComponent,
     CompetitionListComponent,
     ContestComponent,
-    ContestListComponent,
     EditContestComponent,
     PlayWordleComponent,
     StudentListComponent,

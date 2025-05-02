@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 const TOKEN_KEY = 'AuthToken';
-const USERNAME_KEY = 'AuthUserName';
 const EMAIL_KEY = 'AuthEmail';
 const AUTHORITIES_KEY = 'AuthAuthorities';
 
@@ -58,7 +57,6 @@ export class TokenService {
         this.roles.push(authority.authority);
       });
     }
-
     return this.roles;
   }
 
