@@ -71,6 +71,20 @@ public class CompetitionController {
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/editCompetition/{competitionId}")
+    public ResponseEntity<?> editCompetition(@PathVariable Long competitionId, @RequestBody String newName) {
+        if (!competitionService.existsCompetition(competitionId))
+            return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
+
+
+        Competition competition = competitionService.getCompetitionById(competitionId);
+        competition.setCompetitionName(newName);
+        competitionService.save(competition);
+
+        return new ResponseEntity<>(HttpStatus.OK );
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getCompetitions/{professorName}")
     public ResponseEntity<List<Competition>> getCompetitionsByProfessor(@PathVariable String professorName) {
         User professor = userService.getByUserName(professorName)

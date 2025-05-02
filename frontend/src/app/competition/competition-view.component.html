@@ -4,8 +4,23 @@
     </div>
 
     <div class="competition-info">
-        <h3 class="competition-tittle">{{ competitionName }}</h3>
+        <div class="competition-name">
+            <ng-container *ngIf="!isEditingName; else editMode">
+                <h3 class="competition-title">{{ competitionName }}</h3>
+                <span class="edit-action" (click)="startEditing()">
+                    <i class="fa fa-edit"></i>Cambiar nombre
+                </span>
+            </ng-container>
 
+            <ng-template #editMode>
+                <input type="text" [(ngModel)]="tempCompetitionName" (blur)="saveName()" (keydown.enter)="saveName()"
+                    (keydown.escape)="cancelEditing()" class="edit-input" />
+                <span class="cancel-action" (click)="cancelEditing()">
+                    <i class="fa fa-times"></i>Cancelar
+                </span>
+
+            </ng-template>
+        </div>
         <div class="competition-navbar">
             <ul class="nav-tabs">
                 <li class="tab-item" [class.active]="activeTab === 'contests'" (click)="activeTab = 'contests'">

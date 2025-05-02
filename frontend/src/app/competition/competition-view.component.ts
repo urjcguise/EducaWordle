@@ -21,6 +21,9 @@ export class CompetitionViewComponent implements OnInit {
 
   activeTab: string = 'contests';
 
+  isEditingName: boolean = false;
+  tempCompetitionName: string = '';
+
   isModalOpen: boolean = false;
 
   constructor(private route: ActivatedRoute, private tokenService: TokenService, private contestService: ContestService, private router: Router, private competitionService: CompetitionService) {
@@ -49,6 +52,33 @@ export class CompetitionViewComponent implements OnInit {
       },
       error: (e) => {
         console.error('Error obteniendo los concursos', e);
+      }
+    });
+  }
+
+  startEditing() {
+    this.tempCompetitionName = this.competitionName;
+    this.isEditingName = true;
+  }
+
+  cancelEditing() {
+    this.isEditingName = false;
+  }
+
+  saveName() {
+    const newName = this.tempCompetitionName.trim();
+    if (newName && newName !== this.competitionName)
+      this.changeCompetitionName(newName);
+    this.cancelEditing();
+  }
+
+  changeCompetitionName(newName: string) {
+    this.competitionService.editCompetition(this.competitionId, newName).subscribe({
+      next: () => {
+        this.competitionName = newName;
+      },
+      error: (e) => {
+        console.error('Error cambiando el nombre a la competición', e);
       }
     });
   }

@@ -18,6 +18,10 @@ export class CompetitionService {
     return this.httpClient.post<any>(this.apiUrl + 'newCompetition/' + professorName, competition);
   }
 
+  public editCompetition(competitionId: number, newName: string): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'editCompetition/' + competitionId, newName);
+  }
+
   public getCompetitionsByProfessor(professorName: string): Observable<Competition[]> {
     return this.httpClient.get<Competition[]>(this.apiUrl + 'getCompetitions/' + professorName);
   }

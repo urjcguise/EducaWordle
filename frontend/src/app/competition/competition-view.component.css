@@ -9,12 +9,42 @@
     font-family: "Inter", sans-serif;
 }
 
+.competition-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* Título de la Competición */
 .competition-title {
     color: black;
     margin-top: 0;
-    margin-bottom: 10px;
 }
+
+.edit-action,
+.cancel-action {
+    font-size: 0.9rem;
+    color: #cb0017;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.edit-action:hover,
+.cancel-action:hover {
+    color: #980011;
+}
+
+.edit-action i,
+.cancel-action i {
+    margin-right: 4px;
+}
+
+.edit-input {
+    padding: 2px 6px;
+    font-size: 1rem;
+}
+
 
 .competition-navbar {
     border-top: 1px solid #eeeeee;
