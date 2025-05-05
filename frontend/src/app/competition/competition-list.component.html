@@ -19,12 +19,18 @@
   <div class="competition-list-container">
     <div class="competition-list">
       <div *ngFor="let competition of competitions" class="competition-item">
-        <div class="competition-header" (click)="toggleCompetition(competition)">
-          <i class="arrow fa fa-fw" [class.fa-chevron-right]="!competition.isOpen"
-            [class.fa-chevron-down]="competition.isOpen" aria-hidden="true"></i>
-          <h3 (dblclick)="navigateToCompetitionView(competition.name, competition.id)"><strong>{{ competition.name
-              }}</strong></h3>
-        </div>
+        <div class="competition-header">
+          <i class="arrow fa fa-fw" 
+             [class.fa-chevron-right]="!competition.isOpen" 
+             [class.fa-chevron-down]="competition.isOpen" 
+             aria-hidden="true"
+             (click)="toggleCompetition(competition)" 
+             title="Mostrar/Ocultar concursos"></i> 
+          <h3 (click)="navigateToCompetitionView(competition.name, competition.id)" 
+              title="Ver detalles de la competición {{ competition.name }}">
+              <strong>{{ competition.name }}</strong>
+          </h3>
+      </div>
         <div class="contest-list" *ngIf="competition.isOpen">
           <ul>
             <li *ngFor="let contest of competition.contests" class="contest-item">
