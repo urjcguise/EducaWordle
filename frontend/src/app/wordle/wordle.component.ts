@@ -40,11 +40,27 @@ export class WordleComponent {
   }
 
   createWordles() {
-    for (const word of this.wordles) {
+    let posMoreThanOneWord: number[] = []
+
+    for (let i = 0; i < this.wordles.length; i ++) {
+      const word = this.wordles[i];
       if (word == "") {
         alert('No se puede guardar un wordle vacío');
         return;
       }
+      if (word.trim().split(/\s+/).length > 1) {
+        posMoreThanOneWord.push(i);
+      }
+    }
+
+    if (posMoreThanOneWord.length > 0) {
+      const confirmSave = confirm(`No se puede guardar un Wordle con espacios, se procederá a unir las palabras`);
+      if (!confirmSave)
+        return;
+
+      posMoreThanOneWord.forEach((pos) => {
+        this.wordles[pos] = this.wordles[pos].replace(/\s+/g, '');
+      });
     }
 
     this.wordleService.saveWordles(this.wordles, 0, this.professorName, this.folderId).subscribe({

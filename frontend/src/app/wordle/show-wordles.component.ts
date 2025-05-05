@@ -43,7 +43,6 @@ export class ShowWordlesComponent implements OnInit {
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (wordleList) => {
         this.wordles = wordleList.map(w => w.word);
-        console.log('Wordles en concurso cargados:', this.wordles);
       },
       error: (e) => {
         console.error('Error obteniendo los wordles', e);
@@ -67,7 +66,7 @@ export class ShowWordlesComponent implements OnInit {
         this.folders.forEach(folder => sortWordlesInFolder(folder));
       },
       error: (e) => {
-        console.error('Error obteniendo datos para modal (wordles/folders)', e);
+        console.error('Error obteniendo datos para modal', e);
         this.availableRootWordles = [];
         this.folders = [];
       }
@@ -85,7 +84,6 @@ export class ShowWordlesComponent implements OnInit {
     } else {
       this.selectedWordles.push(wordle);
     }
-    console.log('Seleccionados:', this.selectedWordles);
   }
 
   isSelected(wordle: string): boolean {
@@ -101,7 +99,6 @@ export class ShowWordlesComponent implements OnInit {
       this.editingWordle = wordleToEdit;
       this.editedValue = wordleToEdit;
       this.selectedWordles = [];
-      console.log('Iniciando edición para:', this.editingWordle);
     }
   }
 
@@ -113,20 +110,16 @@ export class ShowWordlesComponent implements OnInit {
 
     if (newValue === '' || newValue === originalWordle) {
       this.cancelEdit();
-      console.log('Edición cancelada (sin cambios o valor vacío)');
       return;
     }
 
     if (this.wordles.some(w => w === newValue && w !== originalWordle) || this.availableRootWordles.some(w => w === newValue && w !== originalWordle)) {
-      alert(`El wordle "${newValue}" ya existe en la lista.`);
+      alert(`El wordle "${newValue}" ya existe en la lista`);
       return;
     }
 
-    console.log(`Intentando guardar: ${originalWordle} -> ${newValue}`);
-
     this.wordleService.editWordle(originalWordle, newValue).subscribe({
       next: () => {
-        console.log('Wordle actualizado en backend con éxito');
         const index = this.wordles.indexOf(originalWordle);
         if (index > -1) {
           this.wordles[index] = newValue;
@@ -135,13 +128,11 @@ export class ShowWordlesComponent implements OnInit {
       },
       error: (e) => {
         console.error('Error al actualizar el wordle en el backend', e);
-        alert('Error al guardar los cambios. Inténtalo de nuevo.');
       }
     });
   }
 
   cancelEdit() {
-    console.log('Edición cancelada para:', this.editingWordle);
     this.editingWordle = null;
     this.editedValue = '';
   }
@@ -150,13 +141,11 @@ export class ShowWordlesComponent implements OnInit {
     if (this.editingWordle) return;
 
     if (this.selectedWordles.length > 0) {
-      console.log('Borrar wordles:', this.selectedWordles);
       if (!confirm(`¿Seguro que quieres eliminar ${this.selectedWordles.length} wordle(s)?`)) {
         return;
       }
       this.contestService.deleteWordlesInContest(this.contestId, this.selectedWordles).subscribe({
         next: () => {
-          console.log('Wordles eliminados correctamente');
           this.wordles = this.wordles.filter(w => !this.selectedWordles.includes(w));
           this.selectedWordles = [];
         },
@@ -193,7 +182,6 @@ export class ShowWordlesComponent implements OnInit {
     } else {
       this.wordlesToAddSelection.push(wordle);
     }
-    console.log('Wordles para añadir:', this.wordlesToAddSelection);
   }
 
   isWordleToAddSelected(wordle: string) {
@@ -203,10 +191,8 @@ export class ShowWordlesComponent implements OnInit {
 
   saveNewWordles() {
     if (this.wordlesToAddSelection.length > 0 || !this.isCreatingNewWordle) {
-      console.log('Añadiendo wordles:', this.wordlesToAddSelection);
       this.contestService.addWordlesToContest(this.contestId, this.wordlesToAddSelection).subscribe({
         next: () => {
-          console.log('Wordles añadidos correctamente al backend');
           this.wordles = [...this.wordles, ...this.wordlesToAddSelection];
           this.closeModal();
           this.selectedWordles = [];
@@ -221,43 +207,50 @@ export class ShowWordlesComponent implements OnInit {
   }
 
   startCreateNewWordle() {
-    console.log('Iniciando modo creación de nuevo wordle.');
     this.isCreatingNewWordle = true;
     this.newWordleValue = '';
     this.wordlesToAddSelection = [];
   }
 
   cancelCreateNewWordle() {
-    console.log('Cancelando modo creación.');
     this.isCreatingNewWordle = false;
     this.newWordleValue = '';
   }
 
   saveCreatedWordle() {
-    const newWordle = this.newWordleValue.trim();
+
+    let newWordle = this.newWordleValue.trim();
 
     if (newWordle === '') {
       alert('El nombre del wordle no puede estar vacío.');
       return;
     }
 
-    if (this.wordles.includes(newWordle) || this.availableRootWordles.includes(newWordle)) {
-      alert(`El wordle "${newWordle}" ya existe.`);
-      return;
+    const moreThanOneWord = this.newWordleValue.trim().split(/\s+/).length > 1;
+
+    if (moreThanOneWord) {
+      const newWordleNoSpaces = newWordle.replace(/\s+/g, '');
+      const confirmSave = confirm(`El Wordle cuenta con más de una palabra, se convertirá de "${newWordle}" a "${newWordleNoSpaces}"`);
+      if (!confirmSave)
+        return;
+      newWordle = newWordleNoSpaces;
     }
 
-    console.log(`Intentando crear nuevo wordle: ${newWordle}`);
+
+    if (this.wordles.includes(newWordle.toUpperCase()) || this.availableRootWordles.includes(newWordle.toUpperCase())) {
+      const confirmSave = confirm(`El wordle "${newWordle}" ya existe, ¿Está seguro de que desea crearlo de nuevo?`);
+      if (!confirmSave)
+        return;
+    }
 
     this.wordleService.saveWordles([newWordle], 0, this.professorName, 0).subscribe({
       next: () => {
-        console.log('Nuevo wordle creado con éxito en el backend');
-        this.availableRootWordles.push(newWordle);
+        this.availableRootWordles.push(newWordle.toUpperCase());
         this.isCreatingNewWordle = false;
         this.newWordleValue = '';
       },
       error: (e) => {
         console.error('Error al crear el nuevo wordle en el backend', e);
-        alert(`Error al crear el wordle "${newWordle}". Es posible que ya exista o haya otro problema.`);
       }
     });
   }

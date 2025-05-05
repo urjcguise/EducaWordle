@@ -171,7 +171,6 @@ export class FolderListComponent implements OnInit {
     if (this.newFolderName && this.newFolderName.trim().length > 0) {
       this.wordleService.createFolderInsideFolder(this.newFolderName, this.professorName, this.actualFolderId).subscribe({
         next: () => {
-          console.log('Carpeta creada correctamente');
           this.loadFolders();
         },
         error: (e) => {
@@ -272,7 +271,6 @@ export class FolderListComponent implements OnInit {
     if (selectedFolderIds.length > 0) {
       this.wordleService.deleteFolders(selectedFolderIds).subscribe({
         next: () => {
-          console.log('Carpetas eliminadas correctamente');
           this.folderList = this.folderList.filter(
             (_, index) => !this.selectedFolders.includes(index)
           );
@@ -283,14 +281,11 @@ export class FolderListComponent implements OnInit {
           console.error('Error al eliminar las carpetas:', err);
         }
       });
-    } else {
-      console.log('No hay carpetas seleccionadas para eliminar');
     }
 
     if (selectedWordle.length > 0) {
       this.wordleService.deleteWordles(selectedWordle).subscribe({
         next: () => {
-          console.log('Wordles eliminados correctamente');
           this.wordleList = this.wordleList.filter(
             (_, index) => !this.selectedWordles.includes(index)
           );
@@ -301,8 +296,6 @@ export class FolderListComponent implements OnInit {
           console.error('Error al eliminar los wordles:', err);
         }
       });
-    } else {
-      console.log('No hay Wordles seleccionados para eliminar');
     }
   }
 

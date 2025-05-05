@@ -212,8 +212,6 @@ export class WordleListComponent implements OnInit {
           console.error('Error al eliminar las carpetas:', err);
         }
       });
-    } else {
-      console.log('No hay carpetas seleccionadas para eliminar.');
     }
 
     if (selectedWordle.length > 0) {
@@ -230,8 +228,6 @@ export class WordleListComponent implements OnInit {
           console.error('Error al eliminar los wordles:', err);
         }
       });
-    } else {
-      console.log('No hay Wordles seleccionados para eliminar.');
     }
 
     this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
