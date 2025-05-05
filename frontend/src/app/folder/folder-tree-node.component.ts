@@ -13,6 +13,10 @@ export class FolderTreeNodeComponent implements OnInit, OnChanges {
   @Input() level: number = 0;
   @Input() contestWordles: string[] = [];
   @Input() selectedForAddition: string[] = [];
+  @Input() isAddingFolder: boolean = false;
+  @Input() selectedFolderId: number | string | null = 0;
+
+  @Output() folderSelected = new EventEmitter<number | string | null>();
   @Output() wordleToggled = new EventEmitter<string>();
 
   isExpanded: boolean = false;
@@ -23,7 +27,7 @@ export class FolderTreeNodeComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['contestWordles'] || changes['selectedForAddition']) {
+    if (changes['contestWordles'] || changes['selectedForAddition'] || changes['folder']) {
       this.updateDisplayableWordles();
     }
   }
@@ -47,6 +51,15 @@ export class FolderTreeNodeComponent implements OnInit, OnChanges {
     this.isExpanded = !this.isExpanded;
   }
 
+  selectThisFolder(event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (this.isSelected)
+      this.folderSelected.emit(null);
+    else
+      this.folderSelected.emit(this.folder.id);
+  }
+
   toggleWordleSelection(wordleWord: string, event: MouseEvent): void {
     event.stopPropagation();
     if (!this.contestWordles.includes(wordleWord)) {
@@ -62,5 +75,9 @@ export class FolderTreeNodeComponent implements OnInit, OnChanges {
     const hasSubfolders = this.subFolders.length > 0;
     const hasDisplayableWordles = this.displayableWordles.length > 0;
     return hasSubfolders || hasDisplayableWordles;
+  }
+
+  get isSelected(): boolean {
+    return !!this.folder && this.folder.id === this.selectedFolderId;
   }
 }

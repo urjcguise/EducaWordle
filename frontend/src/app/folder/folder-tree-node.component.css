@@ -18,6 +18,21 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
+.folder-item-add {
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.15s ease-in-out;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.folder-item-add.selected {
+    background-color: #c9e6ff;
+    font-weight: 500;
+}
+
 .folder-item:hover {
     background-color: #f8f9fa;
 }

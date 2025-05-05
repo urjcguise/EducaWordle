@@ -36,7 +36,7 @@ export class ContestViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activeTab = history.state.activeTab || 'info';
+    this.activeTab = history.state.activeTab || 'wordles';
     this.competitionName = history.state.competitionName;
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.isProfessor = this.tokenService.getAuthorities().includes('ROLE_PROFESSOR') ||

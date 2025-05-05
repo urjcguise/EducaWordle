@@ -84,6 +84,19 @@
                 <input #createInput type="text" placeholder="Nombre del nuevo Wordle" [(ngModel)]="newWordleValue"
                     (keyup.enter)="saveCreatedWordle()" (keyup.escape)="cancelCreateNewWordle()"
                     (click)="$event.stopPropagation()" class="edit-input" />
+
+                <p>¿Desea guardar el Wordle en una carpeta?</p>
+                <div *ngIf="folders.length === 0">
+                    <p>No hay carpetas actualmente</p>
+                </div>
+                <div *ngIf="folders.length !== 0">
+                    <app-folder-tree-node *ngFor="let folder of foldersWithOutWordles" [folder]="folder" [level]="0"
+                        [contestWordles]="wordles" [selectedForAddition]="wordlesToAddSelection" [isAddingFolder]="true"
+                        (wordleToggled)="toggleWordleToAdd($event)" [selectedFolderId]="currentSelectedFolderId"
+                        (folderSelected)="handleFolderSelection($event)">
+                    </app-folder-tree-node>
+                </div>
+
             </div>
 
         </div>

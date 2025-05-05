@@ -30,6 +30,8 @@ export class ShowWordlesComponent implements OnInit {
 
   availableRootWordles: string[] = [];
   folders: Folder[] = [];
+  foldersWithOutWordles: Folder[] = [];
+  currentSelectedFolderId: string | number | null = 0;
 
   constructor(private wordleService: WordleService, private route: ActivatedRoute, private tokenService: TokenService, private contestService: ContestService) { }
 
@@ -62,7 +64,8 @@ export class ShowWordlesComponent implements OnInit {
           .filter(word => !this.wordles.includes(word))
           .sort((a, b) => a.localeCompare(b));
 
-        this.folders = rootFoldersRaw;
+        this.folders = deepCopyFolders(rootFoldersRaw);
+        this.deleteWordlesInFolder(rootFoldersRaw);
         this.folders.forEach(folder => sortWordlesInFolder(folder));
       },
       error: (e) => {
@@ -171,6 +174,7 @@ export class ShowWordlesComponent implements OnInit {
     this.wordlesToAddSelection = [];
     this.isCreatingNewWordle = false;
     this.newWordleValue = '';
+    this.currentSelectedFolderId = 0;
   }
 
   toggleWordleToAdd(wordle: string) {
@@ -214,6 +218,7 @@ export class ShowWordlesComponent implements OnInit {
 
   cancelCreateNewWordle() {
     this.isCreatingNewWordle = false;
+    this.currentSelectedFolderId = 0;
     this.newWordleValue = '';
   }
 
@@ -243,11 +248,12 @@ export class ShowWordlesComponent implements OnInit {
         return;
     }
 
-    this.wordleService.saveWordles([newWordle], 0, this.professorName, 0).subscribe({
+
+    this.wordleService.saveWordles([newWordle], 0, this.professorName, Number(this.currentSelectedFolderId)).subscribe({
       next: () => {
-        this.availableRootWordles.push(newWordle.toUpperCase());
         this.isCreatingNewWordle = false;
         this.newWordleValue = '';
+        this.loadModalData();
       },
       error: (e) => {
         console.error('Error al crear el nuevo wordle en el backend', e);
@@ -258,9 +264,37 @@ export class ShowWordlesComponent implements OnInit {
   onModalContentClick(event: MouseEvent) {
     event.stopPropagation();
   }
+
+  deleteWordlesInFolder(folders: Folder[]) {
+    folders.forEach(folder => {
+      folder.wordles = [];
+
+      if (folder.folders.length > 0)
+        this.deleteWordlesInFolder(folder.folders);
+    })
+
+    this.foldersWithOutWordles = folders;
+  }
+
+  onFolderSelected(folderId: number) {
+    console.log(folderId);
+  }
+
+  handleFolderSelection(folderId: number | string | null): void {
+    this.currentSelectedFolderId = folderId;
+  }
+
 }
 
 function sortWordlesInFolder(folder: Folder) {
   folder.wordles.sort((a, b) => a.word.localeCompare(b.word));
   folder.folders.forEach(subFolder => sortWordlesInFolder(subFolder));
+}
+
+function deepCopyFolders(folders: Folder[]): Folder[] {
+  return folders.map(folder => ({
+    ...folder,
+    wordles: [...folder.wordles],
+    folders: deepCopyFolders(folder.folders)
+  }));
 }
