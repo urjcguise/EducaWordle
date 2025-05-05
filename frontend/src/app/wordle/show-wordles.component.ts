@@ -58,16 +58,13 @@ export class ShowWordlesComponent implements OnInit {
       rootFoldersRaw: this.wordleService.getFoldersByProfessor(this.professorName)
     }).subscribe({
       next: ({ rootWordlesRaw, rootFoldersRaw }) => {
-        console.log('Datos brutos recibidos:', rootWordlesRaw, rootFoldersRaw);
-
         this.availableRootWordles = rootWordlesRaw
           .map(w => w.word)
-          .filter(word => !this.wordles.includes(word));
-        console.log('Wordles raíz disponibles filtrados:', this.availableRootWordles);
+          .filter(word => !this.wordles.includes(word))
+          .sort((a, b) => a.localeCompare(b));
 
         this.folders = rootFoldersRaw;
-        console.log('Carpetas filtradas:', this.folders);
-
+        this.folders.forEach(folder => sortWordlesInFolder(folder));
       },
       error: (e) => {
         console.error('Error obteniendo datos para modal (wordles/folders)', e);
@@ -268,4 +265,9 @@ export class ShowWordlesComponent implements OnInit {
   onModalContentClick(event: MouseEvent) {
     event.stopPropagation();
   }
+}
+
+function sortWordlesInFolder(folder: Folder) {
+  folder.wordles.sort((a, b) => a.word.localeCompare(b.word));
+  folder.folders.forEach(subFolder => sortWordlesInFolder(subFolder));
 }

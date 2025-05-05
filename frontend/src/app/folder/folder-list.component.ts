@@ -80,7 +80,8 @@ export class FolderListComponent implements OnInit {
       this.wordleService.getFoldersInsideFolder(this.actualFolderId).subscribe({
         next: (folders) => {
           this.folderList = folders;
-          this.folderList.forEach(() => {
+          this.folderList.forEach((folder) => {
+            sortWordlesInFolder(folder);
             this.isEditingFolder.push(false);
             this.isExpanded.push(false);
           })
@@ -92,7 +93,7 @@ export class FolderListComponent implements OnInit {
 
       this.wordleService.getWordlesInsideFolder(this.actualFolderId).subscribe({
         next: (wordles) => {
-          this.wordleList = wordles;
+          this.wordleList = wordles.sort((a, b) => a.word.localeCompare(b.word));
         },
         error: (e) => {
           console.error('Error obteniendo los wordle', e);
@@ -320,4 +321,9 @@ export class FolderListComponent implements OnInit {
     else
       this.router.navigate(['/wordles'], { state: { professorName: this.professorName } });
   }
+}
+
+function sortWordlesInFolder(folder: Folder) {
+  folder.wordles.sort((a, b) => a.word.localeCompare(b.word));
+  folder.folders.forEach(subFolder => sortWordlesInFolder(subFolder));
 }
