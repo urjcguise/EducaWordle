@@ -25,7 +25,7 @@
 }
 
 .button-bar button:hover {
-    background-color: #c82333;
+    background-color: #980011;
 }
 
 .button-bar button.delete-button {
@@ -34,7 +34,7 @@
 }
 
 .button-bar button.delete-button:hover {
-    border-color: #cb0017;
+    background-color: #980011;
 }
 
 .button-bar button.save-button {
@@ -77,10 +77,50 @@
     padding: 20px;
 }
 
+.order-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-buttons button {
+    font-size: calc(0.90375rem + 0.045vw);
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 2px;
+    background-color: #cb0017;
+    border-color: #cb0017;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.8em;
+    cursor: pointer;
+    width: auto;
+}
+
+.order-buttons button:hover {
+    background-color: #980011;
+}
+
+.order-buttons button:disabled {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+}
+
+.wordle-list-area li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 li {
@@ -103,6 +143,10 @@ li.selected {
     background-color: #cfe2ff;
     color: #052c65;
     font-weight: bold;
+}
+
+.node-name {
+    margin-right: 5px;
 }
 
 .modal-overlay {

@@ -25,6 +25,9 @@ export class ShowWordlesComponent implements OnInit {
   editingWordle: string | null = null;
   editedValue: string = '';
 
+  isModifyingOrder: boolean = false;
+  initialWordleList: string[] = [];
+
   isCreatingNewWordle = false;
   newWordleValue = '';
 
@@ -159,6 +162,38 @@ export class ShowWordlesComponent implements OnInit {
     }
   }
 
+  startModifyOrder() {
+    this.isModifyingOrder = true;
+    this.initialWordleList = [...this.wordles];
+  }
+
+  cancelModifyOrder() {
+    this.wordles = this.initialWordleList;
+    this.isModifyingOrder = false;
+  }
+
+  moveUp(index: number) {
+    if (index > 0)
+      [this.wordles[index - 1], this.wordles[index]] = [this.wordles[index], this.wordles[index - 1]];
+  }
+
+  moveDown(index: number) {
+    if (index < this.wordles.length - 1)
+      [this.wordles[index], this.wordles[index + 1]] = [this.wordles[index + 1], this.wordles[index]];
+  }
+
+  saveOrder() {
+    this.contestService.changeWordlesPosition(this.contestId, this.wordles).subscribe({
+      next: () => {
+        alert('Orden correctamente modificado');
+        this.isModifyingOrder = false;
+      },
+      error: (e) => {
+        console.error('Error modificando el orden', e);
+      }
+    });
+  }
+
   openAddModal() {
     if (this.editingWordle) return;
 
@@ -235,7 +270,7 @@ export class ShowWordlesComponent implements OnInit {
 
     if (moreThanOneWord) {
       const newWordleNoSpaces = newWordle.replace(/\s+/g, '');
-      const confirmSave = confirm(`El Wordle cuenta con más de una palabra, se convertirá de "${newWordle}" a "${newWordleNoSpaces}"`);
+      const confirmSave = confirm(`El Wordle cuenta con más de una palabra, se convertirá de "${newWordle.toUpperCase()}" a "${newWordleNoSpaces.toUpperCase()}"`);
       if (!confirmSave)
         return;
       newWordle = newWordleNoSpaces;

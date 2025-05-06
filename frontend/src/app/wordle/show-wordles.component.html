@@ -2,8 +2,9 @@
     <h2>Wordles activos</h2>
 
     <div class="button-bar">
-        <ng-container *ngIf="!editingWordle">
+        <ng-container *ngIf="!editingWordle && !isModifyingOrder">
             <button *ngIf="selectedWordles.length === 0" (click)="openAddModal()">Añadir</button>
+            <button *ngIf="wordles.length > 1 && selectedWordles.length === 0" (click)="startModifyOrder()">Modificar orden</button>
 
             <ng-container *ngIf="selectedWordles.length === 1">
                 <button (click)="editWordle()">Editar</button>
@@ -18,6 +19,11 @@
                 class="save-button">Guardar</button>
             <button (click)="cancelEdit()" class="cancel-button">Cancelar</button>
         </ng-container>
+
+        <ng-container *ngIf="isModifyingOrder">
+            <button (click)="saveOrder()" class="save-button">Guardar</button>
+            <button (click)="cancelModifyOrder()" class="cancel-button">Cancelar</button>
+        </ng-container>
     </div>
 
     <div class="wordle-list-area">
@@ -27,7 +33,7 @@
 
         <ng-template #wordleListOrEdit>
             <ul>
-                <li *ngFor="let wordle of wordles" (click)="toggleSelection(wordle)" [ngClass]="{
+                <li *ngFor="let wordle of wordles; let i = index" (click)="toggleSelection(wordle)" [ngClass]="{
                         'selected': isSelected(wordle),
                         'editing': editingWordle === wordle,
                         'disabled': editingWordle && editingWordle !== wordle
@@ -38,6 +44,11 @@
                     <input #editInput *ngIf="editingWordle === wordle" type="text" [(ngModel)]="editedValue"
                         (keyup.enter)="saveEdit()" (keyup.escape)="cancelEdit()" (click)="$event.stopPropagation()"
                         class="edit-input" />
+
+                    <div *ngIf="isModifyingOrder" class="order-buttons">
+                        <button (click)="moveUp(i); $event.stopPropagation()" [disabled]="i === 0">Subir</button>
+                        <button (click)="moveDown(i); $event.stopPropagation()" [disabled]="i === wordles.length - 1">Bajar</button>
+                    </div>
                 </li>
             </ul>
         </ng-template>

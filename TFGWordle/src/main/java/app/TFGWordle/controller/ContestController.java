@@ -172,7 +172,33 @@ public class ContestController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{contestId}/contest")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/changeWordlesPosition/{contestId}")
+    public ResponseEntity<?> changeWordlesPosition(@PathVariable Long contestId, @RequestBody List<String> wordles) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+
+        List<Wordle> newOrder = new ArrayList<>();
+
+        for (String word: wordles) {
+            if (!wordleService.existsByWord(word))
+                return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
+
+            Wordle wordle = wordleService.getByWord(word);
+
+            newOrder.add(wordle);
+        }
+
+        contest.setWordles(newOrder);
+        contest.calculateWordlesLength();
+
+        contestService.save(contest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+        @GetMapping("/{contestId}/contest")
     public ResponseEntity<Contest> getContestById(@PathVariable Long contestId) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -40,6 +40,10 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'deleteWordlesInContest/' + contestId, wordles);
   }
 
+  public changeWordlesPosition(contestId: number, wordles: string[]) {
+    return this.httpClient.post<any>(this.apiUrl + 'changeWordlesPosition/' + contestId, wordles);
+  }
+
   public getContestById(contestId: number) {
     return this.httpClient.get<Contest>(this.apiUrl + contestId + '/contest');
   }
