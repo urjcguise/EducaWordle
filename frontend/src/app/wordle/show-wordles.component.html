@@ -2,9 +2,10 @@
     <h2>Wordles activos</h2>
 
     <div class="button-bar">
-        <ng-container *ngIf="!editingWordle && !isModifyingOrder">
+        <ng-container *ngIf="!editingWordle && !isModifyingOrder && !contestFinished">
             <button *ngIf="selectedWordles.length === 0" (click)="openAddModal()">Añadir</button>
-            <button *ngIf="wordles.length > 1 && selectedWordles.length === 0" (click)="startModifyOrder()">Modificar orden</button>
+            <button *ngIf="wordles.length > 1 && selectedWordles.length === 0" (click)="startModifyOrder()">Modificar
+                orden</button>
 
             <ng-container *ngIf="selectedWordles.length === 1">
                 <button (click)="editWordle()">Editar</button>
@@ -47,11 +48,23 @@
 
                     <div *ngIf="isModifyingOrder" class="order-buttons">
                         <button (click)="moveUp(i); $event.stopPropagation()" [disabled]="i === 0">Subir</button>
-                        <button (click)="moveDown(i); $event.stopPropagation()" [disabled]="i === wordles.length - 1">Bajar</button>
+                        <button (click)="moveDown(i); $event.stopPropagation()"
+                            [disabled]="i === wordles.length - 1">Bajar</button>
                     </div>
                 </li>
             </ul>
         </ng-template>
+    </div>
+
+    <div *ngIf="!contestFinished">
+        <div class="checkbox">
+            <input type="checkbox" [(ngModel)]="randomMode" (change)="randomModeChanged()">
+            <span class="checkbox-label">Modo aleatorio</span>
+        </div>
+        <div class="checkbox">
+            <input type="checkbox" [(ngModel)]="accentMode" (change)="accentModeChanged()">
+            <span class="checkbox-label">Modo tíldes</span>
+        </div>
     </div>
 </div>
 

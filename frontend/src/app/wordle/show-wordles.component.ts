@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { WordleService } from '../service/wordle.service';
 import { ActivatedRoute } from '@angular/router';
 import { TokenService } from '../service/token.service';
@@ -12,6 +12,12 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./show-wordles.component.css']
 })
 export class ShowWordlesComponent implements OnInit {
+
+  @Input() randomMode: boolean = false;
+  @Input() accentMode: boolean = false;
+  @Input() contestFinished: boolean = false;
+
+  @Output() hasWordles = new EventEmitter<any>();
 
   professorName: string = '';
   contestId: number = 0;
@@ -48,6 +54,7 @@ export class ShowWordlesComponent implements OnInit {
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (wordleList) => {
         this.wordles = wordleList.map(w => w.word);
+        this.checkHasWordles();
       },
       error: (e) => {
         console.error('Error obteniendo los wordles', e);
@@ -154,6 +161,7 @@ export class ShowWordlesComponent implements OnInit {
         next: () => {
           this.wordles = this.wordles.filter(w => !this.selectedWordles.includes(w));
           this.selectedWordles = [];
+          this.checkHasWordles();
         },
         error: (e) => {
           console.error('Error eliminando los wordles', e);
@@ -192,6 +200,34 @@ export class ShowWordlesComponent implements OnInit {
         console.error('Error modificando el orden', e);
       }
     });
+  }
+
+  randomModeChanged() {
+    this.contestService.editRandomMode(this.randomMode, this.contestId).subscribe({
+      next: (mode) => {
+        if (mode)
+          alert('Modo aleatorio activado');
+        else
+          alert('Modo aleatorio desactivado');
+      },
+      error: (e) => {
+        console.error('Error modificando el modo de juego', e);
+      }
+    })
+  }
+
+  accentModeChanged() {
+    this.contestService.editAccentMode(this.accentMode, this.contestId).subscribe({
+      next: (mode) => {
+        if (mode)
+          alert('Modo tildes activado');
+        else
+          alert('Modo tildes desactivado');
+      },
+      error: (e) => {
+        console.error('Error modificando el modo de juego', e);
+      }
+    })
   }
 
   openAddModal() {
@@ -235,6 +271,7 @@ export class ShowWordlesComponent implements OnInit {
           this.wordles = [...this.wordles, ...this.wordlesToAddSelection];
           this.closeModal();
           this.selectedWordles = [];
+          this.checkHasWordles();
         },
         error: (e) => {
           console.error('Error guardando los wordles', e);
@@ -319,6 +356,9 @@ export class ShowWordlesComponent implements OnInit {
     this.currentSelectedFolderId = folderId;
   }
 
+  checkHasWordles() {
+    this.hasWordles.emit(this.wordles.length > 0);
+  }
 }
 
 function sortWordlesInFolder(folder: Folder) {

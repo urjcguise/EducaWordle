@@ -7,7 +7,7 @@
         <div class="competition-name">
             <ng-container *ngIf="!isEditingName; else editMode">
                 <h3 class="competition-title">{{ competitionName }}</h3>
-                <span class="edit-action" (click)="startEditing()">
+                <span *ngIf="isProfessor" class="edit-action" (click)="startEditing()">
                     <i class="fa fa-edit"></i>Cambiar nombre
                 </span>
             </ng-container>
@@ -38,7 +38,7 @@
                         <span class="contest-name"
                             (click)="navigateToViewContest(contest.id)">{{contest.contestName}}</span>
                     </div>
-                    <div class="new-contest">
+                    <div *ngIf="isProfessor" class="new-contest">
                         <button class="new-contest-button" (click)="openCreateContest()">
                             <span class="fa fa-plus"></span>
                             <span class="button-text">Añadir nuevo concurso</span>
@@ -53,7 +53,7 @@
                 </div>
             </div>
         </div>
-        <button class="delete-competition" (click)="deleteCompetition()">
+        <button *ngIf="isProfessor" class="delete-competition" (click)="deleteCompetition()">
             <span class="fa fa-trash"></span>
             <span class="button-text">Eliminar competición</span>
         </button>

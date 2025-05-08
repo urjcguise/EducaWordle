@@ -27,6 +27,7 @@ export class CompetitionListComponent implements OnInit {
     name: string;
     contests: Contest[];
     isOpen: boolean;
+    professorName: string;
   }[] = [];
 
   professorName: string = '';
@@ -70,7 +71,8 @@ export class CompetitionListComponent implements OnInit {
               id: compe.id,
               name: compe.competitionName,
               contests: compe.contests.sort((a, b) => a.contestName.localeCompare(b.contestName)),
-              isOpen: true
+              isOpen: true,
+              professorName: compe.professor.username
             })
           });
           this.noCompetitions = false;
@@ -84,7 +86,7 @@ export class CompetitionListComponent implements OnInit {
     });
   }
 
-  loadCompetitionsProfessor(): void {
+  loadCompetitionsProfessor() {
     this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (data) => {
         data.forEach(compe => {
@@ -93,7 +95,8 @@ export class CompetitionListComponent implements OnInit {
             id: compe.id,
             name: compe.competitionName,
             contests: compe.contests.sort((a, b) => a.contestName.localeCompare(b.contestName)),
-            isOpen: true
+            isOpen: true,
+            professorName: compe.professor.username
           })
         });
       },
@@ -116,8 +119,8 @@ export class CompetitionListComponent implements OnInit {
     competition.isOpen = !competition.isOpen;
   }
 
-  viewContest(contestId: number, competitionName: string) {
-    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: this.professorName } });
+  viewContest(contestId: number, competitionName: string, professorName: string) {
+    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: professorName } });
   }
 
   openCreateCompetition() {
@@ -126,8 +129,10 @@ export class CompetitionListComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.competitions = [];
-    this.loadCompetitionsProfessor();
+    if (this.isProfessor || this.isAdmin) {
+      this.competitions = [];
+      this.loadCompetitionsProfessor();
+    }
   }
 
   navigateToCompetitionView(competitionName: string, competitionId: number) {

@@ -348,3 +348,20 @@ li.disabled:hover {
     color: #424ac1;
     flex-shrink: 0;
 }
+
+.checkbox {
+    margin-top: 10px;
+}
+
+.checkbox input[type="checkbox"] {
+    margin-right: 5px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #cb0017;
+}
+
+.checkbox-label {
+    font-size: 1rem;
+    color: #333;
+}

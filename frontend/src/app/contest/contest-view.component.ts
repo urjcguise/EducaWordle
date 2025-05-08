@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ContestService } from '../service/contest.service';
 import { Contest } from '../models/contest';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
@@ -15,12 +15,16 @@ export class ContestViewComponent implements OnInit {
   isProfessor: boolean = false;
   isStudent: boolean = false;
 
+  professorName: string = '';
+
   studentFinished: boolean = false;
   studentPlaying: boolean = false;
 
   contest!: Contest;
   contestId: number = 0;
   contestFinished: boolean = false;
+  contestStarted: boolean = false;
+  hasWordles: boolean = false;
 
   competitionName: string = '';
   activeTab: string = '';
@@ -36,8 +40,9 @@ export class ContestViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activeTab = history.state.activeTab || 'wordles';
+    this.activeTab = history.state.activeTab || 'info';
     this.competitionName = history.state.competitionName;
+    this.professorName = history.state.professorName;
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.isProfessor = this.tokenService.getAuthorities().includes('ROLE_PROFESSOR') ||
       this.tokenService.getAuthorities().includes('ROLE_ADMIN');
@@ -47,13 +52,17 @@ export class ContestViewComponent implements OnInit {
       next: (cont) => {
         this.contest = cont;
 
+        this.hasWordles = cont.wordlesLength.length > 0;
+
+        const startDate = new Date(cont.startDate);
         const endDate = new Date(cont.endDate);
         const thisMoment = new Date();
         if (endDate < thisMoment)
           this.contestFinished = true;
+        if (startDate <= thisMoment)
+          this.contestStarted = true;
 
-        if (this.isStudent)
-          this.checkIsFinished();
+        this.checkIsFinished();
       },
       error: (e) => {
         console.error('Error obteniendo el concurso', e);
@@ -113,9 +122,15 @@ export class ContestViewComponent implements OnInit {
       state: {
         contestId: this.contest.id,
         wordleIndex: 0,
-        competitionName: this.competitionName
+        competitionName: this.competitionName,
+        isProfessor: this.isProfessor,
+        professorName: this.professorName
       }
     });
+  }
+
+  hasWordlesChange(value: boolean) {
+    this.hasWordles = value;
   }
 
   goBack() {

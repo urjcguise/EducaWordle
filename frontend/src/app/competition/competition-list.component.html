@@ -34,7 +34,7 @@
         <div class="contest-list" *ngIf="competition.isOpen">
           <ul>
             <li *ngFor="let contest of competition.contests" class="contest-item">
-              <span class="contest-link" (click)="viewContest(contest.id, competition.name)">{{ contest.contestName
+              <span class="contest-link" (click)="viewContest(contest.id, competition.name, competition.professorName)">{{ contest.contestName
                 }}</span>
             </li>
           </ul>
