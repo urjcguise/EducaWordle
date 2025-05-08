@@ -134,9 +134,15 @@ body {
   cursor: pointer;
   border-radius: 4px;
   background-color: #d3d6da;
-  font-size: 13px;
+  font-size: 0.9rem;
   font-weight: bold;
   user-select: none;
+}
+
+.accent-key {
+  min-width: 90px;
+  height: 42px;
+  font-size: 0.9rem;
 }
 
 .key.enter {

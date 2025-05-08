@@ -45,6 +45,13 @@ export class PlayWordleComponent {
     ['Enviar', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
   ];
 
+  readonly keyboardRowsAccent = [
+    ['Á', 'É', 'Í', 'Ó', 'Ú'],
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
+    ['Enviar', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
+  ];
+
   readonly curLetterStates: { [key: string]: LetterState } = {};
   infoMsg = '';
   fadeOutInfoMessage = false;
@@ -52,6 +59,9 @@ export class PlayWordleComponent {
   private curLetterIndex = 0;
 
   wordleLength: number[] = [];
+  wordleOrder: number[] = [];
+
+  isAccentMode: boolean = false;
 
   numSubmittedTries = 0;
   currentWordleIndex = 0;
@@ -74,6 +84,9 @@ export class PlayWordleComponent {
   userEmail: string = '';
   userName: string = '';
 
+  isProfessor: boolean = false;
+  professorName: string = '';
+
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
     this.competitionName = history.state.competitionName;
     this.router.events.subscribe(event => {
@@ -84,10 +97,15 @@ export class PlayWordleComponent {
       }
     });
 
+    this.isProfessor = history.state.isProfessor;
+    this.professorName = history.state.professorName;
+
     this.contestService.getContestById(history.state.contestId).subscribe({
       next: (cont) => {
         this.contest = cont;
         this.numTries = cont.numTries;
+
+        this.isAccentMode = cont.accentMode;
 
         this.numWordles = cont.wordlesLength.length;
         this.wordleLength = cont.wordlesLength;
@@ -101,8 +119,8 @@ export class PlayWordleComponent {
         }
 
         this.userName = this.tokenService.getUserName() || '';
-        this.setTargetWord();
         this.initializeState();
+        this.setTargetWord();
       },
       error: (error) => {
         console.error('Error consiguiendo el concurso', error);
@@ -126,8 +144,11 @@ export class PlayWordleComponent {
       this.games.push(newGame);
     }
 
-    this.games[this.currentWordleIndex].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    this.wordleState = new WordleState(this.numWordles, this.games);
+    this.wordleState = new WordleState(this.numWordles, this.games, this.contest.randomMode);
+    
+    this.wordleOrder = this.wordleState.wordleOrder;
+    this.games[this.wordleOrder[this.currentWordleIndex]].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
     this.contestService.createContestState(history.state.contestId, this.userName, this.wordleState).subscribe({
       next: () => {
         console.log('Estado del concurso creado correctamente');
@@ -147,7 +168,7 @@ export class PlayWordleComponent {
       this.won = false;
 
       for (let tryData of this.tries) {
-        tryData.letters = Array.from({ length: this.wordleLength[this.currentWordleIndex] }, () => ({
+        tryData.letters = Array.from({ length: this.wordleLength[this.wordleOrder[this.currentWordleIndex]] }, () => ({
           text: '',
           state: LetterState.PENDING,
         }));
@@ -186,13 +207,22 @@ export class PlayWordleComponent {
 
   handleClickKey(key: string) {
     if (this.finished) return;
-    if (key.length === 1 && /^[a-zñ]$/i.test(key)) {
-      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.currentWordleIndex]) {
+    if (key.length === 1 && this.isAccentMode && /^[a-zñáéíóúÁÉÍÓÚ]$/i.test(key)) {
+      
+      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
         this.setLetter(key);
         this.curLetterIndex++;
       }
-    } else if (key === 'Backspace') {
-      if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength[this.currentWordleIndex]) {
+    } else if (key.length === 1 && !this.isAccentMode && /^[a-zñ]$/i.test(key)) {
+      
+      if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
+        this.setLetter(key);
+        this.curLetterIndex++;
+      }
+    }
+    else if (key === 'Backspace') {
+     
+      if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
         this.curLetterIndex--;
         this.setLetter('');
       }
@@ -202,8 +232,9 @@ export class PlayWordleComponent {
   }
 
   private setLetter(letter: string) {
-    const tryIndex = Math.floor(this.curLetterIndex / this.wordleLength[this.currentWordleIndex]);
-    const letterIndex = this.curLetterIndex % this.wordleLength[this.currentWordleIndex];
+    const tryIndex = Math.floor(this.curLetterIndex / this.wordleLength[this.wordleOrder[this.currentWordleIndex]]);
+    const letterIndex = this.curLetterIndex % this.wordleLength[this.wordleOrder[this.currentWordleIndex]];
+
     this.tries[tryIndex].letters[letterIndex].text = letter;
   }
 
@@ -231,7 +262,7 @@ export class PlayWordleComponent {
   }
 
   private checkWordLenght(word: string) {
-    if (word.length < this.wordleLength[this.currentWordleIndex]) {
+    if (word.length < this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
       this.showInfoMessage('No hay suficientes letras');
       this.shakeTryContainer(this.numSubmittedTries);
       return false;
@@ -264,10 +295,9 @@ export class PlayWordleComponent {
 
     this.lastWordle = wordFromCurTry.toUpperCase();
 
-    this.wordleService.checkWordleAttempt(this.contest.id, wordFromCurTry, this.currentWordleIndex, this.userEmail).subscribe({
+    this.wordleService.checkWordleAttempt(this.contest.id, wordFromCurTry, this.wordleOrder[this.currentWordleIndex], this.userEmail).subscribe({
       next: (checkStates) => {
-
-        for (let i = 0; i < this.wordleLength[this.currentWordleIndex]; i++) {
+        for (let i = 0; i < this.wordleLength[this.wordleOrder[this.currentWordleIndex]]; i++) {
           curTry.letters[i].state = checkStates[i];
           const key = curTry.letters[i].text.toLowerCase();
           const currentStoredState = this.curLetterStates[key];
@@ -278,7 +308,8 @@ export class PlayWordleComponent {
 
         this.numSubmittedTries++;
         if (checkStates.every((state) => state === LetterState.FULL_MATCH)) {
-          const currentGame = this.wordleState.games[this.currentWordleIndex];
+          const currentGame = this.wordleState.games[this.wordleOrder[this.currentWordleIndex]];
+
           currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.showInfoMessage('¡CORRECTO!');
@@ -291,13 +322,12 @@ export class PlayWordleComponent {
           this.hasMoreWords = this.currentWordleIndex < this.numWordles - 1;
           this.finished = true;
           this.won = false;
-          const currentGame = this.wordleState.games[this.currentWordleIndex];
+          const currentGame = this.wordleState.games[this.wordleOrder[this.currentWordleIndex]];
+
           currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.updateContestState();
           this.uploadNewLog();
-
-
         } else {
           this.updateContestState();
           this.uploadNewLog();
@@ -311,7 +341,7 @@ export class PlayWordleComponent {
   }
 
   lostGame() {
-    this.wordleService.getWordleInContest(this.contest.id, this.currentWordleIndex).subscribe({
+    this.wordleService.getWordleInContest(this.contest.id, this.wordleOrder[this.currentWordleIndex]).subscribe({
       next: (wordle) => {
         this.showInfoMessage(`La palabra era: ${wordle.word.toUpperCase()}`);
       },
@@ -328,14 +358,11 @@ export class PlayWordleComponent {
 
   handleNextWord() {
     if (this.currentWordleIndex + 1 < this.numWordles) {
-      this.wordleState.games[this.currentWordleIndex + 1].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+      this.wordleState.games[this.wordleOrder[this.currentWordleIndex + 1]].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
       this.updateContestState();
       this.currentWordleIndex++;
       this.setTargetWord();
-    } else {
-      this.hasMoreWords = false;
-      this.showInfoMessage('¡Has completado todas las palabras!');
-    }
+    } 
 
     this.numSubmittedTries = 0;
     this.curLetterIndex = 0;
@@ -353,7 +380,7 @@ export class PlayWordleComponent {
   }
 
   private updateContestState(): void {
-    const currentGame = this.wordleState.games[this.currentWordleIndex];
+    const currentGame = this.wordleState.games[this.wordleOrder[this.currentWordleIndex]];
 
     currentGame.finished = this.finished;
     currentGame.won = this.won;
@@ -407,13 +434,13 @@ export class PlayWordleComponent {
       wordleToGuess: '',
       wordleInserted: this.lastWordle.toUpperCase(),
       numTry: this.numSubmittedTries,
-      wordlePosition: this.currentWordleIndex + 1,
+      wordlePosition: this.wordleOrder[this.currentWordleIndex] + 1,
       correct: counts.fullMatch,
       wrongPosition: counts.partialMatch,
       wrong: counts.wrong,
       state: this.won
     };
-    this.contestService.createContestLog(this.contest.id, this.currentWordleIndex, this.userName, this.wordleStateLog).subscribe({
+    this.contestService.createContestLog(this.contest.id, this.wordleOrder[this.currentWordleIndex], this.userName, this.wordleStateLog).subscribe({
       next: () => {
         console.log('Creado nuevo log correctamente');
         if (this.finished && !this.won)
@@ -422,6 +449,18 @@ export class PlayWordleComponent {
       error: (error) => {
         console.error('Error creando el nuevo log del concurso', error);
       },
+    });
+  }
+
+  deleteProfessorState() {
+    this.contestService.deleteProfessorState(this.contest.id, this.userName).subscribe({
+      next: () => {
+        console.log('Estado y logs eliminados correctamente');
+        this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, professorName: this.professorName } });
+      },
+      error: (e) => {
+        console.error('Error borrando el estado y los logs', e);
+      }
     });
   }
 
@@ -439,6 +478,7 @@ export class PlayWordleComponent {
             for (let j = 0; j < this.wordleLength[this.currentWordleIndex]; j++) {
               this.tries[i].letters[j].text = letters[j].letter;
               this.tries[i].letters[j].state = letters[j].state;
+              this.curLetterStates[letters[j].letter.toLowerCase()] = letters[j].state;
             }
           }
         }
@@ -449,11 +489,15 @@ export class PlayWordleComponent {
     });
   }
 
+  isAccentKey(key: string): boolean {
+    return ['Á', 'É', 'Í', 'Ó', 'Ú'].includes(key)
+  }
+
   navigateToStatistics() {
-    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats' } });
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats', professorName: this.professorName } });
   }
 
   goBack() {
-    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName } });
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, professorName: this.professorName } });
   }
 }

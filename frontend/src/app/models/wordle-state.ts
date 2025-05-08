@@ -1,10 +1,22 @@
 export class WordleState {
   numberOfWordle: number;
   games: Game[];
+  wordleOrder: number[];
 
-  constructor(numberOfWordle: number = 0, games: Game[] = []) {
+  constructor(numberOfWordle: number = 0, games: Game[] = [], isRandom: boolean) {
     this.numberOfWordle = numberOfWordle;
     this.games = games;
+    this.wordleOrder = isRandom
+      ? this.shuffle(Array.from({ length: numberOfWordle }, (_, i) => i))
+      : Array.from( { length: numberOfWordle }, (_, i) => i);
+  }
+
+  private shuffle(array: number[]): number[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }
 

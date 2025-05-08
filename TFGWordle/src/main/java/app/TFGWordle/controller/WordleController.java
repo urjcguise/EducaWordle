@@ -187,7 +187,7 @@ public class WordleController {
             }
         }
 
-        return new ResponseEntity<>(wordleService.findByContestId(contest.getId()), HttpStatus.OK);
+        return new ResponseEntity<>(contest.getWordles(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -217,7 +217,6 @@ public class WordleController {
         return new ResponseEntity<>(wordle.getContests(), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/checkWordleAttempt/{contestId}/{wordleIndex}/{word}/{userEmail}")
     public ResponseEntity<List<Integer>> checkWordleAttempt(@PathVariable Long contestId, @PathVariable Integer wordleIndex, @PathVariable String word, @PathVariable String userEmail) {
         if (!contestService.existsById(contestId))
@@ -231,9 +230,14 @@ public class WordleController {
         Contest contest = contestService.getById(contestId);
         String wordle = contest.getWordles().get(wordleIndex).getWord();
 
+        boolean isAccentMode = contest.getAccentMode();
+
         for (int i = 0; i < wordle.length(); i++) {
             char expected = wordle.charAt(i);
             char got = Character.toUpperCase(word.charAt(i));
+
+            if (!isAccentMode)
+                expected = deleteAccent(expected);
 
             if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                 toReturn.add(2);
@@ -259,7 +263,6 @@ public class WordleController {
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getWordleInContest/{contestId}/{wordleIndex}")
     public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
@@ -418,5 +421,16 @@ public class WordleController {
             folderService.save(folder);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private char deleteAccent(char c) {
+        switch (c) {
+            case 'Á': case 'á': return 'A';
+            case 'É': case 'é': return 'E';
+            case 'Í': case 'í': return 'I';
+            case 'Ó': case 'ó': return 'O';
+            case 'Ú': case 'ú': return 'U';
+            default: return c;
+        }
     }
 }

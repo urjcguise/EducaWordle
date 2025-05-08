@@ -67,6 +67,8 @@ public class ContestController {
         contest.setNumTries(6);
         contest.setUseDictionary(false);
         contest.setUseExternalFile(false);
+        contest.setRandomMode(false);
+        contest.setAccentMode(false);
 
         competitionService.save(competition);
         return ResponseEntity.status(HttpStatus.CREATED).body(contestService.save(contest));
@@ -117,6 +119,32 @@ public class ContestController {
         contest.setCompetition(contestService.getById(contest.getId()).getCompetition());
 
         return ResponseEntity.ok(contestService.save(contest));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/editRandomMode/{contestId}")
+    public ResponseEntity<Boolean> editRandomMode(@RequestBody Boolean newMode, @PathVariable Long contestId) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+        contest.setRandomMode(newMode);
+        contestService.save(contest);
+
+        return new ResponseEntity<>(newMode, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/editAccentMode/{contestId}")
+    public ResponseEntity<Boolean> editAccentMode(@RequestBody Boolean newMode, @PathVariable Long contestId) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Contest contest = contestService.getById(contestId);
+        contest.setAccentMode(newMode);
+        contestService.save(contest);
+
+        return new ResponseEntity<>(newMode, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -198,7 +226,8 @@ public class ContestController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-        @GetMapping("/{contestId}/contest")
+
+    @GetMapping("/{contestId}/contest")
     public ResponseEntity<Contest> getContestById(@PathVariable Long contestId) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -226,6 +255,8 @@ public class ContestController {
         newContest.setNumTries(oldContest.getNumTries());
         newContest.setUseDictionary(oldContest.getUseDictionary());
         newContest.setUseExternalFile(oldContest.getUseExternalFile());
+        newContest.setRandomMode(oldContest.getRandomMode());
+        newContest.setAccentMode(oldContest.getAccentMode());
         newContest.setWordlesLength(oldContest.getWordlesLength());
         List<Wordle> copiedWordles = new ArrayList<>(oldContest.getWordles());
         newContest.setWordles(copiedWordles);
@@ -234,7 +265,6 @@ public class ContestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/resumeContest/{contestId}/{userName}")
     public ResponseEntity<ResumeContestDTO> resumeContest(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
@@ -310,7 +340,7 @@ public class ContestController {
 
             for (int i = 0; i < wordleToSolve.length(); i++) {
                 char expected = wordleToSolve.charAt(i);
-                char got = Character.toLowerCase(wordleInserted.charAt(i));
+                char got = wordleInserted.charAt(i);
 
                 ResumeContestDTO.Try.Letter newLetter = new ResumeContestDTO.Try.Letter();
                 newLetter.setLetter(got);
@@ -326,7 +356,7 @@ public class ContestController {
             }
 
             for (int i = 0; i < wordleToSolve.length(); i++) {
-                char got = Character.toLowerCase(wordleInserted.charAt(i));
+                char got = wordleInserted.charAt(i);
 
                 if (letters.get(i).getState() == 3 && wordleToSolve.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                     letters.get(i).setState(1);
@@ -348,7 +378,6 @@ public class ContestController {
         return new ResponseEntity<>(resumeContestDTO, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/newContestState/{contestId}/{userName}")
     public ResponseEntity<?> createContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
         if (!contestService.existsById(contestId))
@@ -358,11 +387,14 @@ public class ContestController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Contest contest = contestService.getById(contestId);
 
+        boolean isAccentMode = contest.getAccentMode();
+
         List<Map<Character, Integer>> letterCounts = new ArrayList<>();
         for (Wordle wordle: contest.getWordles()) {
             Map<Character, Integer> letterCount = new HashMap<>();
             for (char c: wordle.getWord().toCharArray()) {
-                letterCount.put(c, letterCount.getOrDefault(c, 0) + 1);
+                char charToSave = isAccentMode ? c : deleteAccent(c);
+                letterCount.put(charToSave, letterCount.getOrDefault(charToSave, 0) + 1);
             }
             letterCounts.add(letterCount);
         }
@@ -397,7 +429,6 @@ public class ContestController {
         return new ResponseEntity<>(contestStateService.getState(contest.getId(), user.getId()), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/updateContestState/{contestId}/{userName}")
     public ResponseEntity<?> updateContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
         if (!contestService.existsById(contestId))
@@ -434,7 +465,6 @@ public class ContestController {
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/createContestLog/{contestId}/{wordlePosition}/{userName}")
     public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable Integer wordlePosition, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
         if (!contestService.existsById(contestId))
@@ -503,7 +533,24 @@ public class ContestController {
         return new ResponseEntity<>(toReturn, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
+    @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
+    @PostMapping("/deleteAllProfessorState/{contestId}/{professorName}")
+    public ResponseEntity<?> deleteAllProfessorState(@PathVariable Long contestId, @PathVariable String professorName) {
+        if (!contestService.existsById(contestId))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        User professor = userService.getByUserName(professorName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        ContestState toDelete = contestStateService.getContestState(contestId, professor.getId());
+        contestStateService.deleteById(toDelete.getId());
+
+        List<ContestStateLog> logsToDelete = contestStateService.getLogsByContestIdAndUser(contestId, professor.getId());
+        contestStateService.deleteAllLogs(logsToDelete);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/existsInDictionary/{word}")
     public ResponseEntity<Boolean> existsInDictionary(@PathVariable String word) {
         return new ResponseEntity<>(dictionaryService.existsInGlobalDictionary(word.toLowerCase()), HttpStatus.OK);
@@ -527,7 +574,6 @@ public class ContestController {
         return new ResponseEntity<>(dictionaryService.saveExternal(toSave), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/existsInExternalDictionary/{contestId}/{wordle}")
     public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable Long contestId, @PathVariable String wordle) {
         if(!contestService.existsById(contestId))
@@ -554,6 +600,17 @@ public class ContestController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=logs.xlsx")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    private char deleteAccent(char c) {
+        switch (c) {
+            case 'Á': case 'á': return 'A';
+            case 'É': case 'é': return 'E';
+            case 'Í': case 'í': return 'I';
+            case 'Ó': case 'ó': return 'O';
+            case 'Ú': case 'ú': return 'U';
+            default: return c;
+        }
     }
 
     private void writeDataToExcel(List<String> logs, ByteArrayOutputStream out) {

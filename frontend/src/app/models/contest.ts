@@ -9,6 +9,8 @@ export class Contest {
     numTries!: number;
     useDictionary!: boolean;
     useExternalFile!: boolean;
+    randomMode!: boolean;
+    accentMode!: boolean;
     wordlesLength!: number[];
 
     constructor(contestName: string,
@@ -17,6 +19,8 @@ export class Contest {
         numTries: number,
         useDictionary: boolean,
         useExternalFile: boolean,
+        randomMode: boolean,
+        accentMode: boolean,
         competition: Competition,
         wordlesLength: number[]) {
         this.contestName = contestName;
@@ -25,6 +29,8 @@ export class Contest {
         this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
+        this.randomMode = randomMode;
+        this.accentMode = accentMode;
         this.competition = competition;
         this.wordlesLength = wordlesLength;
     }

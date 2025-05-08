@@ -32,6 +32,14 @@ export class ContestService {
     return this.httpClient.post<any>(this.apiUrl + 'editContest', updatedContest);
   }
 
+  public editRandomMode(newMode: boolean, contestId: number) {
+    return this.httpClient.post<any>(this.apiUrl + 'editRandomMode/' + contestId, newMode);
+  }
+
+  public editAccentMode(newMode: boolean, contestId: number) {
+    return this.httpClient.post<any>(this.apiUrl + 'editAccentMode/' + contestId, newMode);
+  }
+
   public addWordlesToContest(contestId: number, wordles: string[]) {
     return this.httpClient.post<any>(this.apiUrl + 'addWordlesToContest/' + contestId, wordles);
   }
@@ -82,6 +90,10 @@ export class ContestService {
 
   public getAllUserStateLog(contestId: number, userName: string) {
     return this.httpClient.get<WordleStateLog[]>(this.apiUrl + 'getAllUserContestStateLogs/' + contestId + '/' + userName);
+  }
+
+  public deleteProfessorState(contestId: number, professorName: string) {
+    return this.httpClient.post<any>(this.apiUrl + 'deleteAllProfessorState/' + contestId + '/' + professorName, null);
   }
 
   public existsInDictionary(word: string) {

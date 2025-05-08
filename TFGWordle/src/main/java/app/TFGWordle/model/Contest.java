@@ -25,6 +25,8 @@ public class Contest {
     private int numTries;
     private Boolean useDictionary;
     private Boolean useExternalFile;
+    private Boolean randomMode;
+    private Boolean accentMode;
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
@@ -38,6 +40,7 @@ public class Contest {
             joinColumns = @JoinColumn(name = "contest_id"),
             inverseJoinColumns = @JoinColumn(name = "wordle_id")
     )
+    @OrderColumn(name = "wordle_order")
     private List<Wordle> wordles = new ArrayList<>();
 
     @Convert(converter = ListOfIntegerConverter.class)
@@ -46,7 +49,8 @@ public class Contest {
 
     public Contest() {}
 
-    public Contest(String name, Competition competition, Date startDate, Date endDate, int numTries, Boolean useDictionary, Boolean useExternalFile) {
+    public Contest(String name, Competition competition, Date startDate, Date endDate, int numTries,
+                   Boolean useDictionary, Boolean useExternalFile, Boolean randomMode, Boolean accentMode) {
         this.name = name;
         this.competition = competition;
         this.startDate = startDate;
@@ -54,6 +58,8 @@ public class Contest {
         this.numTries = numTries;
         this.useDictionary = useDictionary;
         this.useExternalFile = useExternalFile;
+        this.randomMode = randomMode;
+        this.accentMode = accentMode;
     }
 
     @Override
@@ -66,7 +72,8 @@ public class Contest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, startDate, endDate, numTries, useDictionary, useExternalFile, competition, wordles);
+        return Objects.hash(id, name, startDate, endDate, numTries, useDictionary, useExternalFile, randomMode,
+                accentMode, competition, wordles, wordlesLength);
     }
 
     public void setId(Long id) {
@@ -123,6 +130,22 @@ public class Contest {
 
     public void setUseExternalFile(Boolean useExternalFile) {
         this.useExternalFile = useExternalFile;
+    }
+
+    public Boolean getRandomMode() {
+        return randomMode;
+    }
+
+    public void setRandomMode(Boolean randomMode) {
+        this.randomMode = randomMode;
+    }
+
+    public Boolean getAccentMode() {
+        return accentMode;
+    }
+
+    public void setAccentMode(Boolean accentMode) {
+        this.accentMode = accentMode;
     }
 
     public Competition getCompetition() {

@@ -24,9 +24,25 @@
                 </div>
             </div>
 
-            <div class="keyboard-container">
+            <div class="keyboard-container" *ngIf="!isAccentMode">
                 <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRows; let i = index">
                     <div *ngFor="let key of row" [class]="getKeyClass(key)" [class.enter]="key === 'Enviar'"
+                        (click)="handleClickKey(key)">
+                        <div *ngIf="key !== 'Backspace'; else backspace">
+                            {{key}}
+                        </div>
+                        <ng-template #backspace>
+                            <div class="backspace-icon">⌫</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-container" *ngIf="isAccentMode">
+                <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRowsAccent; let i = index">
+                    <div *ngFor="let key of row" 
+                        [class]="getKeyClass(key)" 
+                        [ngClass]="{'accent-key': isAccentKey(key), 'enter': key === 'Enviar'}"
                         (click)="handleClickKey(key)">
                         <div *ngIf="key !== 'Backspace'; else backspace">
                             {{key}}
@@ -44,7 +60,8 @@
 
             <div *ngIf="!hasMoreWords" class="completion-message">
                 ¡Has completado todas las palabras!
-                <button (click)="navigateToStatistics()" class="button-action">Ver estadísticas</button>
+                <button *ngIf="!isProfessor" (click)="navigateToStatistics()" class="button-action">Ver estadísticas</button>
+                <button *ngIf="isProfessor" (click)="deleteProfessorState()" class="button-action">Volver</button>
             </div>
 
             <div class="info-msg" [class.show]="infoMsg !== ''" [class.fade-out]="fadeOutInfoMessage">
