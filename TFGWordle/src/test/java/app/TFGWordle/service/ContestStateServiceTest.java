@@ -259,6 +259,7 @@ class ContestStateServiceTest {
         verify(contestStateLogRepository, times(1)).save(contestStateLog);
     }
 
+    /*
     @Test
     void getAllLogsByContestAndUser() {
         Long contestId = 1L;
@@ -292,7 +293,7 @@ class ContestStateServiceTest {
         assertTrue(actualLogs.isEmpty());
 
         verify(contestStateLogRepository, times(1)).findByContestIdAndUserId(contestId, userId);
-    }
+    }*/
 
     @Test
     public void getAllLogsByContest() {

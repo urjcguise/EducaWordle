@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Game } from '../models/wordle-state';
 import { ContestService } from '../service/contest.service';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
@@ -18,7 +18,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription;
 
-  professorName: string = '';
+  @Input() professorName: string = '';
 
   contestId: number = 0;
   competitionName!: string;
@@ -97,8 +97,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     this.isStudent = this.tokenService.getAuthorities().includes("ROLE_STUDENT");
     this.isAdmin = this.tokenService.getAuthorities().includes("ROLE_ADMIN");
 
-    if (this.isAdmin)
-      this.professorName = history.state.professorName;
+    this.professorName = history.state.professorName;
 
     this.wordleService.getWordlesByContest(this.contestId).subscribe({
       next: (wordles) => {
@@ -131,43 +130,49 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
             data.forEach((userState: UserState) => {
               const userName = userState.userName;
               const email = userState.email;
-              let endTime = "";
-              let totalTime = 0;
               let wordleIndex = 0;
-              userState.state.games.forEach((game: Game) => {
-                const wordleDataItem = this.wordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
-                const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
 
-                if (!wordleDataItem || !wordleStudentsItem) {
-                  console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
-                  return;
-                }
+              if (userName === this.professorName)
+                this.totalStudents -= 1;
 
-                if (game.finished) {
-                  if (game.won)
-                    wordleDataItem.success += 1;
-                  else
-                    wordleDataItem.wrong += 1;
-                  endTime = game.finishTime;
-                  totalTime = game.timeNeeded;
-                  wordleDataItem.totalTriesAccumulated += game.tryCount;
-                  wordleDataItem.totalTimeAccumulated += game.timeNeeded;
-                } else {
-                  wordleDataItem.trying += 1;
-                }
+              if (userName !== this.professorName) {
+                userState.state.games.forEach((game: Game) => {
+                  let endTime = "";
+                  let totalTime = 0;
+                  const wordleDataItem = this.wordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
+                  const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
 
-                wordleStudentsItem.students.push({
-                  name: userName,
-                  email: email,
-                  totalTries: game.tryCount,
-                  startTime: game.startTime,
-                  endTime: endTime,
-                  totalTime: totalTime,
-                  lastWordle: game.lastWordle,
-                  finished: game.finished
+                  if (!wordleDataItem || !wordleStudentsItem) {
+                    console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
+                    return;
+                  }
+
+                  if (game.finished) {
+                    if (game.won)
+                      wordleDataItem.success += 1;
+                    else
+                      wordleDataItem.wrong += 1;
+                    endTime = game.finishTime;
+                    totalTime = game.timeNeeded;
+                    wordleDataItem.totalTriesAccumulated += game.tryCount;
+                    wordleDataItem.totalTimeAccumulated += game.timeNeeded;
+                  } else {
+                    wordleDataItem.trying += 1;
+                  }
+
+                  wordleStudentsItem.students.push({
+                    name: userName,
+                    email: email,
+                    totalTries: game.tryCount,
+                    startTime: game.startTime,
+                    endTime: endTime,
+                    totalTime: totalTime,
+                    lastWordle: game.lastWordle,
+                    finished: game.finished
+                  });
+                  wordleIndex += 1;
                 });
-                wordleIndex += 1;
-              });
+              }
             });
 
             if (this.isStudent) {
@@ -190,7 +195,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
                       wrong: log.wrong
                     });
                   });
-                  this.studentInformation.forEach( (elem) => {
+                  this.studentInformation.forEach((elem) => {
                     elem.info.sort((a, b) => a.nunTry - b.nunTry);
                   });
                 },
@@ -219,16 +224,18 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
       this.contestService.getAllStateLog(this.contestId).subscribe({
         next: (logs) => {
           logs.forEach((log: WordleStateLog) => {
-            this.studentsLog.push({
-              student: log.userName,
-              email: log.email,
-              time: log.dateLog,
-              wordleToGuess: log.wordleToGuess,
-              wordlePosition: log.wordlePosition,
-              wordleInserted: log.wordleInserted,
-              try: log.numTry,
-              state: log.state
-            });
+            if (log.userName !== this.professorName) {
+              this.studentsLog.push({
+                student: log.userName,
+                email: log.email,
+                time: log.dateLog,
+                wordleToGuess: log.wordleToGuess,
+                wordlePosition: log.wordlePosition,
+                wordleInserted: log.wordleInserted,
+                try: log.numTry,
+                state: log.state
+              });
+            }
           });
           this.studentsLog.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
           this.subscription = interval(5000).subscribe(() => {
@@ -245,16 +252,18 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   getLogs() {
     this.contestService.getAllStateLog(this.contestId).subscribe({
       next: (logs) => {
-        const updatedLogs = logs.map((log: WordleStateLog) => ({
-          student: log.userName,
-          email: log.email,
-          time: log.dateLog,
-          wordleToGuess: log.wordleToGuess,
-          wordlePosition: log.wordlePosition,
-          wordleInserted: log.wordleInserted,
-          try: log.numTry,
-          state: log.state
-        }));
+        const updatedLogs = logs
+          .filter((log: WordleStateLog) => log.userName !== this.professorName)
+          .map((log: WordleStateLog) => ({
+            student: log.userName,
+            email: log.email,
+            time: log.dateLog,
+            wordleToGuess: log.wordleToGuess,
+            wordlePosition: log.wordlePosition,
+            wordleInserted: log.wordleInserted,
+            try: log.numTry,
+            state: log.state
+          }));
 
         this.studentsLog.length = 0;
         this.studentsLog.push(...updatedLogs);

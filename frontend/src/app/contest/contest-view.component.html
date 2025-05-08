@@ -7,12 +7,13 @@
 
         <div class="contest-header">
             <span class="contest-name" *ngIf="contest">{{ contest.contestName }}</span>
-          
+
             <div class="button-group">
-              <button *ngIf="isProfessor && !contestFinished" class="contest-button" (click)="editContest()">Editar</button>
-              <button *ngIf="isProfessor" class="contest-button" (click)="copyContest()">Copiar</button>
+                <button *ngIf="isProfessor && !contestFinished" class="contest-button"
+                    (click)="editContest()">Editar</button>
+                <button *ngIf="isProfessor" class="contest-button" (click)="copyContest()">Copiar</button>
             </div>
-          </div>
+        </div>
 
         <div class="contest-navbar">
             <ul class="nav-tabs">
@@ -20,7 +21,8 @@
                 <li *ngIf="isProfessor" class="tab-item" [class.active]="activeTab === 'wordles'"
                     (click)="activeTab = 'wordles'">Wordles
                 </li>
-                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking</li>
+                <li class="tab-item" [class.active]="activeTab === 'ranking'" (click)="activeTab = 'ranking'">Ranking
+                </li>
                 <li *ngIf="isProfessor || (isStudent && studentFinished)" class="tab-item"
                     [class.active]="activeTab === 'stats'" (click)="activeTab = 'stats'">Estadísticas
                 </li>
@@ -32,26 +34,39 @@
                     <p><strong>Fecha de fin:</strong> {{ contest.endDate | date:'dd/MM/yyyy HH:mm' }}</p>
                     <p><strong>Número de intentos:</strong> {{ contest.numTries }}</p>
                     <p><strong>Usa diccionario:</strong> {{ contest.useDictionary ? 'Sí' : 'No' }}</p>
+                    <p><strong>Modo tildes:</strong> {{ contest.accentMode ? 'Sí' : 'No' }}</p>
                     <p *ngIf="contest.useDictionary"><strong>Usa diccionario externo:</strong> {{contest.useExternalFile
                         ? 'Sí' : 'No' }}</p>
-                    <div *ngIf="isStudent && !studentFinished && !studentPlaying" class="mt-3">
-                        <button class="btn btn-success" (click)="playWordle()">🎮 Jugar</button>
+                    <div *ngIf="!contestFinished && contestStarted">
+                        <div *ngIf="isStudent && !studentFinished && !studentPlaying" class="mt-3">
+                            <button class="btn btn-success" (click)="playWordle()">🎮 Jugar</button>
+                        </div>
+                        <div *ngIf="isStudent && !studentFinished && studentPlaying" class="mt-3">
+                            <button class="btn btn-success" (click)="playWordle()">🎮 Reanudar</button>
+                        </div>
                     </div>
-                    <div *ngIf="isStudent && !studentFinished && studentPlaying" class="mt-3">
-                        <button class="btn btn-success" (click)="playWordle()">🎮 Reanudar</button>
+                    <div *ngIf="hasWordles">
+                        <div *ngIf="isProfessor && !studentPlaying" class="mt-3">
+                            <button class="btn btn-success" (click)="playWordle()">Ver concurso borrador</button>
+                        </div>
+                        <div *ngIf="isProfessor && studentPlaying" class="mt-3">
+                            <button class="btn btn-success" (click)="playWordle()">Reanudar concurso borrador</button>
+                        </div>
                     </div>
                 </div>
 
                 <div *ngIf="activeTab === 'wordles'">
-                    <app-show-wordles></app-show-wordles>
+                    <app-show-wordles [randomMode]="contest.randomMode" [accentMode]="contest.accentMode"
+                        [contestFinished]="contestFinished"
+                        (hasWordles)="hasWordlesChange($event)"></app-show-wordles>
                 </div>
 
                 <div *ngIf="activeTab === 'ranking'">
-                    <app-contest-ranking></app-contest-ranking>
+                    <app-contest-ranking [professorName]="professorName"></app-contest-ranking>
                 </div>
 
                 <div *ngIf="activeTab === 'stats'">
-                    <app-contest-statistics></app-contest-statistics>
+                    <app-contest-statistics [professorName]="professorName"></app-contest-statistics>
                 </div>
             </div>
         </div>
@@ -60,6 +75,6 @@
             <span class="button-text">Eliminar concurso</span>
         </button>
     </div>
-    
+
     <app-footer></app-footer>
 </div>

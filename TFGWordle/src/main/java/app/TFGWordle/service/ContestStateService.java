@@ -78,12 +78,16 @@ public class ContestStateService {
         contestStateLogRepository.deleteById(id);
     }
 
+    public void deleteAllLogs(List<ContestStateLog> contestStateLogs) {
+        contestStateLogRepository.deleteAll(contestStateLogs);
+    }
+
     public void saveLog(ContestStateLog contestStateLog) {
         contestStateLogRepository.save(contestStateLog);
     }
 
     public List<String> getAllLogsByContestAndUser(Long contestId, Long userId) {
-        return contestStateLogRepository.findByContestIdAndUserId(contestId, userId);
+        return contestStateLogRepository.findAllLogsByContestIdAndUserId(contestId, userId);
     }
 
     public List<String> getAllLogsByContest(Long contestId) {
@@ -92,5 +96,9 @@ public class ContestStateService {
 
     public List<ContestStateLog> getLogsByContestId(Long contestId) {
         return contestStateLogRepository.findByContestId(contestId);
+    }
+
+    public List<ContestStateLog> getLogsByContestIdAndUser(Long contestId, Long userId) {
+        return contestStateLogRepository.findByContestIdAndUserId(contestId, userId);
     }
 }

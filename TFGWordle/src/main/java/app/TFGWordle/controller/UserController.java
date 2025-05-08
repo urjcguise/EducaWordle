@@ -79,7 +79,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getUserEmail/{userName}")
     public ResponseEntity<String> getUserEmail(@PathVariable String userName) {
         User user = userService.getByUserName(userName)

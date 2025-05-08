@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Contest } from '../models/contest';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContestService } from '../service/contest.service';
@@ -12,8 +12,9 @@ import { TokenService } from '../service/token.service';
 })
 export class ContestRankingComponent implements OnInit {
 
+  @Input() professorName: string = '';
+
   isAdmin: boolean = false;
-  professorName: string = '';
 
   competitionName: string = '';
   contestId: number = 0;
@@ -69,26 +70,28 @@ export class ContestRankingComponent implements OnInit {
 
     userState.forEach((user) => {
       const userName = user.userName;
-      var numRightGuess = 0;
-      var totalRightGuess = 0;
-      var time = 0;
-      var tries: number[] = [];
-      user.state.games.forEach((game) => {
-        if (game.finished) {
-          if (game.won)
-            numRightGuess++;
-          time += Number(game.timeNeeded);
-        }
-        tries = [game.tryCount, this.contest.numTries];
-        totalRightGuess += game.tryCount;
-      });
-      this.studentsRanking.push({
-        name: userName,
-        rightGuess: numRightGuess,
-        actualTries: tries,
-        totalTries: totalRightGuess,
-        totalTime: time,
-      });
+      if (userName !== this.professorName) {
+        var numRightGuess = 0;
+        var totalRightGuess = 0;
+        var time = 0;
+        var tries: number[] = [];
+        user.state.games.forEach((game) => {
+          if (game.finished) {
+            if (game.won)
+              numRightGuess++;
+            time += Number(game.timeNeeded);
+          }
+          tries = [game.tryCount, this.contest.numTries];
+          totalRightGuess += game.tryCount;
+        });
+        this.studentsRanking.push({
+          name: userName,
+          rightGuess: numRightGuess,
+          actualTries: tries,
+          totalTries: totalRightGuess,
+          totalTime: time,
+        });
+      }
     });
     this.studentsRanking.sort((a, b) => b.rightGuess - a.rightGuess);
   }

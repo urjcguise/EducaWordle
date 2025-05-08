@@ -13,10 +13,12 @@ export class EditContestComponent {
 
   professorName: string = '';
 
-  contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, new Competition(""), []);
+  contest: Contest = new Contest("", new Date(), new Date(), 0, false, false, false, false, new Competition(""), []);
   contestId: number = 0;
   dictionary: boolean = false;
   file: boolean = false;
+  random: boolean = false;
+  accent: boolean = false;
   numTries: number = 0;
   contestName: string = '';
 
@@ -49,6 +51,8 @@ export class EditContestComponent {
         this.contestName = data.contestName;
         this.dictionary = data.useDictionary || false;
         this.file = data.useExternalFile || false;
+        this.random = data.randomMode || false;
+        this.accent = data.accentMode ||false;
         this.numTries = data.numTries;
         this.formattedStartDate = this.formatDateForInput(this.contest.startDate);
         this.formattedEndDate = this.formatDateForInput(this.contest.endDate);
