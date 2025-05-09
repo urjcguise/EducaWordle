@@ -145,7 +145,7 @@ export class PlayWordleComponent {
     }
 
     this.wordleState = new WordleState(this.numWordles, this.games, this.contest.randomMode);
-    
+
     this.wordleOrder = this.wordleState.wordleOrder;
     this.games[this.wordleOrder[this.currentWordleIndex]].startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
@@ -208,20 +208,20 @@ export class PlayWordleComponent {
   handleClickKey(key: string) {
     if (this.finished) return;
     if (key.length === 1 && this.isAccentMode && /^[a-zñáéíóúÁÉÍÓÚ]$/i.test(key)) {
-      
+
       if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
         this.setLetter(key);
         this.curLetterIndex++;
       }
     } else if (key.length === 1 && !this.isAccentMode && /^[a-zñ]$/i.test(key)) {
-      
+
       if (this.curLetterIndex < (this.numSubmittedTries + 1) * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
         this.setLetter(key);
         this.curLetterIndex++;
       }
     }
     else if (key === 'Backspace') {
-     
+
       if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
         this.curLetterIndex--;
         this.setLetter('');
@@ -362,7 +362,7 @@ export class PlayWordleComponent {
       this.updateContestState();
       this.currentWordleIndex++;
       this.setTargetWord();
-    } 
+    }
 
     this.numSubmittedTries = 0;
     this.curLetterIndex = 0;
@@ -470,12 +470,14 @@ export class PlayWordleComponent {
         this.curLetterIndex = resumeContestDTO.charPosition;
         this.numSubmittedTries = resumeContestDTO.tryPosition;
         this.currentWordleIndex = resumeContestDTO.wordlePosition;
+        this.wordleOrder = resumeContestDTO.wordleOrder;
         this.wordleState = resumeContestDTO.wordleState;
+
         this.setTargetWord();
         if (resumeContestDTO.tries.length > 0) {
           for (let i = 0; i < resumeContestDTO.tries.length; i++) {
             const letters = resumeContestDTO.tries[i].letters;
-            for (let j = 0; j < this.wordleLength[this.currentWordleIndex]; j++) {
+            for (let j = 0; j < this.wordleLength[this.wordleOrder[this.currentWordleIndex]]; j++) {
               this.tries[i].letters[j].text = letters[j].letter;
               this.tries[i].letters[j].state = letters[j].state;
               this.curLetterStates[letters[j].letter.toLowerCase()] = letters[j].state;

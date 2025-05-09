@@ -4,6 +4,7 @@ import java.util.List;
 
 public class WordleState {
     private int numberOfWordle;
+    private List<Integer> wordleOrder;
     private List<Game> games;
 
     public int getNumberOfWordle() {
@@ -12,6 +13,14 @@ public class WordleState {
 
     public void setNumberOfWordle(int numberOfWordle) {
         this.numberOfWordle = numberOfWordle;
+    }
+
+    public List<Integer> getWordleOrder() {
+        return wordleOrder;
+    }
+
+    public void setWordleOrder(List<Integer> wordleOrder) {
+        this.wordleOrder = wordleOrder;
     }
 
     public List<Game> getGames() {

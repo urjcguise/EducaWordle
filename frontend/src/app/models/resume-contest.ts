@@ -5,6 +5,7 @@ export interface ResumeContestDTO {
     tryPosition: number;
     charPosition: number;
     tries: Try[];
+    wordleOrder: number[];
 
     wordleState: WordleState;
 }

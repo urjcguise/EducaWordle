@@ -277,24 +277,43 @@ public class ContestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        List<WordleState.Game> games = contestStateService.getState(contest.getId(), user.getId()).getGames();
+        WordleState wordleState = contestStateService.getState(contest.getId(), user.getId());
+        List<WordleState.Game> games = wordleState.getGames();
         int firstUnfinished = -1;
+        int posFirstUnfinished = -1;
 
-        for (int i = 0; i < games.size(); i++) {
-            WordleState.Game game = games.get(i);
-            boolean finished = game.isFinished();
+        if (contest.getRandomMode()) {
+            List<Integer> wordleOrder = wordleState.getWordleOrder();
+            for (int i = 0; i < wordleOrder.size(); i++) {
+                int realIndex = wordleOrder.get(i);
+                WordleState.Game game = games.get(realIndex);
+                if (!game.isFinished()) {
+                    firstUnfinished = realIndex;
+                    posFirstUnfinished = i;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < games.size(); i++) {
+                WordleState.Game game = games.get(i);
+                boolean finished = game.isFinished();
 
-            if (!finished) {
-                firstUnfinished = i;
-                break;
+                if (!finished) {
+                    firstUnfinished = i;
+                    break;
+                }
             }
         }
 
         List<String> logs = contestStateService.getAllLogsByContestAndUser(contest.getId(), user.getId());
 
         ResumeContestDTO resumeContestDTO = new ResumeContestDTO();
-        resumeContestDTO.setWordlePosition(firstUnfinished);
-        resumeContestDTO.setWordleState(contestStateService.getState(contest.getId(), user.getId()));
+        resumeContestDTO.setWordleOrder(wordleState.getWordleOrder());
+        if (contest.getRandomMode())
+            resumeContestDTO.setWordlePosition(posFirstUnfinished);
+        else
+            resumeContestDTO.setWordlePosition(firstUnfinished);
+        resumeContestDTO.setWordleState(wordleState);
 
         if (logs.isEmpty()) {
             resumeContestDTO.setTryPosition(0);

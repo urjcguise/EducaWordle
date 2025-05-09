@@ -8,6 +8,7 @@ public class ResumeContestDTO {
     private int tryPosition;
     private int charPosition;
     private List<Try> tries;
+    private List<Integer> wordleOrder;
     private WordleState wordleState;
 
     public int getWordlePosition() {
@@ -24,6 +25,14 @@ public class ResumeContestDTO {
 
     public void setTryPosition(int tryPosition) {
         this.tryPosition = tryPosition;
+    }
+
+    public List<Integer> getWordleOrder() {
+        return wordleOrder;
+    }
+
+    public void setWordleOrder(List<Integer> wordleOrder) {
+        this.wordleOrder = wordleOrder;
     }
 
     public int getCharPosition() {
