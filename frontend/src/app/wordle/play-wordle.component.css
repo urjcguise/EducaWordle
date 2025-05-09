@@ -87,6 +87,14 @@ body {
   animation-duration: 120ms;
 }
 
+.letter-container.active {
+  border: 2px solid #cb0017;
+}
+
+.letter-container.clickable {
+  cursor: pointer;
+}
+
 .letter-container.match {
   background-color: #6aaa64;
   border-color: #6aaa64;

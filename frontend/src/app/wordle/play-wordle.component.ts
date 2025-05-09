@@ -231,6 +231,14 @@ export class PlayWordleComponent {
     }
   }
 
+  selectCell(tryIndex: number, letterIndex: number) {
+    const wordleLength = this.wordleLength[this.wordleOrder[this.currentWordleIndex]];
+    const isInCurrentTry = tryIndex === this.numSubmittedTries;
+
+    if (isInCurrentTry)
+      this.curLetterIndex = tryIndex * wordleLength + letterIndex;
+  }
+
   private setLetter(letter: string) {
     const tryIndex = Math.floor(this.curLetterIndex / this.wordleLength[this.wordleOrder[this.currentWordleIndex]]);
     const letterIndex = this.curLetterIndex % this.wordleLength[this.wordleOrder[this.currentWordleIndex]];
@@ -494,6 +502,10 @@ export class PlayWordleComponent {
   isAccentKey(key: string): boolean {
     return ['Á', 'É', 'Í', 'Ó', 'Ú'].includes(key)
   }
+
+  getCurLetterIndex(): number {
+    return this.curLetterIndex;
+  } 
 
   navigateToStatistics() {
     this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats', professorName: this.professorName } });

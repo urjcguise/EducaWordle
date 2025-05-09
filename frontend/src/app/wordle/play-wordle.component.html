@@ -14,11 +14,16 @@
             </div>
 
             <div class="main">
-                <div class="try-container" *ngFor="let try of tries" #tryContainer>
-                    <div class="letter-container" *ngFor="let letter of try.letters"
+                <div class="try-container" *ngFor="let try of tries; let tryIndex = index" #tryContainer>
+                    <div class="letter-container" *ngFor="let letter of try.letters; let letterIndex = index"
                         [class.match]="letter.state === LetterState.FULL_MATCH"
                         [class.partial]="letter.state === LetterState.PARTIAL_MATCH"
-                        [class.wrong]="letter.state === LetterState.WRONG" [class.has-text]="letter.text !== ''">
+                        [class.wrong]="letter.state === LetterState.WRONG" 
+                        [class.has-text]="letter.text !== ''"
+                        [class.active]="(tryIndex * wordleLength[this.wordleOrder[this.currentWordleIndex]] + letterIndex) === getCurLetterIndex() &&
+                                        (tryIndex === numSubmittedTries)"
+                        [class.clickable]="tryIndex === numSubmittedTries"
+                        (click)="selectCell(tryIndex, letterIndex)">
                         {{letter.text}}
                     </div>
                 </div>
