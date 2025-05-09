@@ -40,8 +40,19 @@ export class NewStudentComponent {
         });
       },
       error: (err) => {
-        this.errMsj = err.error.mensaje;
-        console.error('Error al crear la cuenta:', this.errMsj);
+        if (err.status === 409 && err.error) {
+          const existingUserId = err.error;
+          this.competitionService.createUser(this.competitionId, existingUserId).subscribe({
+            next: () => {
+              console.log('Usuario vinculado a la competición exitosamente');
+              this.close.emit();
+            },
+            error: (err) => console.error('Error al vincular al usuario:', err)
+          });
+        } else {
+          this.errMsj = err.error.mensaje;
+          console.error('Error al crear la cuenta:', this.errMsj);
+        }
       },
       complete: () => {
         alert('Usuario creado correctamente');

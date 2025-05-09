@@ -65,7 +65,6 @@ export class CompetitionListComponent implements OnInit {
     this.userService.getCompetitionsByUserName(this.tokenService.getUserName()!).subscribe({
       next: (data) => {
         if (data.length != 0) {
-          this.competitions = [];
           data.forEach(compe => {
             this.competitions.push({
               id: compe.id,
@@ -89,8 +88,8 @@ export class CompetitionListComponent implements OnInit {
   loadCompetitionsProfessor() {
     this.competitionService.getCompetitionsByProfessor(this.professorName).subscribe({
       next: (data) => {
+        this.competitions = [];
         data.forEach(compe => {
-          this.competitions = [];
           this.competitions.push({
             id: compe.id,
             name: compe.competitionName,
