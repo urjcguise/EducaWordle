@@ -28,8 +28,6 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
 
   wordlesInContest: string[] = [];
 
-  totalStudents: number = 0;
-
   wordleList: Wordle[] = [];
 
   wordlesData: {
@@ -37,6 +35,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
     success: number;
     trying: number;
     wrong: number;
+    finished: number;
     averageTryCount: number;
     totalTriesAccumulated: number;
     averageTime: number;
@@ -109,6 +108,7 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
             success: 0,
             trying: 0,
             wrong: 0,
+            finished: 0,
             averageTryCount: 0,
             totalTriesAccumulated: 0,
             averageTime: 0,
@@ -124,90 +124,140 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
           });
         })
 
-        this.contestService.getAllUserState(this.contestId).subscribe({
-          next: (data) => {
-            this.totalStudents = data.length;
-            data.forEach((userState: UserState) => {
-              const userName = userState.userName;
-              const email = userState.email;
-              let wordleIndex = 0;
-
-              if (userName === this.professorName)
-                this.totalStudents -= 1;
-
-              if (userName !== this.professorName) {
-                userState.state.games.forEach((game: Game) => {
-                  let endTime = "";
-                  let totalTime = 0;
-                  const wordleDataItem = this.wordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
-                  const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
-
-                  if (!wordleDataItem || !wordleStudentsItem) {
-                    console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
-                    return;
-                  }
-
-                  if (game.finished) {
-                    if (game.won)
-                      wordleDataItem.success += 1;
-                    else
-                      wordleDataItem.wrong += 1;
-                    endTime = game.finishTime;
-                    totalTime = game.timeNeeded;
-                    wordleDataItem.totalTriesAccumulated += game.tryCount;
-                    wordleDataItem.totalTimeAccumulated += game.timeNeeded;
-                  } else {
-                    wordleDataItem.trying += 1;
-                  }
-
-                  wordleStudentsItem.students.push({
-                    name: userName,
-                    email: email,
-                    totalTries: game.tryCount,
-                    startTime: game.startTime,
-                    endTime: endTime,
-                    totalTime: totalTime,
-                    lastWordle: game.lastWordle,
-                    finished: game.finished
-                  });
-                  wordleIndex += 1;
-                });
-              }
-            });
-
-            if (this.isStudent) {
-              this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
-                next: (logs) => {
-                  logs.forEach((log: WordleStateLog) => {
-                    const studentInfoItem = this.studentInformation.find(item =>
-                      item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
-                    );
-                    if (!studentInfoItem) {
-                      console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
-                      return;
-                    }
-                    studentInfoItem.info.push({
-                      nunTry: log.numTry,
-                      time: log.dateLog,
-                      lastWord: log.wordleInserted,
-                      correct: log.correct,
-                      wrongPlace: log.wrongPosition,
-                      wrong: log.wrong
-                    });
-                  });
-                  this.studentInformation.forEach((elem) => {
-                    elem.info.sort((a, b) => a.nunTry - b.nunTry);
-                  });
-                },
-                error: (e) => {
-                  console.error('Error obteniendo los logs', e);
+        if (this.isStudent) {
+          this.contestService.getAllUserStateLog(this.contestId, this.tokenService.getUserName()!).subscribe({
+            next: (logs) => {
+              logs.forEach((log: WordleStateLog) => {
+                const studentInfoItem = this.studentInformation.find(item =>
+                  item.wordle.trim().toLowerCase() === log.wordleToGuess.trim().toLowerCase()
+                );
+                if (!studentInfoItem) {
+                  console.error(`No se encontró el wordle para ${log.wordleToGuess}`);
+                  return;
                 }
+
+                studentInfoItem.info.push({
+                  nunTry: log.numTry,
+                  time: log.dateLog,
+                  lastWord: log.wordleInserted,
+                  correct: log.correct,
+                  wrongPlace: log.wrongPosition,
+                  wrong: log.wrong
+                });
               });
+              this.studentInformation.forEach((elem) => {
+                elem.info.sort((a, b) => a.nunTry - b.nunTry);
+              });
+            },
+            error: (e) => {
+              console.error('Error obteniendo los logs', e);
             }
-          },
-          error: (e) => {
-            console.error('Error consiguiendo los usuarios y sus estados', e);
+          });
+        }
+      },
+      error: (e) => {
+        console.error('Error consiguiendo los usuarios y sus estados', e);
+      }
+    });
+
+    this.getWordlesInfo();
+    this.subscription = interval(1000).subscribe(() => {
+      this.getWordlesInfo();
+    });
+
+    if (this.isProfessor || this.isAdmin) {
+      this.getLogs();
+      this.subscription = interval(1000).subscribe(() => {
+        this.getLogs();
+      });
+    }
+  }
+
+  getWordlesInfo() {
+
+    this.contestService.getAllUserState(this.contestId).subscribe({
+      next: (data) => {
+
+        const newWordlesData: typeof this.wordlesData = this.wordleList.map((wordle) => ({
+          wordle: wordle.word,
+          success: 0,
+          trying: 0,
+          wrong: 0,
+          finished: 0,
+          averageTryCount: 0,
+          totalTriesAccumulated: 0,
+          averageTime: 0,
+          totalTimeAccumulated: 0
+        }));
+
+        data.forEach((userState: UserState) => {
+          const userName = userState.userName;
+          const email = userState.email;
+          let wordleIndex = 0;
+
+          if (userName !== this.professorName) {
+            userState.state.games.forEach((game: Game) => {
+              let endTime = "";
+              let totalTime = 0;
+
+              const wordleDataItem = newWordlesData.find((item) => item.wordle === this.wordleList[wordleIndex].word);
+              const wordleStudentsItem = this.wordleStudents.find((item) => item.wordle === this.wordleList[wordleIndex].word);
+
+              if (!wordleDataItem || !wordleStudentsItem) {
+                console.error(`No se encontró el wordle para ${this.wordleList[wordleIndex].word}`);
+                return;
+              }
+
+              if (game.finished) {
+                if (game.won)
+                  wordleDataItem.success += 1;
+                else
+                  wordleDataItem.wrong += 1;
+
+                endTime = game.finishTime;
+                totalTime = game.timeNeeded;
+                wordleDataItem.finished++;
+                wordleDataItem.totalTriesAccumulated += game.tryCount;
+                wordleDataItem.totalTimeAccumulated += game.timeNeeded;
+              } else if (game.tryCount > 0) {
+                wordleDataItem.trying += 1;
+              }
+
+              const existsStudentIndex = wordleStudentsItem.students.findIndex(
+                (student) => student.name === userName && student.email === email
+              );
+
+              const updatedStudentData = {
+                name: userName,
+                email: email,
+                totalTries: game.tryCount,
+                startTime: game.startTime,
+                endTime: endTime,
+                totalTime: totalTime,
+                lastWordle: game.lastWordle,
+                finished: game.finished
+              };
+
+              if (existsStudentIndex !== -1)
+                wordleStudentsItem.students[existsStudentIndex] = updatedStudentData;
+              else
+                wordleStudentsItem.students.push(updatedStudentData);
+
+              wordleIndex += 1;
+            });
           }
+        });
+
+        this.wordlesData = this.wordlesData.map((oldItem, i) => {
+          const newItem = newWordlesData[i];
+          const changed = oldItem.totalTriesAccumulated !== newItem.totalTriesAccumulated ||
+            oldItem.finished !== newItem.finished ||
+            oldItem.success !== newItem.success ||
+            oldItem.wrong !== newItem.wrong ||
+            oldItem.trying !== newItem.trying ||
+            oldItem.totalTimeAccumulated !== newItem.totalTimeAccumulated;
+
+          return changed ? newItem : oldItem;
         });
       },
       error: (e) => {
@@ -219,34 +269,6 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
           console.error('No se ha encontrado al usuario', e);
       }
     });
-
-    if (this.isProfessor || this.isAdmin) {
-      this.contestService.getAllStateLog(this.contestId).subscribe({
-        next: (logs) => {
-          logs.forEach((log: WordleStateLog) => {
-            if (log.userName !== this.professorName) {
-              this.studentsLog.push({
-                student: log.userName,
-                email: log.email,
-                time: log.dateLog,
-                wordleToGuess: log.wordleToGuess,
-                wordlePosition: log.wordlePosition,
-                wordleInserted: log.wordleInserted,
-                try: log.numTry,
-                state: log.state
-              });
-            }
-          });
-          this.studentsLog.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-          this.subscription = interval(5000).subscribe(() => {
-            this.getLogs();
-          });
-        },
-        error: (e) => {
-          console.error('Error obteniendo los logs', e);
-        }
-      });
-    }
   }
 
   getLogs() {
@@ -282,21 +304,37 @@ export class ContestStatisticsComponent implements OnInit, OnDestroy {
   }
 
   convertTime(seconds: number): string {
-    if (this.totalStudents === 0) return '0:00';
-    const average = seconds / this.totalStudents;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  getSuccessPercentage(wordle: any): number {
+    if (wordle.success === 0) return 0;
+    return parseFloat(((wordle.success / (wordle.finished + wordle.trying)) * 100).toFixed(2));
+  }
+
+  getTryingPercentage(wordle: any): number {
+    if (wordle.trying === 0) return 0;
+    return parseFloat(((wordle.trying / (wordle.finished + wordle.trying)) * 100).toFixed(2));
+  }
+
+  getWrongPercentage(wordle: any): number {
+    if (wordle.wrong === 0) return 0;
+    return parseFloat(((wordle.wrong / (wordle.finished + wordle.trying)) * 100).toFixed(2));
+  }
+
+  getAverageTime(wordle: any): string {
+    if (wordle.finished === 0) return '0:00';
+    const average = wordle.totalTimeAccumulated / wordle.finished;
     const minutes = Math.floor(average / 60);
     const remainingSeconds = Math.floor(average % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  convertPercentage(total: number): number {
-    if (this.totalStudents === 0) return 0;
-    return parseFloat(((total / this.totalStudents) * 100).toFixed(2));
-  }
-
-  convertTries(totalTries: number): number {
-    if (this.totalStudents === 0) return 0;
-    return parseFloat((totalTries / this.totalStudents).toFixed(2));
+  getAverageTries(wordle: any): number {
+    if (wordle.finished === 0) return 0;
+    return parseFloat((wordle.totalTriesAccumulated / wordle.finished).toFixed(2));
   }
 
   exportToExcel() {

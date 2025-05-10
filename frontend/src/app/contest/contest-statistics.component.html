@@ -16,11 +16,11 @@
     <tbody>
       <tr *ngFor="let wordle of wordlesData">
         <td class="text-center">{{ wordle.wordle }}</td>
-        <td class="text-center">{{ convertPercentage(wordle.success) }}%</td>
-        <td class="text-center">{{ convertPercentage(wordle.trying) }}%</td>
-        <td class="text-center">{{ convertPercentage(wordle.wrong) }}%</td>
-        <td class="text-center">{{ convertTries(wordle.totalTriesAccumulated) }}</td>
-        <td class="text-center">{{ convertTime(wordle.totalTimeAccumulated) }}</td>
+        <td class="text-center">{{ getSuccessPercentage(wordle) }}%</td>
+        <td class="text-center">{{ getTryingPercentage(wordle) }}%</td>
+        <td class="text-center">{{ getWrongPercentage(wordle) }}%</td>
+        <td class="text-center">{{ getAverageTries(wordle) }}</td>
+        <td class="text-center">{{ getAverageTime(wordle) }}</td>
       </tr>
       <tr *ngIf="!wordlesData || wordlesData.length === 0">
         <td colspan="6" class="text-center no-data">No hay datos de resumen</td>
