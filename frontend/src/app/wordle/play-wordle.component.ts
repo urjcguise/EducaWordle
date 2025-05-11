@@ -317,7 +317,7 @@ export class PlayWordleComponent {
         this.numSubmittedTries++;
         if (checkStates.every((state) => state === LetterState.FULL_MATCH)) {
           const currentGame = this.wordleState.games[this.wordleOrder[this.currentWordleIndex]];
-
+          this.numSubmittedTries--;
           currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.showInfoMessage('¡CORRECTO!');
