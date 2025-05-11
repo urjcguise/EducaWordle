@@ -3,7 +3,7 @@
         <app-menu (backClicked)="goBack()"></app-menu>
     </div>
     <div class="contest-info">
-        <h3 class="competition-title">{{ competitionName }}</h3>
+        <h3 class="competition-title" (click)="navigateToCompetition()">{{ competitionName }}</h3>
 
         <div class="contest-header">
             <span class="contest-name" *ngIf="contest">{{ contest.contestName }}</span>

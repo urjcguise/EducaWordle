@@ -4,6 +4,7 @@ import { NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { UserService } from '../service/user.service';
 import { Contest } from '../models/contest';
+import { Competition } from '../models/competition';
 
 @Component({
   selector: 'app-competition-list',
@@ -118,8 +119,8 @@ export class CompetitionListComponent implements OnInit {
     competition.isOpen = !competition.isOpen;
   }
 
-  viewContest(contestId: number, competitionName: string, professorName: string) {
-    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competitionName, professorName: professorName } });
+  viewContest(contestId: number, competition: any) {
+    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: competition.name, competitionId: competition.id, professorName: competition.professorName } });
   }
 
   openCreateCompetition() {

@@ -27,6 +27,7 @@ export class ContestViewComponent implements OnInit {
   hasWordles: boolean = false;
 
   competitionName: string = '';
+  competitionId: number = 0;
   activeTab: string = '';
 
   constructor(private contestService: ContestService, private route: ActivatedRoute, private router: Router, private tokenService: TokenService) {
@@ -43,6 +44,7 @@ export class ContestViewComponent implements OnInit {
     this.activeTab = history.state.activeTab || 'info';
     this.competitionName = history.state.competitionName;
     this.professorName = history.state.professorName;
+    this.competitionId = history.state.competitionId;
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.isProfessor = this.tokenService.getAuthorities().includes('ROLE_PROFESSOR') ||
       this.tokenService.getAuthorities().includes('ROLE_ADMIN');
@@ -131,6 +133,10 @@ export class ContestViewComponent implements OnInit {
 
   hasWordlesChange(value: boolean) {
     this.hasWordles = value;
+  }
+
+  navigateToCompetition() {
+    this.router.navigate(['/competicion/' + this.competitionName], { state: { competitionId: this.competitionId, professorName: this.professorName } });
   }
 
   goBack() {

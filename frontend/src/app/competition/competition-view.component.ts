@@ -84,7 +84,7 @@ export class CompetitionViewComponent implements OnInit {
   }
 
   navigateToViewContest(contestId: number) {
-    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: this.competitionName, professorName: this.professorName } });
+    this.router.navigate(['/' + contestId + '/concurso'], { state: { competitionName: this.competitionName, competitionId: this.competitionId, professorName: this.professorName } });
   }
 
   deleteCompetition() {
