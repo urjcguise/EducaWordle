@@ -1,11 +1,11 @@
 footer {
     background-color: #282829;
     color: #ffffff;
-    font-size: small;
     padding: 1em 0;
 }
 
 .both-col {
+    font-size: 1 rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -21,4 +21,10 @@ footer {
 .col-de {
     flex-basis: 70%;
     flex-grow: 1;
+}
+
+@media (max-width: 450px) {
+    .both-col {
+        font-size: 0.6rem;
+    }
 }

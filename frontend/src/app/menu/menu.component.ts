@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { TokenService } from '../service/token.service';
 
 @Component({
@@ -9,6 +9,8 @@ import { TokenService } from '../service/token.service';
 export class MenuComponent implements OnInit {
 
   @Input() showBackButton: boolean = true;
+  @Input() mainPage: boolean = false;
+  @Input() isPlayingWordle: boolean = false;
   @Output() backClicked = new EventEmitter<void>();
 
   isLogged = false;
@@ -16,9 +18,14 @@ export class MenuComponent implements OnInit {
   isProfessor = false;
   isStudent = false;
 
+  mobilePhone: boolean = false;
+
   constructor(private tokenService: TokenService) { }
 
   ngOnInit(): void {
+
+    this.mobilePhone = window.innerWidth < 450;
+
     if (this.tokenService.getToken())
       this.isLogged = true;
     else
@@ -39,5 +46,14 @@ export class MenuComponent implements OnInit {
 
   goBack() {
     this.backClicked.emit();
+  }
+
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkWindowSize();
+  }
+
+  private checkWindowSize() {
+    this.mobilePhone = window.innerWidth < 450;
   }
 }

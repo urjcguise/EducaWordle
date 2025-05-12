@@ -13,8 +13,6 @@ import { Competition } from '../models/competition';
 })
 export class CompetitionListComponent implements OnInit {
 
-  showBackButton: boolean = false;
-
   isModalOpen: boolean = false;
 
   isProfessor = false;

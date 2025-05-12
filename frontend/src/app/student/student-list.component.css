@@ -74,3 +74,10 @@
   max-height: 75vh;
   overflow-y: auto;
 }
+
+@media (max-width: 450px) {
+
+    .modal-backdrop {
+        min-width: 100vh;
+    }
+}

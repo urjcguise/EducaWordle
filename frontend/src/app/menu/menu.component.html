@@ -3,6 +3,7 @@
 <link
   href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
   rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <div class="header">
   <img src="../../assets/sin_fondo_negro_zoom.png" alt="Logo Universidad" class="logo">
@@ -13,11 +14,11 @@
       Página Principal
     </button>
 
-    <button class="nav-button" routerLink="/wordles" routerLinkActive="active" *ngIf="isProfessor">
+    <button class="nav-button" routerLink="/wordles" routerLinkActive="active" *ngIf="isProfessor && !isPlayingWordle">
       Ver Wordles
     </button>
 
-    <button class="nav-button" routerLink="/wordlesResueltos" routerLinkActive="active" *ngIf="isStudent">
+    <button class="nav-button" routerLink="/wordlesResueltos" routerLinkActive="active" *ngIf="isStudent && !isPlayingWordle">
       Ver Wordles
     </button>
 
@@ -32,7 +33,7 @@
 
     <div class="spacer"></div>
 
-    <button class="nav-button" (click)="onLogOut()">
+    <button class="nav-button" *ngIf="!mobilePhone || mainPage" (click)="onLogOut()">
       Cerrar Sesión
     </button>
   </ng-container>

@@ -53,3 +53,18 @@
 .right-buttons {
     margin-left: auto;
 }
+
+@media (max-width: 450px) {
+    .nav-button {
+        font-size: 12px;
+    }
+
+    .logo {
+        height: 60px;
+        align-self: center;
+    }
+
+    .spacer {
+        margin: 0;
+    }
+}

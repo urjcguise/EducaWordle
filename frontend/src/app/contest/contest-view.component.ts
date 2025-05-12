@@ -123,7 +123,6 @@ export class ContestViewComponent implements OnInit {
     this.router.navigate(['/wordle'], {
       state: {
         contestId: this.contest.id,
-        wordleIndex: 0,
         competitionName: this.competitionName,
         isProfessor: this.isProfessor,
         professorName: this.professorName

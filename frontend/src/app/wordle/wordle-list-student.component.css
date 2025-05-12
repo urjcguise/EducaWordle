@@ -67,17 +67,53 @@
     flex-direction: column;
     gap: 0.4rem;
     padding: 0.5rem 0 0 50px;
-  }
-  
-  .wordle-item {
+}
+
+.wordle-item {
     display: block;
-  }
-  
-  .wordle-badge {
+}
+
+.wordle-badge {
     background-color: transparent;
     color: #015e79;
     font-weight: 600;
     padding: 0.4rem 0;
     font-size: 1rem;
-  }
-  
+}
+
+@media (max-width: 450px) {
+    .body {
+        max-width: 80vh;
+        max-height: 40vh;
+    }
+
+    .wordle-list {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+
+    .competition-card {
+        padding: 1rem;
+        padding-bottom: 1rem;
+        max-width: 55vh;
+    }
+
+    .arrow {
+        font-size: 1em;
+    }
+
+    .competition-title {
+        font-size: 1.1rem;
+    }
+
+    .contest-title {
+        font-size: 0.9rem;
+    }
+
+    .wordle-badge {
+        font-weight: 500;
+        font-size: 0.7rem;
+    }
+
+}

@@ -91,3 +91,35 @@
 .btn.btn-export:hover {
   background-color: #0056b3;
 }
+
+@media (max-width: 450px) {
+
+  .info-table thead th {
+    font-size: 8px;
+  }
+
+  .info-table tbody td {
+    font-size: 8px;
+  }
+
+  .status-badge {
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: 300;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  .table-title {
+    font-size: 8px !important;
+  }
+
+  .no-data {
+    font-size: 8px;
+  }
+
+  .btn.btn-export {
+    font-size: 8px;
+  }
+}
