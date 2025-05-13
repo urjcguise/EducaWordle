@@ -221,10 +221,27 @@ export class PlayWordleComponent {
       }
     }
     else if (key === 'Backspace') {
+      const wordleLength = this.wordleLength[this.wordleOrder[this.currentWordleIndex]];
+      const minIndex = this.numSubmittedTries * wordleLength;
+      const maxIndex = (this.numSubmittedTries + 1) * wordleLength;
 
-      if (this.curLetterIndex > this.numSubmittedTries * this.wordleLength[this.wordleOrder[this.currentWordleIndex]]) {
+      if (this.curLetterIndex === minIndex) {
+        this.setLetter('');
+      } else if (this.curLetterIndex === maxIndex) {
         this.curLetterIndex--;
         this.setLetter('');
+      } else {
+        const tryIndex = Math.floor(this.curLetterIndex / wordleLength);
+        const letterIndex = this.curLetterIndex % wordleLength;
+        const currentLetter = this.tries[tryIndex].letters[letterIndex].text;
+
+        if (currentLetter === '') {
+          this.curLetterIndex--;
+          this.setLetter('');
+        } else {
+          this.setLetter('');
+          this.curLetterIndex--;
+        }
       }
     } else if (key === 'Enviar' || key === 'Enter') {
       this.checkCurrentTry();
@@ -505,7 +522,7 @@ export class PlayWordleComponent {
 
   getCurLetterIndex(): number {
     return this.curLetterIndex;
-  } 
+  }
 
   navigateToStatistics() {
     this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats', professorName: this.professorName } });
