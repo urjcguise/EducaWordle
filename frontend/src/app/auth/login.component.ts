@@ -40,8 +40,6 @@ export class LoginComponent implements OnInit {
       tap((data) => {
         this.isLogged = true;
         this.tokenService.setToken(data.token);
-        this.tokenService.setEmail(data.email);
-        this.tokenService.setAuthorities(data.authorities);
         this.roles = data.authorities;
 
         if (data.authorities.map((auth: any) => auth.authority).includes("ROLE_ADMIN"))

@@ -39,6 +39,6 @@ public class FolderService {
     }
 
     public Folder getById(Long id) {
-        return folderRepository.getById(id);
+        return folderRepository.getReferenceById(id);
     }
 }
