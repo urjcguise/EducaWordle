@@ -313,6 +313,8 @@ export class ShowWordlesComponent implements OnInit {
       newWordle = newWordleNoSpaces;
     }
 
+    if (newWordle.length >= 10)
+      alert('Las palabras demasiado largas pueden afectar la visualización en dispositivos móviles. Se recomienda usar palabras de hasta 10 caracteres');
 
     if (this.wordles.includes(newWordle.toUpperCase()) || this.availableRootWordles.includes(newWordle.toUpperCase())) {
       const confirmSave = confirm(`El wordle "${newWordle}" ya existe, ¿Está seguro de que desea crearlo de nuevo?`);

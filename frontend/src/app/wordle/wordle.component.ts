@@ -41,8 +41,8 @@ export class WordleComponent {
 
   createWordles() {
     let posMoreThanOneWord: number[] = []
-
-    for (let i = 0; i < this.wordles.length; i ++) {
+    let moreThanTen: boolean = false;
+    for (let i = 0; i < this.wordles.length; i++) {
       const word = this.wordles[i];
       if (word == "") {
         alert('No se puede guardar un wordle vacío');
@@ -50,8 +50,13 @@ export class WordleComponent {
       }
       if (word.trim().split(/\s+/).length > 1) {
         posMoreThanOneWord.push(i);
-      }
+      } 
+      if (word.trim().length >= 10)
+        moreThanTen = true;
     }
+
+    if (moreThanTen)
+      alert('Las palabras demasiado largas pueden afectar la visualización en dispositivos móviles. Se recomienda usar palabras de hasta 10 caracteres');
 
     if (posMoreThanOneWord.length > 0) {
       const confirmSave = confirm(`No se puede guardar un Wordle con espacios, se procederá a unir las palabras`);
