@@ -8,6 +8,7 @@
         <div class="container">
             <div class="title-container">
                 <div class="title"> {{contest.contestName}} </div>
+                <div class="finish-time"> {{timeToFinish}} </div>
             </div>
 
             <div class="progress-container">
@@ -22,7 +23,8 @@
                         [class.wrong]="letter.state === LetterState.WRONG" 
                         [class.has-text]="letter.text !== ''"
                         [class.active]="(tryIndex * wordleLength[this.wordleOrder[this.currentWordleIndex]] + letterIndex) === getCurLetterIndex() &&
-                                        (tryIndex === numSubmittedTries)"
+                                        (tryIndex === numSubmittedTries) &&
+                                        !finished"
                         [class.clickable]="tryIndex === numSubmittedTries"
                         (click)="selectCell(tryIndex, letterIndex)">
                         {{letter.text}}

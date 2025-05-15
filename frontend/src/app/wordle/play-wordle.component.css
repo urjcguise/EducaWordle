@@ -38,7 +38,11 @@ body {
 .title {
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 30px;
+}
+
+.finish-time {
+  font-size: 20px;
 }
 
 .subtitle {
@@ -286,6 +290,19 @@ body {
 }
 
 @media (max-width: 480px) {
+
+  .title {
+    font-size: 20px;
+  }
+
+  .progress-container {
+    font-size: 15px;
+  }
+
+  .finish-time {
+    font-size: 15px;
+  }
+
   .letter-container {
     width: 44px;
     height: 44px;
@@ -302,7 +319,7 @@ body {
   }
 
   .key {
-    height: 48px;
+    height: 42px;
     min-width: 32px;
     margin-right: 4px;
     display: flex;
@@ -317,7 +334,7 @@ body {
   }
 
   .accent-key {
-    min-width: 90px;
+    min-width: 68px;
     height: 42px;
     font-size: 0.7rem;
   }

@@ -125,6 +125,6 @@ export class EditContestComponent {
   }
 
   goBack() {
-    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/concurso'], { state: { professorName: this.professorName, competitionName: history.state.competitionName } });
+    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/concurso'], { state: { professorName: this.professorName, competitionName: history.state.competitionName, competitionId: history.state.competitionId } });
   }
 }

@@ -8,6 +8,7 @@ import { differenceInSeconds, format } from 'date-fns';
 import { WordleStateLog } from '../models/wordle-state-log';
 import { NavigationStart, Router } from '@angular/router';
 import { UserService } from '../service/user.service';
+import { Subscription } from 'rxjs';
 
 
 interface Try {
@@ -32,9 +33,13 @@ enum LetterState {
   styleUrls: ['./play-wordle.component.css'],
 })
 export class PlayWordleComponent {
+
+  private subscription: Subscription = new Subscription;
+
   @ViewChildren('tryContainer') tryContainers!: QueryList<ElementRef>;
 
   competitionName: string = '';
+  competitionId: number = 0;
 
   readonly tries: Try[] = [];
   readonly LetterState = LetterState;
@@ -72,7 +77,11 @@ export class PlayWordleComponent {
 
   numWordles: number = 0;
 
+  private intervalId: any;
   contest!: Contest;
+  endTime: Date = new Date();
+  timeToFinish: string = '';
+  rightNow: Date = new Date();
 
   games: Game[] = [];
 
@@ -89,6 +98,7 @@ export class PlayWordleComponent {
 
   constructor(private wordleService: WordleService, private contestService: ContestService, private tokenService: TokenService, private router: Router, private userService: UserService) {
     this.competitionName = history.state.competitionName;
+    this.competitionId = history.state.competitionId;
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.navigationTrigger == 'popstate') {
@@ -104,6 +114,13 @@ export class PlayWordleComponent {
       next: (cont) => {
         this.contest = cont;
         this.numTries = cont.numTries;
+        this.endTime = new Date(cont.endDate);
+
+        this.updateTimeToFinish();
+        this.intervalId = setInterval(() => {
+          this.rightNow = new Date();
+          this.updateTimeToFinish();
+        }, 1000); 
 
         this.isAccentMode = cont.accentMode;
 
@@ -126,6 +143,10 @@ export class PlayWordleComponent {
         console.error('Error consiguiendo el concurso', error);
       },
     });
+  }
+
+  ngDestroy() {
+    clearInterval(this.intervalId);
   }
 
   private initializeState() {
@@ -334,7 +355,6 @@ export class PlayWordleComponent {
         this.numSubmittedTries++;
         if (checkStates.every((state) => state === LetterState.FULL_MATCH)) {
           const currentGame = this.wordleState.games[this.wordleOrder[this.currentWordleIndex]];
-          this.numSubmittedTries--;
           currentGame.finishTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           currentGame.timeNeeded = differenceInSeconds(currentGame.finishTime, currentGame.startTime);
           this.showInfoMessage('¡CORRECTO!');
@@ -524,11 +544,32 @@ export class PlayWordleComponent {
     return this.curLetterIndex;
   }
 
+  updateTimeToFinish() {
+    const difference = this.endTime.getTime() - this.rightNow.getTime();
+
+    if (difference > 0) {
+      const totalSeconds = Math.floor(difference / 1000);
+      const min = Math.floor(totalSeconds / 60);
+      const sec = totalSeconds % 60;
+
+      this.timeToFinish = `${this.padZero(min)}:${this.padZero(sec)}`;
+    } else {
+      this.timeToFinish = '00:00';
+      clearInterval(this.intervalId);
+      alert('¡Se acabó el tiempo!');
+      this.navigateToStatistics();
+    }
+  }
+
+  padZero(num: number): string {
+    return num < 10 ? '0' + num : num.toString();
+  }
+
   navigateToStatistics() {
-    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats', professorName: this.professorName } });
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, activeTab: 'stats', professorName: this.professorName, competitionId: this.competitionId } });
   }
 
   goBack() {
-    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, professorName: this.professorName } });
+    this.router.navigate([this.contest.id + '/concurso'], { state: { competitionName: this.competitionName, professorName: this.professorName, competitionId: this.competitionId } });
   }
 }

@@ -73,7 +73,7 @@ export class ContestViewComponent implements OnInit {
   }
 
   editContest() {
-    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/editarConcurso'], { state: { professorName: history.state.professorName, competitionName: this.competitionName } });
+    this.router.navigate([Number(this.route.snapshot.paramMap.get('contestId')) + '/editarConcurso'], { state: { professorName: history.state.professorName, competitionName: this.competitionName, competitionId: this.competitionId } });
   }
 
   deleteContest() {
@@ -125,7 +125,8 @@ export class ContestViewComponent implements OnInit {
         contestId: this.contest.id,
         competitionName: this.competitionName,
         isProfessor: this.isProfessor,
-        professorName: this.professorName
+        professorName: this.professorName,
+        competitionId: this.competitionId
       }
     });
   }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -175,15 +176,19 @@ public class WordleController {
 
         Contest contest = contestService.getById(contestId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isStudent = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"));
-        if (isStudent) {
-            User user = userService.getByUserName(((UserDetails) authentication.getPrincipal()).getUsername())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-            JsonNode state = contestStateService.getContestState(contestId, user.getId()).getState();
-            for (int i = 0; i < contest.getWordles().size(); i++) {
-                if (!state.get("games").get(i).get("finished").asBoolean())
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        boolean isFinished = contest.getEndDate().before(new Date());
+
+        if (!isFinished) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            boolean isStudent = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT"));
+            if (isStudent) {
+                User user = userService.getByUserName(((UserDetails) authentication.getPrincipal()).getUsername())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                JsonNode state = contestStateService.getContestState(contestId, user.getId()).getState();
+                for (int i = 0; i < contest.getWordles().size(); i++) {
+                    if (!state.get("games").get(i).get("finished").asBoolean())
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
             }
         }
 
