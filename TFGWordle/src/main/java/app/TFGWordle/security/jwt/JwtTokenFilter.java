@@ -1,6 +1,5 @@
 package app.TFGWordle.security.jwt;
 
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,31 +26,33 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     JwtProvider jwtProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
+            throws ServletException, IOException {
         try {
             String token = getToken(req);
             if (token != null) {
                 if (jwtProvider.validateToken(token)) {
                     logger.info("Token válido, autenticando...");
-                    //logger.info("Obteniendo nombre de usuario del token...");
+                    // logger.info("Obteniendo nombre de usuario del token...");
                     String email = jwtProvider.getEmailFromToken(token);
-                    //logger.info("Nombre de usuario obtenido: " + userName);
+                    // logger.info("Nombre de usuario obtenido: " + userName);
 
-                    //logger.info("Cargando detalles del usuario...");
+                    // logger.info("Cargando detalles del usuario...");
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                     /*
-                    for (GrantedAuthority authority : userDetails.getAuthorities()) {
-                        String authority1 = authority.getAuthority();
-                        logger.info("Autenticando: {}", authority1);
-                    }*/
+                     * for (GrantedAuthority authority : userDetails.getAuthorities()) {
+                     * String authority1 = authority.getAuthority();
+                     * logger.info("Autenticando: {}", authority1);
+                     * }
+                     */
 
-                    //logger.info("Detalles del usuario cargados.");
+                    // logger.info("Detalles del usuario cargados.");
 
-                    //logger.info("Creando objeto de autenticación...");
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    //logger.info("Autenticación creada.");
+                    // logger.info("Creando objeto de autenticación...");
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
+                            null, userDetails.getAuthorities());
+                    // logger.info("Autenticación creada.");
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {

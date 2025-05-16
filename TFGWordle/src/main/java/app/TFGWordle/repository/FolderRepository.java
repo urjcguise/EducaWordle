@@ -1,6 +1,5 @@
 package app.TFGWordle.repository;
 
-
 import app.TFGWordle.model.Folder;
 import app.TFGWordle.security.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

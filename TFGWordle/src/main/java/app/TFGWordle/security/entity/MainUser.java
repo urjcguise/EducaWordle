@@ -23,7 +23,8 @@ public class MainUser implements UserDetails {
     }
 
     public static MainUser build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream().map(rol -> new SimpleGrantedAuthority(rol.getRolName().name())).collect(Collectors.toList());
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(rol -> new SimpleGrantedAuthority(rol.getRolName().name())).collect(Collectors.toList());
         return new MainUser(user.getUsername(), user.getEmail(), user.getPassword(), authorities);
     }
 
@@ -37,7 +38,6 @@ public class MainUser implements UserDetails {
         return UserDetails.super.isAccountNonExpired();
     }
 
-    // Si no funciona cambiar los booleanos a true y probar
     @Override
     public boolean isAccountNonLocked() {
         return UserDetails.super.isAccountNonLocked();

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name="wordle")
+@Table(name = "wordle")
 public class Wordle {
 
     @Id
@@ -47,8 +47,10 @@ public class Wordle {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Wordle wordle = (Wordle) o;
         return Objects.equals(id, wordle.id);
     }
@@ -61,6 +63,7 @@ public class Wordle {
     public void setId(Long id) {
         this.id = id;
     }
+
     public void setWord(String word) {
         this.word = word;
     }
@@ -68,6 +71,7 @@ public class Wordle {
     public Long getId() {
         return id;
     }
+
     public String getWord() {
         return word;
     }
@@ -75,6 +79,7 @@ public class Wordle {
     public List<Contest> getContests() {
         return contests;
     }
+
     public void setContests(List<Contest> contests) {
         this.contests = contests;
     }
@@ -82,6 +87,7 @@ public class Wordle {
     public User getUser() {
         return user;
     }
+
     public void setUser(User user) {
         this.user = user;
     }

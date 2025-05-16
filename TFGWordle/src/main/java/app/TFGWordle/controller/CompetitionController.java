@@ -6,15 +6,12 @@ import app.TFGWordle.model.Participation;
 import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
 import app.TFGWordle.security.enums.RolName;
-import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.RolService;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.CompetitionService;
 import app.TFGWordle.service.ContestService;
 import app.TFGWordle.service.ParticipationService;
 import org.apache.poi.ss.usermodel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,9 +40,8 @@ public class CompetitionController {
     private final UserService userService;
     private final ParticipationService participationService;
 
-    private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
-
-    public CompetitionController(CompetitionService competitionService, ContestService contestService, UserService userService, ParticipationService participationService) {
+    public CompetitionController(CompetitionService competitionService, ContestService contestService,
+            UserService userService, ParticipationService participationService) {
         this.competitionService = competitionService;
         this.contestService = contestService;
         this.userService = userService;
@@ -54,7 +50,8 @@ public class CompetitionController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newCompetition/{professorName}")
-    public ResponseEntity<?> createCompetition(@PathVariable String professorName, @RequestBody Competition competition) {
+    public ResponseEntity<?> createCompetition(@PathVariable String professorName,
+            @RequestBody Competition competition) {
         User professor = userService.getByUserName(professorName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -73,12 +70,11 @@ public class CompetitionController {
         if (!competitionService.existsCompetition(competitionId))
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
 
-
         Competition competition = competitionService.getCompetitionById(competitionId);
         competition.setCompetitionName(newName);
         competitionService.save(competition);
 
-        return new ResponseEntity<>(HttpStatus.OK );
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
@@ -98,13 +94,14 @@ public class CompetitionController {
             return new ResponseEntity<>("Competición no encontrada", HttpStatus.NOT_FOUND);
 
         List<Participation> participations = competitionService.getParticipations(competitionId);
-        for (Participation p: participations) {
+        for (Participation p : participations) {
             User student = p.getStudent();
             if (student.getParticipations().size() == 1)
                 userService.deleteUser(student);
         }
 
-        List<Contest> contestInCompetition = contestService.getContestsByCompetition(competitionService.getCompetitionById(competitionId));
+        List<Contest> contestInCompetition = contestService
+                .getContestsByCompetition(competitionService.getCompetitionById(competitionId));
         for (Contest contest : contestInCompetition) {
             contestService.deleteContest(contest.getId());
         }
@@ -121,7 +118,7 @@ public class CompetitionController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/linkStudentToCompetition/{competitionId}/{userId}")
-    public ResponseEntity<?> linkStudent(@PathVariable Long competitionId, @PathVariable Long userId ) {
+    public ResponseEntity<?> linkStudent(@PathVariable Long competitionId, @PathVariable Long userId) {
         if (competitionService.existsCompetition(competitionId) && userService.existsById(userId)) {
             Competition competition = competitionService.getCompetitionById(competitionId);
             User user = userService.getById(userId).get();
@@ -148,8 +145,10 @@ public class CompetitionController {
                 Sheet sheet = workbook.getSheetAt(0);
 
                 for (Row row : sheet) {
-                    if (row.getRowNum() == 0) continue;
-                    if (isRowEmpty(row)) continue;
+                    if (row.getRowNum() == 0)
+                        continue;
+                    if (isRowEmpty(row))
+                        continue;
 
                     String name = row.getCell(0).getStringCellValue();
                     String email = row.getCell(1).getStringCellValue();
@@ -157,7 +156,8 @@ public class CompetitionController {
 
                     if (userService.existsByUserName(name) || userService.existsByEmail(email)) {
                         User userExists = userService.getByUserName(name).get();
-                        List<Participation> participations = participationService.findParticipationsByStudent(userExists.getId());
+                        List<Participation> participations = participationService
+                                .findParticipationsByStudent(userExists.getId());
                         if (!participations.contains(competition)) {
                             Participation newParticipation = new Participation(userExists, competition);
                             participationService.save(newParticipation);

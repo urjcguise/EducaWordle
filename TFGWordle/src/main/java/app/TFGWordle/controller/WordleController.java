@@ -39,7 +39,8 @@ public class WordleController {
     private final FolderService folderService;
     private final ContestStateService contestStateService;
 
-    public WordleController(WordleService wordleService, ContestService contestService, UserService userService, FolderService folderService, ContestStateService contestStateService) {
+    public WordleController(WordleService wordleService, ContestService contestService, UserService userService,
+            FolderService folderService, ContestStateService contestStateService) {
         this.wordleService = wordleService;
         this.contestService = contestService;
         this.userService = userService;
@@ -49,7 +50,8 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newWordles/{contestId}/{professorName}/{folderId}")
-    public ResponseEntity<List<Wordle>> newWordles(@RequestBody List<String> wordles, @PathVariable Long contestId, @PathVariable String professorName, @PathVariable Long folderId) {
+    public ResponseEntity<List<Wordle>> newWordles(@RequestBody List<String> wordles, @PathVariable Long contestId,
+            @PathVariable String professorName, @PathVariable Long folderId) {
         if (contestId != 0 & !contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -126,7 +128,8 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/updateWordle/{wordInitial}/{wordUpdated}")
-    public ResponseEntity<?> updateWordles(@PathVariable String wordInitial, @PathVariable String wordUpdated, @RequestBody List<Contest> contests) {
+    public ResponseEntity<?> updateWordles(@PathVariable String wordInitial, @PathVariable String wordUpdated,
+            @RequestBody List<Contest> contests) {
 
         if (!wordleService.existsByWord(wordInitial)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -149,7 +152,8 @@ public class WordleController {
 
         for (Contest contest : contests) {
             if (!contestService.existsById(contest.getId())) {
-                return new ResponseEntity<>("El concurso " + contest.getContestName() + " no existe", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("El concurso " + contest.getContestName() + " no existe",
+                        HttpStatus.NOT_FOUND);
             }
 
             if (contest.getCompetition() == null) {
@@ -170,7 +174,8 @@ public class WordleController {
     }
 
     @GetMapping("/getWordlesByContest/{contestId}")
-    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId) throws JsonProcessingException {
+    public ResponseEntity<List<Wordle>> getWordlesByContest(@PathVariable Long contestId)
+            throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -215,7 +220,7 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getContestsWhereIsUsed/{word}")
     public ResponseEntity<List<Contest>> getContestsWhereIsUsed(@PathVariable String word) {
-        if(!wordleService.existsByWord(word))
+        if (!wordleService.existsByWord(word))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Wordle wordle = wordleService.getByWord(word);
@@ -223,13 +228,15 @@ public class WordleController {
     }
 
     @GetMapping("/checkWordleAttempt/{contestId}/{wordleIndex}/{word}/{userEmail}")
-    public ResponseEntity<List<Integer>> checkWordleAttempt(@PathVariable Long contestId, @PathVariable Integer wordleIndex, @PathVariable String word, @PathVariable String userEmail) {
+    public ResponseEntity<List<Integer>> checkWordleAttempt(@PathVariable Long contestId,
+            @PathVariable Integer wordleIndex, @PathVariable String word, @PathVariable String userEmail) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         User user = userService.getByEmail(userEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Map<Character, Integer> letterCounts = contestStateService.getContestState(contestId, user.getId()).getLetterCountsList().get(wordleIndex);
+        Map<Character, Integer> letterCounts = contestStateService.getContestState(contestId, user.getId())
+                .getLetterCountsList().get(wordleIndex);
 
         List<Integer> toReturn = new ArrayList<>();
         Contest contest = contestService.getById(contestId);
@@ -247,14 +254,14 @@ public class WordleController {
             if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                 toReturn.add(2);
                 letterCounts.put(got, letterCounts.get(got) - 1);
-            }
-            else
+            } else
                 toReturn.add(3);
         }
 
         for (int i = 0; i < wordle.length(); i++) {
             char got = Character.toUpperCase(word.charAt(i));
-            if (toReturn.get(i) == 3 && wordle.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+            if (toReturn.get(i) == 3 && wordle.contains(String.valueOf(got)) && letterCounts.containsKey(got)
+                    && letterCounts.get(got) > 0) {
                 toReturn.set(i, 1);
                 letterCounts.put(got, letterCounts.get(got) - 1);
             }
@@ -269,7 +276,8 @@ public class WordleController {
     }
 
     @GetMapping("/getWordleInContest/{contestId}/{wordleIndex}")
-    public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex) throws JsonProcessingException {
+    public ResponseEntity<Wordle> getWordleInContest(@PathVariable Long contestId, @PathVariable Integer wordleIndex)
+            throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -316,7 +324,8 @@ public class WordleController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/newFolderInsideFolder/{newFolderName}/{folderId}")
-    public ResponseEntity<?> createFolderInsideFolder(@PathVariable String newFolderName, @PathVariable Long folderId, @RequestBody String professorName) {
+    public ResponseEntity<?> createFolderInsideFolder(@PathVariable String newFolderName, @PathVariable Long folderId,
+            @RequestBody String professorName) {
         if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -371,7 +380,7 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getFolder/{folderId}")
     public ResponseEntity<FolderDTO> getFolder(@PathVariable Long folderId) {
-        if(!folderService.existsById(folderId))
+        if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Folder folder = folderService.getById(folderId);
@@ -392,7 +401,7 @@ public class WordleController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getWordlesInsideFolder/{folderId}")
     public ResponseEntity<List<Wordle>> getWordlesByFolderId(@PathVariable Long folderId) {
-        if(!folderService.existsById(folderId))
+        if (!folderService.existsById(folderId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(folderService.getById(folderId).getWordles(), HttpStatus.OK);
@@ -430,12 +439,23 @@ public class WordleController {
 
     private char deleteAccent(char c) {
         switch (c) {
-            case 'Á': case 'á': return 'A';
-            case 'É': case 'é': return 'E';
-            case 'Í': case 'í': return 'I';
-            case 'Ó': case 'ó': return 'O';
-            case 'Ú': case 'ú': return 'U';
-            default: return c;
+            case 'Á':
+            case 'á':
+                return 'A';
+            case 'É':
+            case 'é':
+                return 'E';
+            case 'Í':
+            case 'í':
+                return 'I';
+            case 'Ó':
+            case 'ó':
+                return 'O';
+            case 'Ú':
+            case 'ú':
+                return 'U';
+            default:
+                return c;
         }
     }
 }

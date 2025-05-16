@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class DictionaryService {
 
     private DictionaryRepository dictionaryRepository;
     private DictionaryExternalRepository externalRepository;
 
-    public DictionaryService(DictionaryRepository dictionaryRepository, DictionaryExternalRepository externalRepository) {
+    public DictionaryService(DictionaryRepository dictionaryRepository,
+            DictionaryExternalRepository externalRepository) {
         this.dictionaryRepository = dictionaryRepository;
         this.externalRepository = externalRepository;
     }

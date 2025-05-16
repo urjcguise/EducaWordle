@@ -25,7 +25,8 @@ public class CompetitionService {
     }
 
     public Competition getCompetitionByName(String name) {
-        return competitionRepository.findByName(name).orElseThrow(() -> new NoSuchElementException("Competicion con nombre: " + name + " no existe"));
+        return competitionRepository.findByName(name)
+                .orElseThrow(() -> new NoSuchElementException("Competicion con nombre: " + name + " no existe"));
     }
 
     public Competition getCompetitionById(Long id) {

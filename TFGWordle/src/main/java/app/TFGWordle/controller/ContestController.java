@@ -3,7 +3,6 @@ package app.TFGWordle.controller;
 import app.TFGWordle.dto.*;
 import app.TFGWordle.model.*;
 import app.TFGWordle.security.entity.User;
-import app.TFGWordle.security.jwt.JwtTokenFilter;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,8 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -40,9 +37,9 @@ public class ContestController {
     private final DictionaryService dictionaryService;
     private final ObjectMapper objectMapper;
 
-    private final static Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
-
-    public ContestController(ContestService contestService, CompetitionService competitionService, UserService userService, WordleService wordleService, ContestStateService contestStateService, DictionaryService dictionaryService, ObjectMapper objectMapper) {
+    public ContestController(ContestService contestService, CompetitionService competitionService,
+            UserService userService, WordleService wordleService, ContestStateService contestStateService,
+            DictionaryService dictionaryService, ObjectMapper objectMapper) {
         this.contestService = contestService;
         this.competitionService = competitionService;
         this.userService = userService;
@@ -155,7 +152,7 @@ public class ContestController {
 
         Contest contest = contestService.getById(contestId);
 
-        for (String word: wordles) {
+        for (String word : wordles) {
             if (!wordleService.existsByWord(word))
                 return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
 
@@ -179,7 +176,7 @@ public class ContestController {
 
         Contest contest = contestService.getById(contestId);
 
-        for (String word: wordles) {
+        for (String word : wordles) {
             if (!wordleService.existsByWord(word))
                 return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
 
@@ -210,7 +207,7 @@ public class ContestController {
 
         List<Wordle> newOrder = new ArrayList<>();
 
-        for (String word: wordles) {
+        for (String word : wordles) {
             if (!wordleService.existsByWord(word))
                 return new ResponseEntity<>("Wordle no encontrado", HttpStatus.NOT_FOUND);
 
@@ -266,7 +263,8 @@ public class ContestController {
     }
 
     @GetMapping("/resumeContest/{contestId}/{userName}")
-    public ResponseEntity<ResumeContestDTO> resumeContest(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
+    public ResponseEntity<ResumeContestDTO> resumeContest(@PathVariable Long contestId, @PathVariable String userName)
+            throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         User user = userService.getByUserName(userName)
@@ -367,8 +365,7 @@ public class ContestController {
                 if (expected == got && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                     newLetter.setState(2);
                     letterCounts.put(got, letterCounts.get(got) - 1);
-                }
-                else
+                } else
                     newLetter.setState(3);
 
                 letters.add(newLetter);
@@ -377,7 +374,8 @@ public class ContestController {
             for (int i = 0; i < wordleToSolve.length(); i++) {
                 char got = wordleInserted.charAt(i);
 
-                if (letters.get(i).getState() == 3 && wordleToSolve.contains(String.valueOf(got)) && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
+                if (letters.get(i).getState() == 3 && wordleToSolve.contains(String.valueOf(got))
+                        && letterCounts.containsKey(got) && letterCounts.get(got) > 0) {
                     letters.get(i).setState(1);
                     letterCounts.put(got, letterCounts.get(got) - 1);
                 }
@@ -398,7 +396,8 @@ public class ContestController {
     }
 
     @PostMapping("/newContestState/{contestId}/{userName}")
-    public ResponseEntity<?> createContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
+    public ResponseEntity<?> createContestState(@PathVariable Long contestId, @PathVariable String userName,
+            @RequestBody WordleState wordleState) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
@@ -409,9 +408,9 @@ public class ContestController {
         boolean isAccentMode = contest.getAccentMode();
 
         List<Map<Character, Integer>> letterCounts = new ArrayList<>();
-        for (Wordle wordle: contest.getWordles()) {
+        for (Wordle wordle : contest.getWordles()) {
             Map<Character, Integer> letterCount = new HashMap<>();
-            for (char c: wordle.getWord().toCharArray()) {
+            for (char c : wordle.getWord().toCharArray()) {
                 char charToSave = isAccentMode ? c : deleteAccent(c);
                 letterCount.put(charToSave, letterCount.getOrDefault(charToSave, 0) + 1);
             }
@@ -449,7 +448,8 @@ public class ContestController {
     }
 
     @PostMapping("/updateContestState/{contestId}/{userName}")
-    public ResponseEntity<?> updateContestState(@PathVariable Long contestId, @PathVariable String userName, @RequestBody WordleState wordleState) {
+    public ResponseEntity<?> updateContestState(@PathVariable Long contestId, @PathVariable String userName,
+            @RequestBody WordleState wordleState) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
@@ -467,7 +467,8 @@ public class ContestController {
     }
 
     @GetMapping("/getAllContestState/{contestId}")
-    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable Long contestId) throws JsonProcessingException {
+    public ResponseEntity<List<UserState>> getAllContestState(@PathVariable Long contestId)
+            throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -477,7 +478,8 @@ public class ContestController {
 
         List<UserState> toReturn = new ArrayList<>();
         for (ContestState contestState : contestStates) {
-            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(), contestState.getState());
+            UserState toAdd = new UserState(contestState.getUser().getUsername(), contestState.getUser().getEmail(),
+                    contestState.getState());
             toReturn.add(toAdd);
         }
 
@@ -485,7 +487,8 @@ public class ContestController {
     }
 
     @PostMapping("/createContestLog/{contestId}/{wordlePosition}/{userName}")
-    public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable Integer wordlePosition, @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
+    public ResponseEntity<?> createContestLog(@PathVariable Long contestId, @PathVariable Integer wordlePosition,
+            @PathVariable String userName, @RequestBody WordleStateLog wordleStateLog) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>("Concurso no encontrado", HttpStatus.NOT_FOUND);
 
@@ -508,7 +511,8 @@ public class ContestController {
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/getAllUserContestStateLogs/{contestId}/{userName}")
-    public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable Long contestId, @PathVariable String userName) throws JsonProcessingException {
+    public ResponseEntity<List<WordleStateLog>> getAllUserContestStateLogs(@PathVariable Long contestId,
+            @PathVariable String userName) throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -532,7 +536,8 @@ public class ContestController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/getAllContestStateLogs/{contestId}")
-    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable Long contestId) throws JsonProcessingException {
+    public ResponseEntity<List<WordleStateLog>> getAllContestStateLogs(@PathVariable Long contestId)
+            throws JsonProcessingException {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -564,7 +569,8 @@ public class ContestController {
         ContestState toDelete = contestStateService.getContestState(contestId, professor.getId());
         contestStateService.deleteById(toDelete.getId());
 
-        List<ContestStateLog> logsToDelete = contestStateService.getLogsByContestIdAndUser(contestId, professor.getId());
+        List<ContestStateLog> logsToDelete = contestStateService.getLogsByContestIdAndUser(contestId,
+                professor.getId());
         contestStateService.deleteAllLogs(logsToDelete);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -577,7 +583,8 @@ public class ContestController {
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @PostMapping("/saveExternalDictionary/{contestId}")
-    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable Long contestId, @RequestBody List<String> words) {
+    public ResponseEntity<List<DictionaryExternal>> saveExternalDictionary(@PathVariable Long contestId,
+            @RequestBody List<String> words) {
         if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -594,8 +601,9 @@ public class ContestController {
     }
 
     @GetMapping("/existsInExternalDictionary/{contestId}/{wordle}")
-    public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable Long contestId, @PathVariable String wordle) {
-        if(!contestService.existsById(contestId))
+    public ResponseEntity<Boolean> existsInExternalDictionary(@PathVariable Long contestId,
+            @PathVariable String wordle) {
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Contest contest = contestService.getById(contestId);
@@ -605,7 +613,7 @@ public class ContestController {
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")
     @GetMapping("/exportLogsInExcel/{contestId}")
     public ResponseEntity<Resource> exportLogsInExcel(@PathVariable Long contestId) {
-        if(!contestService.existsById(contestId))
+        if (!contestService.existsById(contestId))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Contest contest = contestService.getById(contestId);
@@ -623,12 +631,23 @@ public class ContestController {
 
     private char deleteAccent(char c) {
         switch (c) {
-            case 'Á': case 'á': return 'A';
-            case 'É': case 'é': return 'E';
-            case 'Í': case 'í': return 'I';
-            case 'Ó': case 'ó': return 'O';
-            case 'Ú': case 'ú': return 'U';
-            default: return c;
+            case 'Á':
+            case 'á':
+                return 'A';
+            case 'É':
+            case 'é':
+                return 'E';
+            case 'Í':
+            case 'í':
+                return 'I';
+            case 'Ó':
+            case 'ó':
+                return 'O';
+            case 'Ú':
+            case 'ú':
+                return 'U';
+            default:
+                return c;
         }
     }
 
@@ -637,7 +656,8 @@ public class ContestController {
             Sheet sheet = workbook.createSheet("Logs");
 
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Alumno", "Correo", "Tiempo", "Palabra adivinar", "Posición palabra", "Intento palabra", "Intento", "Estado"};
+            String[] headers = { "Alumno", "Correo", "Tiempo", "Palabra adivinar", "Posición palabra",
+                    "Intento palabra", "Intento", "Estado" };
 
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);

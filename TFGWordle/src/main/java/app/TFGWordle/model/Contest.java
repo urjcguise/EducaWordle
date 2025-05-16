@@ -35,11 +35,7 @@ public class Contest {
     private Competition competition;
 
     @ManyToMany
-    @JoinTable(
-            name = "contest_wordle",
-            joinColumns = @JoinColumn(name = "contest_id"),
-            inverseJoinColumns = @JoinColumn(name = "wordle_id")
-    )
+    @JoinTable(name = "contest_wordle", joinColumns = @JoinColumn(name = "contest_id"), inverseJoinColumns = @JoinColumn(name = "wordle_id"))
     @OrderColumn(name = "wordle_order")
     private List<Wordle> wordles = new ArrayList<>();
 
@@ -47,10 +43,11 @@ public class Contest {
     @Column(name = "wordles_length", columnDefinition = "TEXT")
     private List<Integer> wordlesLength = new ArrayList<>();
 
-    public Contest() {}
+    public Contest() {
+    }
 
     public Contest(String name, Competition competition, Date startDate, Date endDate, int numTries,
-                   Boolean useDictionary, Boolean useExternalFile, Boolean randomMode, Boolean accentMode) {
+            Boolean useDictionary, Boolean useExternalFile, Boolean randomMode, Boolean accentMode) {
         this.name = name;
         this.competition = competition;
         this.startDate = startDate;
@@ -64,8 +61,10 @@ public class Contest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Contest contest = (Contest) o;
         return Objects.equals(id, contest.id);
     }
@@ -201,7 +200,8 @@ public class Contest {
         @Override
         public List<Integer> convertToEntityAttribute(String dbData) {
             try {
-                return objectMapper.readValue(dbData, new TypeReference<List<Integer>>(){});
+                return objectMapper.readValue(dbData, new TypeReference<List<Integer>>() {
+                });
             } catch (IOException e) {
                 throw new IllegalArgumentException("Error al convertir JSON a lista de enteros", e);
             }

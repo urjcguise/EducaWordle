@@ -14,7 +14,8 @@ public class WordleStateLog {
     private int wrong;
     private boolean state;
 
-    public WordleStateLog(String userName, String email, String dateLog, String wordleToGuess, String wordleInserted, int numTry, int wordlePosition, int correct, int wrongPosition, int wrong, boolean state) {
+    public WordleStateLog(String userName, String email, String dateLog, String wordleToGuess, String wordleInserted,
+            int numTry, int wordlePosition, int correct, int wrongPosition, int wrong, boolean state) {
         this.userName = userName;
         this.email = email;
         this.dateLog = dateLog;

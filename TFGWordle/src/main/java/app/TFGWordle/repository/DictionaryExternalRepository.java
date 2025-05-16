@@ -12,6 +12,7 @@ public interface DictionaryExternalRepository extends JpaRepository<DictionaryEx
 
     @Query("SELECT COUNT(d) > 0 FROM DictionaryExternal d WHERE LOWER(d.wordle) = LOWER(:wordle) AND d.contest.id = :contestId")
     boolean existsWord(@Param("wordle") String wordle, @Param("contestId") Long contestId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM DictionaryExternal d WHERE d.contest = :contest")
