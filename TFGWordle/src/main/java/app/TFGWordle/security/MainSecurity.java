@@ -55,20 +55,8 @@ public class MainSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                "/",
-                                "/index.html",
-                                "/*.ico",
-                                "/*.png",
-                                "/*.jpg",
-                                "/*.gif",
-                                "/*.js",
-                                "/*.css",
-                                "/assets/**",
-                                "/login",
-                                "/auth/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(jwtEntryPoint) // Manejador de excepciones de autenticación
                 )

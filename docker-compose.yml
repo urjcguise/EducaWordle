@@ -1,0 +1,39 @@
+services:
+  backend:
+    container_name: tfg_backend_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME_POSTGRES}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER_POSTGRES}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD_POSTGRES}
+      DB_NAME_POSTGRES: ${DB_NAME_POSTGRES}
+      DB_HOST: db
+      DB_PORT: 5432
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SERVER_PORT: ${SERVER_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER_POSTGRES}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_POSTGRES}
+      POSTGRES_DB: ${DB_NAME_POSTGRES}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_POSTGRES} -d ${DB_NAME_POSTGRES}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+volumes:
+  postgres_data:
