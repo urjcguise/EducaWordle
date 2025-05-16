@@ -77,7 +77,7 @@ export class UserListComponent implements OnInit {
   }
 
   navigateToWatchCompetitions(professorName: string) {
-    this.router.navigate(['/competiciones'], { state: { professorName } });
+    this.router.navigate(['/competiciones'], { state: { professorName: professorName } });
   }
 
   navigateToEditUser(userName: string) {

@@ -140,7 +140,7 @@ export class ContestViewComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/competiciones']);
+    this.router.navigate(['/competiciones'], { state: { professorName: this.professorName } });
   }
 
 }

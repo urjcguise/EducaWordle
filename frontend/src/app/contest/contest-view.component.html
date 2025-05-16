@@ -58,6 +58,7 @@
                 <div *ngIf="activeTab === 'wordles'">
                     <app-show-wordles [randomMode]="contest.randomMode" [accentMode]="contest.accentMode"
                         [contestFinished]="contestFinished"
+                        [professorName]="professorName"
                         (hasWordles)="hasWordlesChange($event)"></app-show-wordles>
                 </div>
 

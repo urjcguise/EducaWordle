@@ -16,10 +16,10 @@ export class ShowWordlesComponent implements OnInit {
   @Input() randomMode: boolean = false;
   @Input() accentMode: boolean = false;
   @Input() contestFinished: boolean = false;
+  @Input() professorName: string = '';
 
   @Output() hasWordles = new EventEmitter<any>();
 
-  professorName: string = '';
   contestId: number = 0;
 
   wordles: string[] = [];
@@ -45,7 +45,6 @@ export class ShowWordlesComponent implements OnInit {
   constructor(private wordleService: WordleService, private route: ActivatedRoute, private tokenService: TokenService, private contestService: ContestService) { }
 
   ngOnInit(): void {
-    this.professorName = this.tokenService.getUserName() || '';
     this.contestId = Number(this.route.snapshot.paramMap.get('contestId'));
     this.loadContestWordles();
   }

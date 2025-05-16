@@ -9,7 +9,7 @@
   <img src="../../assets/sin_fondo_negro_zoom.png" alt="Logo Universidad" class="logo">
 
   <ng-container *ngIf="isLogged">
-    <button class="nav-button" routerLink="/competiciones" routerLinkActive="active"
+    <button *ngIf="!isAdmin" class="nav-button" routerLink="/competiciones" routerLinkActive="active"
       [routerLinkActiveOptions]="{exact: true}">
       Página Principal
     </button>
