@@ -145,6 +145,36 @@ class CompetitionServiceTest {
     }
 
     @Test
+    void existsCompetitionByNameAndProfesorTrue() {
+        String name = "test";
+        Competition competition = new Competition();
+        competition.setCompetitionName(name);
+
+        Long professorId = 1L;
+        User professor = new User();
+        professor.setId(professorId);
+
+        when(competitionRepository.existsByNameAndProfesor(professorId, name)).thenReturn(true);
+
+        assertTrue(competitionService.existsCompetitionByNameAndProfesor(professorId, name));
+    }
+
+    @Test
+    void existsCompetitionByNameAndProfesorFalse() {
+        String name = "test";
+        Competition competition = new Competition();
+        competition.setCompetitionName(name);
+
+        Long professorId = 1L;
+        User professor = new User();
+        professor.setId(professorId);
+
+        when(competitionRepository.existsByNameAndProfesor(professorId, name)).thenReturn(false);
+
+        assertFalse(competitionService.existsCompetitionByNameAndProfesor(professorId, name));
+    }
+
+    @Test
     void getParticipations() {
         Long id = 1L;
         Competition competition = new Competition();

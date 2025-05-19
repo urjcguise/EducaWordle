@@ -1,7 +1,9 @@
 package app.TFGWordle.controller;
 
 import app.TFGWordle.model.Competition;
+import app.TFGWordle.model.Contest;
 import app.TFGWordle.model.Participation;
+import app.TFGWordle.model.Wordle;
 import app.TFGWordle.security.dto.NewUser;
 import app.TFGWordle.security.entity.Rol;
 import app.TFGWordle.security.entity.User;
@@ -9,10 +11,7 @@ import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.service.UserService;
 import app.TFGWordle.service.ParticipationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -139,7 +138,6 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getUserEmailSuccess() throws Exception {
         User user = new User("user", "user@gmail.com", "password");
         when(userService.getByUserName("user")).thenReturn(Optional.of(user));
@@ -149,7 +147,6 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getUserEmailFail() throws Exception {
         when(userService.getByUserName("user")).thenReturn(Optional.empty());
         mockMvc.perform(get(BASE_PATH + "/getUserEmail/user"))
@@ -176,7 +173,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
-    void getCompetitionSuccess() throws Exception {
+    void getCompetitionsSuccess() throws Exception {
         Rol rolProfessor = new Rol(RolName.ROLE_PROFESSOR);
         Set<Rol> professors = new HashSet<>();
         professors.add(rolProfessor);
@@ -197,9 +194,60 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
-    void getCompetitionFail() throws Exception {
+    void getCompetitionsFail() throws Exception {
         when(userService.getByUserName("user")).thenReturn(Optional.empty());
         mockMvc.perform(get(BASE_PATH + "/getCompetitions/user"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void getAllWordlesSuccess() throws Exception {
+        String userName = "user";
+        Long userId = 1L;
+
+        User user = new User();
+        user.setId(userId);
+        user.setUsername(userName);
+
+        Wordle wordle = new Wordle();
+        wordle.setWord("Wordle");
+
+        Contest contest = new Contest();
+        contest.setEndDate(new Date(System.currentTimeMillis() - 100000));
+        contest.setWordles(new ArrayList<>(List.of(wordle)));
+
+        Competition competition = new Competition();
+        competition.setCompetitionName("Competicion");
+        competition.setContests(new ArrayList<>(List.of(contest)));
+
+        Participation participation = new Participation();
+        participation.setStudent(user);
+        participation.setCompetition(competition);
+
+        competition.getParticipations().add(participation);
+
+        when(userService.getByUserName("user")).thenReturn(Optional.of(user));
+        when(participationService.findParticipationsByStudent(userId)).thenReturn(List.of(participation));
+
+        mockMvc.perform(get(BASE_PATH + "/getAllWordles/" + userName))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].competition.competitionName").value("Competicion"))
+                .andExpect(jsonPath("$[0].contestsInfo[0].wordles[0].word").value("Wordle"));
+    }
+
+    @Test
+    @WithMockUser(roles = {"STUDENT"})
+    void getAllWordlesNotFound() throws Exception {
+        String userName = "user";
+
+        User user = new User();
+        user.setUsername(userName);
+
+        when(userService.getByUserName("user")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(BASE_PATH + "/getAllWordles/" + userName))
                 .andExpect(status().isNotFound());
     }
 }

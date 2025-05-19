@@ -65,11 +65,10 @@ class AuthControllerTest {
         objectMapper = new ObjectMapper();
     }
 
-    /*
     @Test
     public void loginValidCredentials() throws Exception {
         LoginUser loginUser = new LoginUser();
-        loginUser.setUserName("testUser");
+        loginUser.setEmail("user@email.com");
         loginUser.setPassword("password");
 
         Authentication authentication = mock(Authentication.class);
@@ -94,7 +93,7 @@ class AuthControllerTest {
     @Test
     public void loginInvalidCredentials() throws Exception {
         LoginUser loginUser = new LoginUser();
-        loginUser.setUserName("testUser");
+        loginUser.setEmail("user@email.com");
         loginUser.setPassword("wrongPassword");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
@@ -109,7 +108,7 @@ class AuthControllerTest {
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtProvider, never()).generateToken(any());
     }
-*/
+
     @Test
     public void newUserValidUser() throws Exception {
         NewUser newUser = new NewUser();
@@ -137,39 +136,50 @@ class AuthControllerTest {
 
     @Test
     public void newUserUserNameExists() throws Exception {
+        Long userId = 1L;
         NewUser newUser = new NewUser();
         newUser.setName("newUser");
         newUser.setEmail("newUser@example.com");
         newUser.setPassword("password");
         newUser.setRoles(Set.of("student"));
 
+        User user = new User();
+        user.setId(userId);
+
         when(bindingResult.hasErrors()).thenReturn(false);
         when(userService.existsByUserName("newUser")).thenReturn(true);
+        when(userService.getByUserName("newUser")).thenReturn(Optional.of(user));
 
         mockMvc.perform(post("/auth/newUser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict())
+                .andExpect(content().string(String.valueOf(userId)));
 
         verify(userService, never()).save(any(User.class));
     }
 
     @Test
     public void newUserEmailExists() throws Exception {
+        Long userId = 1L;
         NewUser newUser = new NewUser();
         newUser.setName("newUser");
         newUser.setEmail("newUser@example.com");
         newUser.setPassword("password");
         newUser.setRoles(Set.of("student"));
 
+        User user = new User();
+        user.setId(userId);
+
         when(bindingResult.hasErrors()).thenReturn(false);
-        when(userService.existsByUserName("newUser")).thenReturn(false);
         when(userService.existsByEmail("newUser@example.com")).thenReturn(true);
+        when(userService.getByUserName("newUser")).thenReturn(Optional.of(user));
 
         mockMvc.perform(post("/auth/newUser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict())
+                .andExpect(content().string(String.valueOf(userId)));
 
         verify(userService, never()).save(any(User.class));
     }

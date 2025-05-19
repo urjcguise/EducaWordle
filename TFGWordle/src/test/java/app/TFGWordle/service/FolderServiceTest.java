@@ -109,7 +109,7 @@ class FolderServiceTest {
         Folder folder = new Folder();
         folder.setId(id);
 
-        when(folderRepository.getById(id)).thenReturn(folder);
+        when(folderRepository.getReferenceById(id)).thenReturn(folder);
 
         Folder result = folderService.getById(id);
 

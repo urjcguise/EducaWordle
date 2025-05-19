@@ -231,6 +231,24 @@ class ContestStateServiceTest {
     }
 
     @Test
+    void existsByContestTrue() {
+        Long contestId = 1L;
+
+        when(contestStateRepository.existsByContestId(contestId)).thenReturn(true);
+
+        assertTrue(contestStateService.existsByContest(contestId));
+    }
+
+    @Test
+    void existsByContestFase() {
+        Long contestId = 1L;
+
+        when(contestStateRepository.existsByContestId(contestId)).thenReturn(false);
+
+        assertFalse(contestStateService.existsByContest(contestId));
+    }
+
+    @Test
     void deleteById() {
         Long contestStateId = 1L;
         ContestState contestState = new ContestState();
@@ -253,22 +271,34 @@ class ContestStateServiceTest {
     }
 
     @Test
+    void deleteAllLogs() {
+        ContestStateLog contestStateLog1 = new ContestStateLog();
+        ContestStateLog contestStateLog2 = new ContestStateLog();
+
+        List<ContestStateLog> contestStateLogs = new ArrayList<>(List.of(contestStateLog1, contestStateLog2));
+
+        contestStateService.deleteAllLogs(contestStateLogs);
+
+        verify(contestStateLogRepository, times(1)).deleteAll(contestStateLogs);
+    }
+
+    @Test
     void saveLog() {
         ContestStateLog contestStateLog = new ContestStateLog();
         contestStateService.saveLog(contestStateLog);
         verify(contestStateLogRepository, times(1)).save(contestStateLog);
     }
 
-    /*
     @Test
     void getAllLogsByContestAndUser() {
         Long contestId = 1L;
         Long userId = 10L;
         List<String> expectedLogs = Arrays.asList(
-                "{\"userName\":\"Ana Torres\",\"email\":\"anatorres@gmail.com\",\"dateLog\":\"2025-03-25 11:21:52\",\"wordleToGuess\":\"ejemplo\",\"wordleInserted\":\"PRUEBAS\",\"numTry\":1,\"wordlePosition\":1,\"correct\":0,\"wrongPosition\":2,\"wrong\":5,\"state\":false}",
-                "{\"userName\":\"Ana Torres\",\"email\":\"anatorres@gmail.com\",\"dateLog\":\"2025-03-25 11:22:52\",\"wordleToGuess\":\"ejemplo\",\"wordleInserted\":\"EJEMPLO\",\"numTry\":2,\"wordlePosition\":6,\"correct\":6,\"wrongPosition\":0,\"wrong\":0,\"state\":true}"
+                "{\"userName\":\"Ana Torres\",\"email\":\"anatorres@gmail.com\",\"dateLog\":\"2025-03-25 11:21:52\",\"wordleToGuess\":\"EJEMPLO\",\"wordleInserted\":\"PRUEBAS\",\"numTry\":1,\"wordlePosition\":1,\"correct\":0,\"wrongPosition\":2,\"wrong\":5,\"state\":false}",
+                "{\"userName\":\"Ana Torres\",\"email\":\"anatorres@gmail.com\",\"dateLog\":\"2025-03-25 11:22:52\",\"wordleToGuess\":\"EJEMPLO\",\"wordleInserted\":\"EJEMPLO\",\"numTry\":2,\"wordlePosition\":6,\"correct\":6,\"wrongPosition\":0,\"wrong\":0,\"state\":true}"
         );
-        when(contestStateLogRepository.findByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
+
+        when(contestStateLogRepository.findAllLogsByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
 
         List<String> actualLogs = contestStateService.getAllLogsByContestAndUser(contestId, userId);
 
@@ -276,7 +306,7 @@ class ContestStateServiceTest {
         assertEquals(expectedLogs.get(0), actualLogs.get(0));
         assertEquals(expectedLogs.get(1), actualLogs.get(1));
 
-        verify(contestStateLogRepository, times(1)).findByContestIdAndUserId(contestId, userId);
+        verify(contestStateLogRepository, times(1)).findAllLogsByContestIdAndUserId(contestId, userId);
     }
 
     @Test
@@ -285,15 +315,15 @@ class ContestStateServiceTest {
         Long userId = 10L;
         List<String> expectedLogs = new ArrayList<>();
 
-        when(contestStateLogRepository.findByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
+        when(contestStateLogRepository.findAllLogsByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
 
         List<String> actualLogs = contestStateService.getAllLogsByContestAndUser(contestId, userId);
 
         assertEquals(expectedLogs.size(), actualLogs.size());
         assertTrue(actualLogs.isEmpty());
 
-        verify(contestStateLogRepository, times(1)).findByContestIdAndUserId(contestId, userId);
-    }*/
+        verify(contestStateLogRepository, times(1)).findAllLogsByContestIdAndUserId(contestId, userId);
+    }
 
     @Test
     public void getAllLogsByContest() {
@@ -371,5 +401,51 @@ class ContestStateServiceTest {
         assertTrue(actualLogs.isEmpty());
 
         verify(contestStateLogRepository, times(1)).findByContestId(contestId);
+    }
+
+    @Test
+    public void getLogsByContestIdAndUser() throws JsonProcessingException {
+        Long contestId = 1L;
+        Long userId = 10L;
+        Contest contest = new Contest();
+        contest.setId(contestId);
+        User user = new User();
+        user.setId(userId);
+
+        ContestStateLog log1 = new ContestStateLog(contest, user);
+        JsonNode jsonNode1 = mock(JsonNode.class);
+        log1.setState(jsonNode1);
+
+        ContestStateLog log2 = new ContestStateLog(contest, user);
+        JsonNode jsonNode2 = mock(JsonNode.class);
+        log2.setState(jsonNode2);
+
+        List<ContestStateLog> expectedLogs = Arrays.asList(log1, log2);
+
+        when(contestStateLogRepository.findByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
+
+        List<ContestStateLog> actualLogs = contestStateService.getLogsByContestIdAndUser(contestId, userId);
+
+        assertEquals(expectedLogs.size(), actualLogs.size());
+        assertEquals(expectedLogs.get(0), actualLogs.get(0));
+        assertEquals(expectedLogs.get(1), actualLogs.get(1));
+
+        verify(contestStateLogRepository, times(1)).findByContestIdAndUserId(contestId, userId);
+    }
+
+    @Test
+    public void getLogsByContestIdAndUserEmptyList() {
+        Long contestId = 1L;
+        Long userId = 10L;
+        List<ContestStateLog> expectedLogs = new ArrayList<>();
+
+        when(contestStateLogRepository.findByContestIdAndUserId(contestId, userId)).thenReturn(expectedLogs);
+
+        List<ContestStateLog> actualLogs = contestStateService.getLogsByContestIdAndUser(contestId, userId);
+
+        assertEquals(expectedLogs.size(), actualLogs.size());
+        assertTrue(actualLogs.isEmpty());
+
+        verify(contestStateLogRepository, times(1)).findByContestIdAndUserId(contestId, userId);
     }
 }

@@ -24,28 +24,29 @@ class MainUserServiceTest {
     private MainUserService mainUserService;
 
     @Test
-    public void testLoadUserByUsername_UserFound() {
-        // Arrange
-        String username = "testUser";
+    public void testLoadUserByUsernameUserFound() {
+        String email = "user@email.com";
+        String name = "user";
         User user = new User();
-        user.setUsername(username);
+        user.setUsername(name);
+        user.setEmail(email);
         user.setPassword("password");
 
-        when(userService.getByUserName(username)).thenReturn(Optional.of(user));
+        when(userService.getByEmail(email)).thenReturn(Optional.of(user));
 
-        UserDetails userDetails = mainUserService.loadUserByUsername(username);
+        UserDetails userDetails = mainUserService.loadUserByUsername(email);
 
-        assertEquals(username, userDetails.getUsername());
-        verify(userService, times(1)).getByUserName(username);
+        assertEquals(name, userDetails.getUsername());
+        verify(userService, times(1)).getByEmail(email);
     }
 
     @Test
-    public void testLoadUserByUsername_UserNotFound() {
-        String username = "nonexistentUser";
+    public void testLoadUserByUsernameUserNotFound() {
+        String email = "user@email.com";
 
-        when(userService.getByUserName(username)).thenReturn(Optional.empty());
+        when(userService.getByEmail(email)).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class, () -> mainUserService.loadUserByUsername(username));
-        verify(userService, times(1)).getByUserName(username);
+        assertThrows(UsernameNotFoundException.class, () -> mainUserService.loadUserByUsername(email));
+        verify(userService, times(1)).getByEmail(email);
     }
 }

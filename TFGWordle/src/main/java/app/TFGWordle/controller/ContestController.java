@@ -115,7 +115,8 @@ public class ContestController {
 
         contest.setCompetition(contestService.getById(contest.getId()).getCompetition());
 
-        return ResponseEntity.ok(contestService.save(contest));
+        contestService.save(contest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('PROFESSOR') || hasRole('ADMIN')")

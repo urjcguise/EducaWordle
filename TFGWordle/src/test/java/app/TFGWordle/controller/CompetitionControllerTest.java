@@ -81,18 +81,55 @@ class CompetitionControllerTest {
     @Test
     @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
     void createCompetitionSameName() throws Exception {
+        Long id = 1L;
         User professor = new User("user", "user@gmail.com", "password");
+        professor.setId(id);
 
         when(userService.getByUserName(professor.getUsername())).thenReturn(Optional.of(professor));
 
         Competition competition = new Competition("competition", professor);
-        when(competitionService.existsCompetitionByName(competition.getCompetitionName())).thenReturn(true);
+        when(competitionService.existsCompetitionByNameAndProfesor(id, competition.getCompetitionName())).thenReturn(true);
 
 
         mockMvc.perform(post(BASE_PATH + "/newCompetition/" + professor.getUsername())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(competition)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editCompetitionSuccess() throws Exception {
+        Long id = 1L;
+        String oldName = "old name";
+        String newName = "new name";
+
+        Competition competition = new Competition();
+        competition.setId(id);
+        competition.setCompetitionName(oldName);
+
+        when(competitionService.existsCompetition(id)).thenReturn(true);
+        when(competitionService.getCompetitionById(id)).thenReturn(competition);
+
+        mockMvc.perform(post(BASE_PATH + "/editCompetition/" + id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(newName))
+                .andExpect(status().isOk());
+        verify(competitionService, times(1)).save(any(Competition.class));
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editCompetitionNotFound() throws Exception {
+        Long id = 1L;
+        String newName = "new name";
+
+        when(competitionService.existsCompetition(id)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/editCompetition/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newName))
+                .andExpect(status().isNotFound());
     }
 
     @Test

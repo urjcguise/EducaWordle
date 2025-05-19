@@ -1,6 +1,5 @@
 package app.TFGWordle.controller;
 
-import app.TFGWordle.dto.EditContestDTO;
 import app.TFGWordle.dto.WordleState;
 import app.TFGWordle.dto.WordleStateLog;
 import app.TFGWordle.model.*;
@@ -17,6 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -100,27 +101,27 @@ class ContestControllerTest {
 
     @Test
     void getContestsByCompetitionSuccess() throws Exception {
-        String competitionName = "test";
+        Long competitionId = 1L;
         Competition competition = new Competition();
         List<Contest> contests = List.of(new Contest());
-        competition.setCompetitionName(competitionName);
+        competition.setId(competitionId);
         competition.setContests(contests);
 
-        when(competitionService.existsCompetitionByName(competitionName)).thenReturn(true);
-        when(competitionService.getCompetitionByName(competitionName)).thenReturn(competition);
+        when(competitionService.existsCompetition(competitionId)).thenReturn(true);
+        when(competitionService.getCompetitionById(competitionId)).thenReturn(competition);
         when(contestService.getContestsByCompetition(competition)).thenReturn(contests);
 
-        mockMvc.perform(get(BASE_PATH + '/' + competitionName + "/contests"))
+        mockMvc.perform(get(BASE_PATH + '/' + competitionId + "/contests"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(contests.size()));
     }
 
     @Test
     void getContestsByCompetitionNotFound() throws Exception {
-        String competitionName = "test";
-        when(competitionService.existsCompetitionByName(competitionName)).thenReturn(false);
+        Long competitionId = 1L;
+        when(competitionService.existsCompetition(competitionId)).thenReturn(false);
 
-        mockMvc.perform(get(BASE_PATH + '/' + competitionName + "/contests"))
+        mockMvc.perform(get(BASE_PATH + '/' + competitionId + "/contests"))
                 .andExpect(status().isNotFound());
     }
 
@@ -169,40 +170,18 @@ class ContestControllerTest {
     void editContestSuccess() throws Exception {
         Long contestId = 1L;
 
-        Contest originalContest = new Contest();
-        originalContest.setId(contestId);
-        Competition competition = new Competition();
-        competition.setId(1L);
-        originalContest.setCompetition(competition);
-
-        Contest editedContest = new Contest();
-        editedContest.setId(contestId);
-        editedContest.setCompetition(competition);
-
-        List<Wordle> wordles = new ArrayList<>();
-        Wordle wordle1 = new Wordle();
-        wordle1.setWord("palabra1");
-        Wordle wordle2 = new Wordle();
-        wordle2.setWord("palabra2");
-        wordles.add(wordle1);
-        wordles.add(wordle2);
-
-        EditContestDTO contestDTO = new EditContestDTO(editedContest, wordles);
-        contestDTO.setContest(editedContest);
-        contestDTO.setWordles(wordles);
+        Contest contest = new Contest();
+        contest.setId(contestId);
 
         when(contestService.existsById(contestId)).thenReturn(true);
-        when(contestService.getById(contestId)).thenReturn(originalContest);
-        when(wordleService.getByWord("palabra1")).thenReturn(wordle1);
-        when(wordleService.getByWord("palabra2")).thenReturn(wordle2);
-        when(contestService.save(any(Contest.class))).thenReturn(editedContest);
+        when(contestService.getById(contestId)).thenReturn(contest);
 
-        // 🔹 Realizar la petición POST
         mockMvc.perform(post(BASE_PATH + "/editContest")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(contestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(contestId));
+                        .content(objectMapper.writeValueAsString(contest)))
+                .andExpect(status().isOk());
+
+        verify(contestService, times(1)).save(contest);
     }
 
     @Test
@@ -210,9 +189,324 @@ class ContestControllerTest {
     void editContestNotFound() throws Exception {
         Long contestId = 1L;
 
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
         when(contestService.existsById(contestId)).thenReturn(false);
 
-        mockMvc.perform(delete(BASE_PATH + "/editContest/" + contestId))
+        mockMvc.perform(post(BASE_PATH + "/editContest")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(contest)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editRandomModeSuccess() throws Exception {
+        Long contestId = 1L;
+        Boolean newMode = true;
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+        contest.setRandomMode(false);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+
+        mockMvc.perform(post(BASE_PATH + "/editRandomMode/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMode)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(newMode)));
+
+        verify(contestService, times(1)).save(contest);
+        assertTrue(contest.getRandomMode());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editRandomModeNotFound() throws Exception {
+        Long contestId = 1L;
+        Boolean newMode = true;
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+        contest.setRandomMode(false);
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/editRandomMode/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMode)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editAccentModeSuccess() throws Exception {
+        Long contestId = 1L;
+        Boolean newMode = true;
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+        contest.setAccentMode(false);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+
+        mockMvc.perform(post(BASE_PATH + "/editAccentMode/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMode)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(newMode)));
+
+        verify(contestService, times(1)).save(contest);
+        assertTrue(contest.getAccentMode());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void editAccentModeNotFound() throws Exception {
+        Long contestId = 1L;
+        Boolean newMode = true;
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+        contest.setAccentMode(false);
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/editAccentMode/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMode)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void deleteWordlesInContestSuccess() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        Wordle wordle1 = new Wordle();
+        wordle1.setWord(wordles.get(0));
+        wordle1.setContests(new ArrayList<>(List.of(contest)));
+        Wordle wordle2 = new Wordle();
+        wordle2.setWord(wordles.get(1));
+        wordle2.setContests(new ArrayList<>(List.of(contest)));
+
+        contest.setWordles(new ArrayList<>(List.of(wordle1, wordle2)));
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(wordleService.existsByWord("Wordle1")).thenReturn(true);
+        when(wordleService.getByWord("Wordle1")).thenReturn(wordle1);
+        when(wordleService.existsByWord("Wordle2")).thenReturn(true);
+        when(wordleService.getByWord("Wordle2")).thenReturn(wordle2);
+
+        mockMvc.perform(post(BASE_PATH + "/deleteWordlesInContest/" + contestId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isOk());
+
+        verify(contestService, times(1)).save(contest);
+        verify(wordleService, times(2)).save(wordle1);
+        assertEquals(contest.getWordles().size(), 0);
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void deleteWordlesInContestContestNotFound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/deleteWordlesInContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void deleteWordlesInContestWordleNotFound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+
+        when(wordleService.existsByWord("Wordle1")).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/deleteWordlesInContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void addWordlesInContestSuccess() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        Wordle wordle1 = new Wordle();
+        wordle1.setWord(wordles.get(0));
+        wordle1.setContests(new ArrayList<>());
+        Wordle wordle2 = new Wordle();
+        wordle2.setWord(wordles.get(1));
+        wordle2.setContests(new ArrayList<>());
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(wordleService.existsByWord("Wordle1")).thenReturn(true);
+        when(wordleService.getByWord("Wordle1")).thenReturn(wordle1);
+        when(wordleService.existsByWord("Wordle2")).thenReturn(true);
+        when(wordleService.getByWord("Wordle2")).thenReturn(wordle2);
+
+        mockMvc.perform(post(BASE_PATH + "/addWordlesToContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isOk());
+
+        verify(contestService, times(1)).save(contest);
+        verify(wordleService, times(2)).save(wordle1);
+        assertEquals(contest.getWordles().size(), 2);
+        assertEquals(wordle1.getContests().size(), 1);
+        assertEquals(wordle2.getContests().size(), 1);
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void addWordlesInContestContestNotFound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/addWordlesToContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void addWordlesInContestWordleNotFound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+
+        when(wordleService.existsByWord("Wordle1")).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/addWordlesToContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void addWordlesInContestWordleConflict() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        Wordle wordle = new Wordle();
+        wordle.setWord(wordles.get(0));
+        wordle.setContests(new ArrayList<>(List.of(contest)));
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(wordleService.existsByWord("Wordle")).thenReturn(true);
+        when(wordleService.getByWord("Wordle")).thenReturn(wordle);
+
+        mockMvc.perform(post(BASE_PATH + "/addWordlesToContest/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void changeWordlesPositionSuccess() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        Wordle wordle1 = new Wordle();
+        wordle1.setWord(wordles.get(0));
+        Wordle wordle2 = new Wordle();
+        wordle2.setWord(wordles.get(1));
+
+        contest.setWordles(new ArrayList<>(List.of(wordle2, wordle1)));
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(wordleService.existsByWord("Wordle1")).thenReturn(true);
+        when(wordleService.getByWord("Wordle1")).thenReturn(wordle1);
+        when(wordleService.existsByWord("Wordle2")).thenReturn(true);
+        when(wordleService.getByWord("Wordle2")).thenReturn(wordle2);
+
+        mockMvc.perform(post(BASE_PATH + "/changeWordlesPosition/" + contestId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isOk());
+
+        verify(contestService, times(1)).save(contest);
+        assertEquals(contest.getWordles().size(), 2);
+        assertEquals(contest.getWordles().get(0).getWord(), wordle1.getWord());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void changeWordlesPositionContestNotFound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/changeWordlesPosition/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void changeWordlesPositionWordleNotfound() throws Exception {
+        Long contestId = 1L;
+        List<String> wordles = List.of("Wordle1", "Wordle2");
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(contestService.getById(contestId)).thenReturn(contest);
+        when(wordleService.existsByWord("Wordle1")).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/changeWordlesPosition/" + contestId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(wordles)))
                 .andExpect(status().isNotFound());
     }
 
@@ -281,13 +575,13 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestStateSuccess() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
 
         Contest contest = new Contest();
         contest.setId(contestId);
+        contest.setAccentMode(false);
 
         User user = new User();
         user.setId(100L);
@@ -315,7 +609,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestStateContestNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -331,7 +624,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestStateUserNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -347,7 +639,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestStateConflict() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -355,6 +646,7 @@ class ContestControllerTest {
 
         Contest contest = new Contest();
         contest.setId(contestId);
+        contest.setAccentMode(true);
 
         User user = new User();
         user.setUsername(userName);
@@ -371,7 +663,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getContestStateSuccess() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -398,7 +689,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getContestStateContestNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -410,7 +700,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getContestStateUserNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -423,7 +712,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getContestStateContestStateNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -441,7 +729,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void updateContestStateSuccess() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -474,7 +761,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void updateContestStateContestNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -489,7 +775,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void updateContestStateUserNotFound() throws Exception {
         Long contestId = 1L;
         String userName = "studentUser";
@@ -505,7 +790,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getAllContestStateSuccess() throws Exception {
         Long contestId = 1L;
 
@@ -542,7 +826,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void getAllContestStateContestNotFound() throws Exception {
         Long contestId = 1L;
 
@@ -553,7 +836,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestLogSuccess() throws Exception {
         Long contestId = 1L;
         int wordlePosition = 0;
@@ -584,7 +866,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestLogContestNotFound() throws Exception {
         Long contestId = 1L;
         int wordlePosition = 0;
@@ -600,7 +881,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void createContestLogUserNotFound() throws Exception {
         Long contestId = 1L;
         int wordlePosition = 0;
@@ -756,7 +1036,53 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void deleteAllProfessorStateSuccess() throws Exception {
+        Long contestId = 1L;
+        Long professorId = 1L;
+        String professorName = "professor";
+
+        Contest contest = new Contest();
+        contest.setId(contestId);
+
+        User professor = new User();
+        professor.setId(professorId);
+        professor.setUsername(professorName);
+
+        ContestState contestState = new ContestState();
+        contestState.setId(1L);
+        contestState.setUser(professor);
+        contestState.setContest(contest);
+
+        ContestStateLog contestStateLog = new ContestStateLog();
+        contestStateLog.setContest(contest);
+        contestStateLog.setUser(professor);
+
+        when(contestService.existsById(contestId)).thenReturn(true);
+        when(userService.getByUserName(professorName)).thenReturn(Optional.of(professor));
+        when(contestStateService.getContestState(contestId, professorId)).thenReturn(contestState);
+        when(contestStateService.getLogsByContestIdAndUser(contestId, professorId)).thenReturn(List.of(contestStateLog));
+
+        mockMvc.perform(post(BASE_PATH + "/deleteAllProfessorState/" + contestId + "/" + professorName))
+                .andExpect(status().isOk());
+
+        verify(contestStateService, times(1)).deleteAllLogs(List.of(contestStateLog));
+        verify(contestStateService, times(1)).deleteById(contestState.getId());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN", "PROFESSOR"})
+    void deleteAllProfessorStateNotFound() throws Exception {
+        Long contestId = 1L;
+        String professorName = "professor";
+
+        when(contestService.existsById(contestId)).thenReturn(false);
+
+        mockMvc.perform(post(BASE_PATH + "/deleteAllProfessorState/" + contestId + "/" + professorName))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void existsInDictionaryTrue() throws Exception {
         String word = "word";
 
@@ -767,7 +1093,6 @@ class ContestControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = {"STUDENT"})
     void existsInDictionaryFalse() throws Exception {
         String word = "word";
 
