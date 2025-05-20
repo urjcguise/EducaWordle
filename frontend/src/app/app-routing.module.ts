@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { IndexComponent } from './index/index.component';
 import { LoginComponent } from './auth/login.component';
-import { RegisterComponent } from './auth/register.component';
 import { prodGuard } from './guards/prod.guard';
 import { CompetitionListComponent } from './competition/competition-list.component';
 import { EditContestComponent } from './contest/edit-contest.component';
@@ -24,7 +23,6 @@ import { CompetitionViewComponent } from './competition/competition-view.compone
 const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'registrar', component: RegisterComponent, canActivate: [prodGuard], data: { expectedRol: ['admin'] } },
   { path: 'usuarios', component: UserListComponent, canActivate: [prodGuard], data: { expectedRol: ['admin'] } },
   { path: 'wordle', component: PlayWordleComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },
   { path: 'competiciones', component: CompetitionListComponent, canActivate: [prodGuard], data: { expectedRol: ['professor', 'student', 'admin'] } },

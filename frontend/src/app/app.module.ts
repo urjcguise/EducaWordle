@@ -8,7 +8,6 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login.component';
-import { RegisterComponent } from './auth/register.component';
 import { IndexComponent } from './index/index.component';
 import { MenuComponent } from './menu/menu.component';
 import { interceptorProvider } from './interceptors/prod-interceptor.service';
@@ -43,7 +42,6 @@ import { CompetitionViewComponent } from './competition/competition-view.compone
   declarations: [
     AppComponent,
     LoginComponent,
-    RegisterComponent,
     IndexComponent,
     MenuComponent,
     CompetitionComponent,
