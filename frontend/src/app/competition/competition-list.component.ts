@@ -4,7 +4,6 @@ import { NavigationStart, Router } from '@angular/router';
 import { TokenService } from '../service/token.service';
 import { UserService } from '../service/user.service';
 import { Contest } from '../models/contest';
-import { Competition } from '../models/competition';
 
 @Component({
   selector: 'app-competition-list',

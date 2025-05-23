@@ -9,14 +9,14 @@
                 <h2 class="main-title text-center mb-4">Editar Wordle</h2>
 
                 <div class="edit-section mb-4">
-                    <label for="wordle" class="edit-section-title edit-word-tittle">Palabra</label> <input type="text"
+                    <label for="wordle" class="edit-section-title">Palabra</label> <input type="text"
                         id="wordle" [(ngModel)]="wordle" class="form-control form-control-lg"
                         placeholder="Escribe la palabra del Wordle" />
                 </div>
 
                 <hr class="my-4">
                 <div class="edit-section mb-4">
-                    <label class="edit-section-title edit-contest-tittle">Asignar a Competiciones</label>
+                    <label class="edit-section-title">Asignar a competiciones</label>
                     <div class="competitions-list-container mt-3">
                         <div *ngFor="let competition of competitionWithContest; let i = index">
                             <hr *ngIf="i > 0" class="my-3">
