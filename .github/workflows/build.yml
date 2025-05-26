@@ -49,12 +49,10 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Run frontend tests with coverage
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Run frontend tests
         working-directory: ./frontend
         run: npm run test
-
-      - name: Run Sonar scanner for frontend
-        working-directory: ./frontend
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: npx sonar-scanner
