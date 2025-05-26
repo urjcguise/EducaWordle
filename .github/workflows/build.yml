@@ -35,8 +35,5 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         #run: mvn -B verify -DskipTests=true org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MiguelRegato_TFG
-        run: mvn -B clean verify -Dspring.profiles.active=test \
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKey=MiguelRegato_TFG \
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        run: mvn -B clean verify -Dspring.profiles.active=test org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
