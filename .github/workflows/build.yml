@@ -42,7 +42,7 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Install Playwright browsers (optional)
+      - name: Install Playwright browsers
         working-directory: ./frontend
         run: npx playwright install --with-deps
 
@@ -50,8 +50,8 @@ jobs:
         working-directory: ./frontend
         run: npm run test
 
-      - name: Run unified Sonar analysis (backend + frontend)
+      - name: Run unified Sonar analysis
         working-directory: ./
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: npx sonar-scanner
+        run: npx sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
