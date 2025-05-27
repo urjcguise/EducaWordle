@@ -56,3 +56,9 @@ jobs:
       - name: Run frontend tests
         working-directory: ./frontend
         run: npm run test
+
+      - name: Run Sonar scanner for frontend
+        working-directory: ./frontend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: npx sonar-scanner
