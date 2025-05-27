@@ -61,4 +61,4 @@ jobs:
         working-directory: ./frontend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: npx sonar-scanner
+        run: npx sonar-scanner -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.organization=miguelregato -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
