@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   build:
-    name: Build and analyze
+    name: Build and analyze backend and frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +34,6 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and analyze backend
-        working-directory: ./TFGWordle
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-      
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -57,8 +51,8 @@ jobs:
         working-directory: ./frontend
         run: npm run test
 
-      - name: Run Sonar scanner for frontend
-        working-directory: ./frontend
+      - name: Build and analyze backend and frontend
+        working-directory: ./TFGWordle
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: npx sonar-scanner -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.organization=miguelregato -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.organization=miguelregato -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml -Dsonar.typescript.lcov.reportPaths=../frontend/coverage/lcov.info -Dsonar.javascript.lcov.reportPaths=../frontend/coverage/lcov.info -Dsonar.sources=src,../frontend/src -Dsonar.exclusions=**/node_modules/** -Dsonar.test.inclusions=**/*.spec.ts -Dsonar.sourceEncoding=UTF-8
