@@ -5,27 +5,22 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   build:
-    name: Build and analyze backend and frontend
+    name: Build and analyze
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
-          
+          fetch-depth: 0
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'zulu'
-          
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -33,6 +28,10 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Build backend and run tests
+        working-directory: ./TFGWordle
+        run: mvn -B verify
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -43,16 +42,15 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright browsers (optional)
         working-directory: ./frontend
         run: npx playwright install --with-deps
 
-      - name: Run frontend tests
+      - name: Run frontend unit tests (Karma)
         working-directory: ./frontend
         run: npm run test
 
-      - name: Build and analyze backend and frontend
-        working-directory: ./TFGWordle
+      - name: Run unified Sonar analysis (backend + frontend)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MiguelRegato_TFG -Dsonar.organization=miguelregato -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml -Dsonar.typescript.lcov.reportPaths=../frontend/coverage/lcov.info -Dsonar.javascript.lcov.reportPaths=../frontend/coverage/lcov.info -Dsonar.sources=src,../frontend/src -Dsonar.exclusions=**/node_modules/** -Dsonar.test.inclusions=**/*.spec.ts -Dsonar.sourceEncoding=UTF-8
+        run: npx sonar-scanner
