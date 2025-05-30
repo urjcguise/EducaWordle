@@ -67,6 +67,16 @@ jobs:
 
       - name: Start backend server
         working-directory: ./TFGWordle
+        env:
+          SERVER_PORT: 9090
+          DB_HOST: db
+          DB_PORT: 5432
+          DB_NAME_POSTGRES: Wordle
+          DB_USER_POSTGRES: postgres
+          DB_PASSWORD_POSTGRES: 9d(gd732^Y
+          SPRING_JPA_HIBERNATE_DDL_AUTO: update
+          JWT_SECRET: 3)FU%02o;q!!d8+0KZT-Y{^GL:wiWB
+          JWT_EXPIRATION: 36000
         run: nohup java -jar target/*.jar &
 
       - name: Wait for backend to be ready
