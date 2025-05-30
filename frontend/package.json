@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --watch=false --browsers=ChromeHeadless --code-coverage"
+    "e2e": "nyc --reporter=lcov --report-dir=coverage/e2e npx playwright test"
   },
   "private": true,
   "dependencies": {
@@ -29,15 +29,12 @@
     "@angular-devkit/build-angular": "^16.2.16",
     "@angular/cli": "^16.2.16",
     "@angular/compiler-cli": "^16.2.12",
+    "@babel/core": "^7.27.3",
+    "@babel/preset-env": "^7.27.2",
     "@playwright/test": "^1.52.0",
-    "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
-    "jasmine-core": "~4.0.0",
-    "karma": "~6.3.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.1.0",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "~1.7.0",
+    "babel-plugin-istanbul": "^7.0.0",
+    "nyc": "^17.1.0",
     "typescript": "^5.1.6"
   }
 }
