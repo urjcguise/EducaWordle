@@ -35,7 +35,8 @@ public class Contest {
     private Competition competition;
 
     @ManyToMany
-    @JoinTable(name = "contest_wordle", joinColumns = @JoinColumn(name = "contest_id"), inverseJoinColumns = @JoinColumn(name = "wordle_id"))
+    @JoinTable(name = "contest_wordle", joinColumns = @JoinColumn(name = "contest_id")
+            , inverseJoinColumns = @JoinColumn(name = "wordle_id"))
     @OrderColumn(name = "wordle_order")
     private List<Wordle> wordles = new ArrayList<>();
 
