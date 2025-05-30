@@ -1,7 +1,5 @@
 package app.TFGWordle.security.util;
 
-import app.TFGWordle.security.entity.Rol;
-import app.TFGWordle.security.enums.RolName;
 import app.TFGWordle.security.service.RolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -15,6 +15,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
     @Query("SELECT p FROM Participation p WHERE p.student.id = :userId")
     List<Participation> findByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT p.student FROM Participation p JOIN p.student.roles r WHERE p.competition.id = :competitionId AND r.rolName = 'ROLE_STUDENT'")
+    @Query("SELECT p.student FROM Participation p JOIN p.student.roles r WHERE " +
+            "p.competition.id = :competitionId AND r.rolName = 'ROLE_STUDENT'")
     List<User> findByCompetitionId(@Param("competitionId") Long competitionId);
 }

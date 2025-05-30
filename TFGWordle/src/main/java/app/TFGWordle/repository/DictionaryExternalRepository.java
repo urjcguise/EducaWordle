@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface DictionaryExternalRepository extends JpaRepository<DictionaryExternal, Integer> {
 
-    @Query("SELECT COUNT(d) > 0 FROM DictionaryExternal d WHERE LOWER(d.wordle) = LOWER(:wordle) AND d.contest.id = :contestId")
+    @Query("SELECT COUNT(d) > 0 FROM DictionaryExternal d WHERE " +
+            "LOWER(d.wordle) = LOWER(:wordle) AND d.contest.id = :contestId")
     boolean existsWord(@Param("wordle") String wordle, @Param("contestId") Long contestId);
 
     @Modifying
