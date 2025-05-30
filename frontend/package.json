@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "e2e": "nyc --reporter=lcov --report-dir=coverage/e2e npx playwright test"
+    "start:e2e": "ng serve",
+    "e2e": "concurrently -k -s first -n \"APP,TEST\" -c \"green,blue\" \"npm run start:e2e\" \"npm run e2e:run\"",
+    "e2e:run": "wait-on http://localhost:4200 && nyc --reporter=lcov --report-dir=coverage/e2e npx playwright test"
   },
   "private": true,
   "dependencies": {
@@ -34,7 +36,9 @@
     "@playwright/test": "^1.52.0",
     "@types/node": "^12.11.1",
     "babel-plugin-istanbul": "^7.0.0",
+    "concurrently": "^9.1.2",
     "nyc": "^17.1.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "wait-on": "^8.0.3"
   }
 }

@@ -33,6 +33,13 @@ jobs:
         working-directory: ./TFGWordle
         run: mvn -B verify
 
+      - name: Start backend server
+        working-directory: ./TFGWordle
+        run: nohup java -jar target/*.jar &
+
+      - name: Wait for backend to be ready
+        run: npx wait-on http://localhost:9090
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
