@@ -1,4 +1,4 @@
-﻿# **Documentación API**
+# **Documentación API**
 Documentación de la API del Wordle educativo
 
 More information: <https://helloreverb.com>
@@ -7,7 +7,7 @@ Contact Info: <m.regato.2019@alumnos.urjc.es>
 
 Version: 1.0.0
 
-BasePath:/MiguelRegato/WordleAPI/1.0.0
+BasePath:/wordle/WordleEducativoAPI/1.0.0
 
 Apache 2.0
 
@@ -22,17 +22,24 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 #### [**CompetitionController**](#competitioncontroller)
 - [POST /api/competitions/addStudentsByExcel/{competitionId}](#apicompetitionsaddstudentsbyexcelcompetitionidpost)
 - [DELETE /api/competitions/deleteCompetition/{competitionId}](#apicompetitionsdeletecompetitioncompetitioniddelete)
+- [POST /api/competitions/editCompetition/{competitionId}](#apicompetitionseditcompetitioncompetitionidpost)
 - [GET /api/competitions/getCompetitions/{professorName}](#apicompetitionsgetcompetitionsprofessornameget)
 - [GET /api/competitions/getStudents/{competitionId}](#apicompetitionsgetstudentscompetitionidget)
 - [POST /api/competitions/linkStudentToCompetition/{competitionId}/{userId}](#apicompetitionslinkstudenttocompetitioncompetitioniduseridpost)
 - [POST /api/competitions/newCompetition/{professorName}](#apicompetitionsnewcompetitionprofessornamepost)
 #### [**ContestController**](#contestcontroller)
-- [GET /api/contests/{competitionName}/contests](#apicontestscompetitionnamecontestsget)
+- [POST /api/contests/addWordlesToContest/{contestId}](#apicontestsaddwordlestocontestcontestidpost)
+- [POST /api/contests/changeWordlesPosition/{contestId}](#apicontestschangewordlespositioncontestidpost)
+- [GET /api/contests/{competitionId}/contests](#apicontestscompetitionidcontestsget)
 - [GET /api/contests/{contestId}/contest](#apicontestscontestidcontestget)
 - [POST /api/contests/copyContest/{oldContestId}](#apicontestscopycontestoldcontestidpost)
 - [POST /api/contests/createContestLog/{contestId}/{wordlePosition}/{userName}](#apicontestscreatecontestlogcontestidwordlepositionusernamepost)
+- [POST /api/contests/deleteAllProfessorState/{contestId}/{professorName}](#apicontestsdeleteallprofessorstatecontestidprofessornamepost)
 - [DELETE /api/contests/deleteContest/{contestId}](#apicontestsdeletecontestcontestiddelete)
+- [POST /api/contests/deleteWordlesInContest/{contestId}](#apicontestsdeletewordlesincontestcontestidpost)
+- [POST /api/contests/editAccentMode/{contestId}](#apicontestseditaccentmodecontestidpost)
 - [POST /api/contests/editContest](#apicontestseditcontestpost)
+- [POST /api/contests/editRandomMode/{contestId}](#apicontestseditrandommodecontestidpost)
 - [GET /api/contests/existsInDictionary/{word}](#apicontestsexistsindictionarywordget)
 - [GET /api/contests/existsInExternalDictionary/{contestId}/{wordle}](#apicontestsexistsinexternaldictionarycontestidwordleget)
 - [GET /api/contests/exportLogsInExcel/{contestId}](#apicontestsexportlogsinexcelcontestidget)
@@ -42,6 +49,7 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 - [GET /api/contests/getContestState/{contestId}/{userName}](#apicontestsgetconteststatecontestidusernameget)
 - [POST /api/contests/newContest/{competitionId}](#apicontestsnewcontestcompetitionidpost)
 - [POST /api/contests/newContestState/{contestId}/{userName}](#apicontestsnewconteststatecontestidusernamepost)
+- [GET /api/contests/resumeContest/{contestId}/{userName}](#apicontestsresumecontestcontestidusernameget)
 - [POST /api/contests/saveExternalDictionary/{contestId}](#apicontestssaveexternaldictionarycontestidpost)
 - [POST /api/contests/updateContestState/{contestId}/{userName}](#apicontestsupdateconteststatecontestidusernamepost)
 #### [**UserController**](#usercontroller)
@@ -51,12 +59,14 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 - [GET /api/users/getUserEmail/{userName}](#apiusersgetuseremailusernameget)
 - [POST /api/users/updateUser/{oldUserName}](#apiusersupdateuseroldusernamepost)
 - [GET /api/users/{userName}](#apiusersusernameget)
+- [GET /apu/users/getAllWordles/{userName}](#apuusersgetallwordlesusernameget)
 - [GET /api/users/getAllProfessors](#getallprofessors)
 #### [**WordleController**](#wordlecontroller)
 - [GET /api/wordle/checkWordleAttempt/{contestId}/{wordleIndex}/{word}/{userEmail}](#apiwordlecheckwordleattemptcontestidwordleindexworduseremailget)
 - [DELETE /api/wordle/deleteFolders](#apiwordledeletefoldersdelete)
 - [DELETE /api/wordle/deleteWordles](#apiwordledeletewordlesdelete)
 - [POST /api/wordle/editFolder/{oldFolderId}](#apiwordleeditfolderoldfolderidpost)
+- [POST /api/wordle/editWordle/{wordle}](#apiwordleeditwordlewordlepost)
 - [GET /api/wordle/getContestsWhereIsUsed/{word}](#apiwordlegetcontestswhereisusedwordget)
 - [GET /api/wordle/getFolder/{folderId}](#apiwordlegetfolderfolderidget)
 - [GET /api/wordle/getFoldersByProfessor/{professorName}](#apiwordlegetfoldersbyprofessorprofessornameget)
@@ -250,6 +260,43 @@ Competición eliminada con éxito. []()
 **401**
 
 No autorizado. []()
+
+**404**
+
+Competición no encontrada. []()
+
+-----
+<a name="apicompetitionseditcompetitioncompetitionidpost"></a>[Up](#__methods) 
+
+POST /api/competitions/editCompetition/{competitionId}
+
+Edita el nombre de una competición. (**apiCompetitionsEditCompetitionCompetitionIdPost**)
+
+Modifica el nombre de una competición existente. Requiere rol de Profesor o de Administrador.
+
+**Path parameters**
+
+**competitionId (required)**
+
+*Path Parameter* — ID de la competición a editar. format: int64
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- text/plain
+
+**Request body**
+
+**body [string](#string) (required)**
+
+*Body Parameter* — 
+
+**Responses**
+
+**200**
+
+Nombre de la competición actualizado correctamente. []()
 
 **404**
 
@@ -649,19 +696,97 @@ Nombre de competición ya utilizado. []()
 
 -----
 # <a name="contestcontroller"></a>**ContestController**
-<a name="apicontestscompetitionnamecontestsget"></a>[Up](#__methods) 
+<a name="apicontestsaddwordlestocontestcontestidpost"></a>[Up](#__methods) 
 
-GET /api/contests/{competitionName}/contests
+POST /api/contests/addWordlesToContest/{contestId}
 
-Obtiene los concursos de una competición por su nombre. (**apiContestsCompetitionNameContestsGet**)
+Añade Wordles a un concurso. (**apiContestsAddWordlesToContestContestIdPost**)
 
-Obtiene la lista de concursos asociados a una competición específica utilizando su nombre.
+Asocia una lista de palabras Wordle a un concurso. Requiere rol de Profesor o Administrador.
 
 **Path parameters**
 
-**competitionName (required)**
+**contestId (required)**
 
-*Path Parameter* — Nombre de la competición. 
+*Path Parameter* — ID del concurso. 
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [string](#string) (required)**
+
+*Body Parameter* — 
+
+**Responses**
+
+**200**
+
+Wordles añadidas correctamente al concurso. []()
+
+**404**
+
+Concurso o Wordle no encontrado. []()
+
+**409**
+
+Wordle ya existente en el concurso. []()
+
+-----
+<a name="apicontestschangewordlespositioncontestidpost"></a>[Up](#__methods) 
+
+POST /api/contests/changeWordlesPosition/{contestId}
+
+Cambia el orden de los Wordles en un concurso. (**apiContestsChangeWordlesPositionContestIdPost**)
+
+Reordena los Wordles asociados a un concurso en el orden especificado. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso. 
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [string](#string) (required)**
+
+*Body Parameter* — 
+
+**Responses**
+
+**200**
+
+Orden de los Wordles actualizado con éxito. []()
+
+**404**
+
+Concurso o Wordle no encontrado. []()
+
+-----
+<a name="apicontestscompetitionidcontestsget"></a>[Up](#__methods) 
+
+GET /api/contests/{competitionId}/contests
+
+Obtiene los concursos asociados a una competición. (**apiContestsCompetitionIdContestsGet**)
+
+Devuelve una lista de concursos (contests) que pertenecen a una competición específica. Requiere rol de Profesor o de Administrador.
+
+**Path parameters**
+
+**competitionId (required)**
+
+*Path Parameter* — ID de la competición. format: int64
 
 **Return type**
 
@@ -723,7 +848,7 @@ This API call produces the following media types according to the Accept request
 
 **200**
 
-Lista de concursos obtenida con éxito. 
+Lista de concursos devuelta con éxito. 
 
 **404**
 
@@ -822,7 +947,7 @@ POST /api/contests/createContestLog/{contestId}/{wordlePosition}/{userName}
 
 Crea un nuevo registro de estado de concurso. (**apiContestsCreateContestLogContestIdWordlePositionUserNamePost**)
 
-Crea un nuevo registro de estado de concurso para un usuario específico en una posición de wordle dada. Requiere el rol de Alumno.
+Crea un nuevo registro de estado de concurso para un usuario específico en una posición de wordle dada.
 
 **Path parameters**
 
@@ -865,6 +990,35 @@ Error al procesar los datos. []()
 Concurso o usuario no encontrado. []()
 
 -----
+<a name="apicontestsdeleteallprofessorstatecontestidprofessornamepost"></a>[Up](#__methods) 
+
+POST /api/contests/deleteAllProfessorState/{contestId}/{professorName}
+
+Elimina todo el estado de un profesor en un concurso. (**apiContestsDeleteAllProfessorStateContestIdProfessorNamePost**)
+
+Elimina el estado del concurso y todos los registros asociados al profesor para el concurso especificado. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso del cual eliminar el estado del profesor. format: int64
+
+**professorName (required)**
+
+*Path Parameter* — Nombre de usuario del profesor. 
+
+**Responses**
+
+**200**
+
+Estado y registros del profesor eliminados correctamente. []()
+
+**404**
+
+Concurso o profesor no encontrado. []()
+
+-----
 <a name="apicontestsdeletecontestcontestiddelete"></a>[Up](#__methods) 
 
 DELETE /api/contests/deleteContest/{contestId}
@@ -884,6 +1038,96 @@ Elimina un concurso específico utilizando su ID. Requiere el rol de Administrad
 **200**
 
 Concurso eliminado con éxito. []()
+
+**404**
+
+Concurso no encontrado. []()
+
+-----
+<a name="apicontestsdeletewordlesincontestcontestidpost"></a>[Up](#__methods) 
+
+POST /api/contests/deleteWordlesInContest/{contestId}
+
+Elimina Wordles de un concurso. (**apiContestsDeleteWordlesInContestContestIdPost**)
+
+Elimina una lista de palabras Wordle asociadas a un concurso. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso. 
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [string](#string) (required)**
+
+*Body Parameter* — 
+
+**Responses**
+
+**200**
+
+Wordles eliminadas del concurso. []()
+
+**404**
+
+Concurso o Wordle no encontrado. []()
+
+-----
+<a name="apicontestseditaccentmodecontestidpost"></a>[Up](#__methods) 
+
+POST /api/contests/editAccentMode/{contestId}
+
+Edita el modo de acentos de un concurso. (**apiContestsEditAccentModeContestIdPost**)
+
+Cambia el estado del modo de acentos de un concurso. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso. format: int64
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [boolean](#boolean) (required)**
+
+*Body Parameter* — 
+
+**Return type**
+
+Boolean 
+
+**Example data**
+
+Content-Type: application/json
+
+true
+
+**Produces**
+
+This API call produces the following media types according to the Accept request header; the media type will be conveyed by the Content-Type response header. 
+
+- application/json
+
+**Responses**
+
+**200**
+
+Modo de acentos actualizado. [Boolean](#boolean) 
 
 **404**
 
@@ -957,13 +1201,66 @@ Concurso editado con éxito. [Contest](#contest)
 Concurso no encontrado. []()
 
 -----
+<a name="apicontestseditrandommodecontestidpost"></a>[Up](#__methods) 
+
+POST /api/contests/editRandomMode/{contestId}
+
+Edita el modo aleatorio de un concurso. (**apiContestsEditRandomModeContestIdPost**)
+
+Cambia el estado del modo aleatorio de un concurso. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso. format: int64
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [boolean](#boolean) (required)**
+
+*Body Parameter* — 
+
+**Return type**
+
+Boolean 
+
+**Example data**
+
+Content-Type: application/json
+
+true
+
+**Produces**
+
+This API call produces the following media types according to the Accept request header; the media type will be conveyed by the Content-Type response header. 
+
+- application/json
+
+**Responses**
+
+**200**
+
+Modo aleatorio actualizado. [Boolean](#boolean) 
+
+**404**
+
+Concurso no encontrado. []()
+
+-----
 <a name="apicontestsexistsindictionarywordget"></a>[Up](#__methods) 
 
 GET /api/contests/existsInDictionary/{word}
 
 Verifica si una palabra existe en el diccionario global. (**apiContestsExistsInDictionaryWordGet**)
 
-Verifica si una palabra dada existe en el diccionario global. Requiere el rol de Alumno.
+Verifica si una palabra dada existe en el diccionario global.
 
 **Path parameters**
 
@@ -1000,7 +1297,7 @@ GET /api/contests/existsInExternalDictionary/{contestId}/{wordle}
 
 Verifica si una palabra existe en el diccionario externo de un concurso. (**apiContestsExistsInExternalDictionaryContestIdWordleGet**)
 
-Verifica si una palabra dada existe en el diccionario externo de un concurso específico. Requiere el rol de Alumno
+Verifica si una palabra dada existe en el diccionario externo de un concurso específico.
 
 **Path parameters**
 
@@ -1143,7 +1440,7 @@ GET /api/contests/getAllContestStateLogs/{contestId}
 
 Obtiene todos los registros de estado de concurso de un concurso. (**apiContestsGetAllContestStateLogsContestIdGet**)
 
-Obtiene una lista de todos los registros de estado de concurso de un concurso dado. Requiere el rol de Administrador o de Profesor
+Obtiene una lista de todos los registros de estado de concurso de un concurso dado.
 
 **Path parameters**
 
@@ -1232,7 +1529,7 @@ GET /api/contests/getAllUserContestStateLogs/{contestId}/{userName}
 
 Obtiene todos los registros de estado de concurso de un usuario en un concurso. (**apiContestsGetAllUserContestStateLogsContestIdUserNameGet**)
 
-Obtiene una lista de todos los registros de estado de concurso de un usuario específico en un concurso dado. Requiere el rol de ALumno.
+Obtiene una lista de todos los registros de estado de concurso de un usuario específico en un concurso dado.
 
 **Path parameters**
 
@@ -1325,7 +1622,7 @@ GET /api/contests/getContestState/{contestId}/{userName}
 
 Obtiene el estado de un concurso para un usuario. (**apiContestsGetContestStateContestIdUserNameGet**)
 
-Obtiene el estado de un concurso específico para un usuario dado. Requiere el rol de Alumno.
+Obtiene el estado de un concurso específico para un usuario dado.
 
 **Path parameters**
 
@@ -1355,13 +1652,13 @@ Content-Type: application/json
 
 `    `"lastWordle" : "",
 
-`    `"timeNeeded" : 6,
+`    `"timeNeeded" : 7,
 
 `    `"won" : false,
 
 `    `"timeGuess" : 0,
 
-`    `"tryCount" : 0,
+`    `"tryCount" : 2,
 
 `    `"finished" : false,
 
@@ -1369,11 +1666,11 @@ Content-Type: application/json
 
 `    `"state" : {
 
-`      `"halfGood" : 5,
+`      `"halfGood" : 3,
 
-`      `"good" : 1,
+`      `"good" : 9,
 
-`      `"wrong" : 5
+`      `"wrong" : 2
 
 `    `}
 
@@ -1383,13 +1680,13 @@ Content-Type: application/json
 
 `    `"lastWordle" : "",
 
-`    `"timeNeeded" : 6,
+`    `"timeNeeded" : 7,
 
 `    `"won" : false,
 
 `    `"timeGuess" : 0,
 
-`    `"tryCount" : 0,
+`    `"tryCount" : 2,
 
 `    `"finished" : false,
 
@@ -1397,11 +1694,11 @@ Content-Type: application/json
 
 `    `"state" : {
 
-`      `"halfGood" : 5,
+`      `"halfGood" : 3,
 
-`      `"good" : 1,
+`      `"good" : 9,
 
-`      `"wrong" : 5
+`      `"wrong" : 2
 
 `    `}
 
@@ -1509,7 +1806,7 @@ POST /api/contests/newContestState/{contestId}/{userName}
 
 Crea un nuevo estado de concurso para un usuario. (**apiContestsNewContestStateContestIdUserNamePost**)
 
-Crea un nuevo estado de concurso para un usuario específico en un concurso dado. Requiere el rol de Alumno.
+Crea un nuevo estado de concurso para un usuario específico en un concurso dado.
 
 **Path parameters**
 
@@ -1622,6 +1919,159 @@ Concurso o usuario no encontrado. []()
 **409**
 
 Estado de concurso ya creado. []()
+
+-----
+<a name="apicontestsresumecontestcontestidusernameget"></a>[Up](#__methods) 
+
+GET /api/contests/resumeContest/{contestId}/{userName}
+
+Reanuda el estado del concurso para un usuario. (**apiContestsResumeContestContestIdUserNameGet**)
+
+Devuelve el estado actual del concurso para un usuario, incluyendo la posición del Wordle actual, las letras ingresadas y su estado. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**contestId (required)**
+
+*Path Parameter* — ID del concurso. format: int64
+
+**userName (required)**
+
+*Path Parameter* — Nombre de usuario del participante. 
+
+**Return type**
+
+[ResumeContestDTO](#resumecontestdto)
+
+**Example data**
+
+Content-Type: application/json
+
+{
+
+`  `"tries" : [ {
+
+`    `"letters" : [ {
+
+`      `"letter" : "letter",
+
+`      `"state" : 5
+
+`    `}, {
+
+`      `"letter" : "letter",
+
+`      `"state" : 5
+
+`    `} ]
+
+`  `}, {
+
+`    `"letters" : [ {
+
+`      `"letter" : "letter",
+
+`      `"state" : 5
+
+`    `}, {
+
+`      `"letter" : "letter",
+
+`      `"state" : 5
+
+`    `} ]
+
+`  `} ],
+
+`  `"wordleOrder" : [ 5, 5 ],
+
+`  `"wordleState" : {
+
+`    `"numberOfWordle" : 1,
+
+`    `"games" : [ {
+
+`      `"finishTime" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"lastWordle" : "",
+
+`      `"timeNeeded" : 7,
+
+`      `"won" : false,
+
+`      `"timeGuess" : 0,
+
+`      `"tryCount" : 2,
+
+`      `"finished" : false,
+
+`      `"startTime" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"state" : {
+
+`        `"halfGood" : 3,
+
+`        `"good" : 9,
+
+`        `"wrong" : 2
+
+`      `}
+
+`    `}, {
+
+`      `"finishTime" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"lastWordle" : "",
+
+`      `"timeNeeded" : 7,
+
+`      `"won" : false,
+
+`      `"timeGuess" : 0,
+
+`      `"tryCount" : 2,
+
+`      `"finished" : false,
+
+`      `"startTime" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"state" : {
+
+`        `"halfGood" : 3,
+
+`        `"good" : 9,
+
+`        `"wrong" : 2
+
+`      `}
+
+`    `} ]
+
+`  `},
+
+`  `"charPosition" : 1,
+
+`  `"wordlePosition" : 0,
+
+`  `"tryPosition" : 6
+
+}
+
+**Produces**
+
+This API call produces the following media types according to the Accept request header; the media type will be conveyed by the Content-Type response header. 
+
+- application/json
+
+**Responses**
+
+**200**
+
+Estado del concurso retornado con éxito. [ResumeContestDTO](#resumecontestdto) 
+
+**404**
+
+Concurso o usuario o estado no encontrado. []()
 
 -----
 <a name="apicontestssaveexternaldictionarycontestidpost"></a>[Up](#__methods) 
@@ -1739,7 +2189,7 @@ POST /api/contests/updateContestState/{contestId}/{userName}
 
 Actualiza el estado de un concurso para un usuario. (**apiContestsUpdateContestStateContestIdUserNamePost**)
 
-Actualiza el estado de un concurso específico para un usuario dado. Requiere el rol de ALumno
+Actualiza el estado de un concurso específico para un usuario dado.
 
 **Path parameters**
 
@@ -2357,6 +2807,523 @@ No autorizado. []()
 Usuario no encontrado. []()
 
 -----
+<a name="apuusersgetallwordlesusernameget"></a>[Up](#__methods) 
+
+GET /apu/users/getAllWordles/{userName}
+
+Obtiene os wordles de los concursos que ya han terminado. (**apuUsersGetAllWordlesUserNameGet**)
+
+Obtiene la lista de competiciones con los wordles que tengan en sus concursos. Requiere el rol de Alumno.
+
+**Path parameters**
+
+**userName (required)**
+
+*Path Parameter* — Nombre de usuario del usuario para obtener sus competiciones. 
+
+**Return type**
+
+array[[WordlesStudentDTO](#wordlesstudentdto)] 
+
+**Example data**
+
+Content-Type: application/json
+
+[ {
+
+`  `"contestInfo" : {
+
+`    `"contest" : {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `},
+
+`    `"wordles" : [ {
+
+`      `"contests" : [ null, null ],
+
+`      `"folder" : {
+
+`        `"parentFolder" : { },
+
+`        `"folders" : [ "[]", "[]" ],
+
+`        `"wordles" : [ "[\"Wordle\"]", "[\"Wordle\"]" ],
+
+`        `"name" : "Carpeta",
+
+`        `"id" : 1
+
+`      `},
+
+`      `"id" : 1,
+
+`      `"word" : "Wordle",
+
+`      `"user" : {
+
+`        `"participations" : [ {
+
+`          `"id" : 1
+
+`        `}, {
+
+`          `"id" : 1
+
+`        `} ],
+
+`        `"roles" : [ {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `}, {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `} ],
+
+`        `"id" : 1,
+
+`        `"email" : "profesor@gmail.com",
+
+`        `"username" : "Profesor"
+
+`      `}
+
+`    `}, {
+
+`      `"contests" : [ null, null ],
+
+`      `"folder" : {
+
+`        `"parentFolder" : { },
+
+`        `"folders" : [ "[]", "[]" ],
+
+`        `"wordles" : [ "[\"Wordle\"]", "[\"Wordle\"]" ],
+
+`        `"name" : "Carpeta",
+
+`        `"id" : 1
+
+`      `},
+
+`      `"id" : 1,
+
+`      `"word" : "Wordle",
+
+`      `"user" : {
+
+`        `"participations" : [ {
+
+`          `"id" : 1
+
+`        `}, {
+
+`          `"id" : 1
+
+`        `} ],
+
+`        `"roles" : [ {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `}, {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `} ],
+
+`        `"id" : 1,
+
+`        `"email" : "profesor@gmail.com",
+
+`        `"username" : "Profesor"
+
+`      `}
+
+`    `} ]
+
+`  `},
+
+`  `"competition" : {
+
+`    `"contests" : [ {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `}, {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `} ],
+
+`    `"professor" : {
+
+`      `"participations" : [ {
+
+`        `"id" : 1
+
+`      `}, {
+
+`        `"id" : 1
+
+`      `} ],
+
+`      `"roles" : [ {
+
+`        `"id" : 0,
+
+`        `"rolName" : "ROLE\_PROFESSOR"
+
+`      `}, {
+
+`        `"id" : 0,
+
+`        `"rolName" : "ROLE\_PROFESSOR"
+
+`      `} ],
+
+`      `"id" : 1,
+
+`      `"email" : "profesor@gmail.com",
+
+`      `"username" : "Profesor"
+
+`    `},
+
+`    `"participations" : [ {
+
+`      `"id" : 1
+
+`    `}, {
+
+`      `"id" : 1
+
+`    `} ],
+
+`    `"competitionName" : "Competición",
+
+`    `"id" : 1
+
+`  `}
+
+}, {
+
+`  `"contestInfo" : {
+
+`    `"contest" : {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `},
+
+`    `"wordles" : [ {
+
+`      `"contests" : [ null, null ],
+
+`      `"folder" : {
+
+`        `"parentFolder" : { },
+
+`        `"folders" : [ "[]", "[]" ],
+
+`        `"wordles" : [ "[\"Wordle\"]", "[\"Wordle\"]" ],
+
+`        `"name" : "Carpeta",
+
+`        `"id" : 1
+
+`      `},
+
+`      `"id" : 1,
+
+`      `"word" : "Wordle",
+
+`      `"user" : {
+
+`        `"participations" : [ {
+
+`          `"id" : 1
+
+`        `}, {
+
+`          `"id" : 1
+
+`        `} ],
+
+`        `"roles" : [ {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `}, {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `} ],
+
+`        `"id" : 1,
+
+`        `"email" : "profesor@gmail.com",
+
+`        `"username" : "Profesor"
+
+`      `}
+
+`    `}, {
+
+`      `"contests" : [ null, null ],
+
+`      `"folder" : {
+
+`        `"parentFolder" : { },
+
+`        `"folders" : [ "[]", "[]" ],
+
+`        `"wordles" : [ "[\"Wordle\"]", "[\"Wordle\"]" ],
+
+`        `"name" : "Carpeta",
+
+`        `"id" : 1
+
+`      `},
+
+`      `"id" : 1,
+
+`      `"word" : "Wordle",
+
+`      `"user" : {
+
+`        `"participations" : [ {
+
+`          `"id" : 1
+
+`        `}, {
+
+`          `"id" : 1
+
+`        `} ],
+
+`        `"roles" : [ {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `}, {
+
+`          `"id" : 0,
+
+`          `"rolName" : "ROLE\_PROFESSOR"
+
+`        `} ],
+
+`        `"id" : 1,
+
+`        `"email" : "profesor@gmail.com",
+
+`        `"username" : "Profesor"
+
+`      `}
+
+`    `} ]
+
+`  `},
+
+`  `"competition" : {
+
+`    `"contests" : [ {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `}, {
+
+`      `"endDate" : "2000-01-23T04:56:07.000+00:00",
+
+`      `"wordles" : [ [ ], [ ] ],
+
+`      `"id" : 1,
+
+`      `"contestName" : "Concurso",
+
+`      `"numTries" : 6,
+
+`      `"useDictionary" : true,
+
+`      `"useExternalFile" : true,
+
+`      `"wordlesLength" : [ [ ], [ ] ],
+
+`      `"startDate" : "2000-01-23T04:56:07.000+00:00"
+
+`    `} ],
+
+`    `"professor" : {
+
+`      `"participations" : [ {
+
+`        `"id" : 1
+
+`      `}, {
+
+`        `"id" : 1
+
+`      `} ],
+
+`      `"roles" : [ {
+
+`        `"id" : 0,
+
+`        `"rolName" : "ROLE\_PROFESSOR"
+
+`      `}, {
+
+`        `"id" : 0,
+
+`        `"rolName" : "ROLE\_PROFESSOR"
+
+`      `} ],
+
+`      `"id" : 1,
+
+`      `"email" : "profesor@gmail.com",
+
+`      `"username" : "Profesor"
+
+`    `},
+
+`    `"participations" : [ {
+
+`      `"id" : 1
+
+`    `}, {
+
+`      `"id" : 1
+
+`    `} ],
+
+`    `"competitionName" : "Competición",
+
+`    `"id" : 1
+
+`  `}
+
+} ]
+
+**Produces**
+
+This API call produces the following media types according to the Accept request header; the media type will be conveyed by the Content-Type response header. 
+
+- application/json
+
+**Responses**
+
+**200**
+
+Lista de wordles obtenida con éxito. 
+
+**401**
+
+No autorizado. []()
+
+**404**
+
+Usuario no encontrado. []()
+
+-----
 <a name="getallprofessors"></a>[Up](#__methods) 
 
 GET /api/users/getAllProfessors
@@ -2463,7 +3430,7 @@ GET /api/wordle/checkWordleAttempt/{contestId}/{wordleIndex}/{word}/{userEmail}
 
 Verifica un intento de palabra Wordle. (**apiWordleCheckWordleAttemptContestIdWordleIndexWordUserEmailGet**)
 
-Verifica un intento de palabra Wordle para un usuario en un concurso específico y devuelve una lista de resultados. Requiere el rol de Alumno.
+Verifica un intento de palabra Wordle para un usuario en un concurso específico y devuelve una lista de resultados.
 
 **Path parameters**
 
@@ -2607,6 +3574,45 @@ Carpeta editada con éxito. []()
 **404**
 
 Carpeta no encontrada. []()
+
+-----
+<a name="apiwordleeditwordlewordlepost"></a>[Up](#__methods) 
+
+POST /api/wordle/editWordle/{wordle}
+
+Edita una palabra Wordle existente. (**apiWordleEditWordleWordlePost**)
+
+Modifica una palabra Wordle específica. Requiere rol de Profesor o Administrador.
+
+**Path parameters**
+
+**wordle (required)**
+
+*Path Parameter* — Palabra original que se desea editar. 
+
+**Consumes**
+
+This API call consumes the following media types via the Content-Type request header: 
+
+- application/json
+
+**Request body**
+
+**body [string](#string) (required)**
+
+*Body Parameter* — 
+
+*example: "NUEVA"*
+
+**Responses**
+
+**200**
+
+Palabra Wordle editada con éxito. []()
+
+**404**
+
+La palabra Wordle original no fue encontrada. []()
 
 -----
 <a name="apiwordlegetcontestswhereisusedwordget"></a>[Up](#__methods) 
@@ -2879,7 +3885,7 @@ GET /api/wordle/getWordleInContest/{contestId}/{wordleIndex}
 
 Obtiene una palabra Wordle específica de un concurso. (**apiWordleGetWordleInContestContestIdWordleIndexGet**)
 
-Obtiene una palabra Wordle específica de un concurso, verificando que el juego esté terminado para el usuario autenticado. Requiere el rol de Alumno.
+Obtiene una palabra Wordle específica de un concurso, verificando que el juego esté terminado para el usuario autenticado.
 
 **Path parameters**
 
@@ -2901,47 +3907,7 @@ Content-Type: application/json
 
 {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3042,47 +4008,7 @@ Content-Type: application/json
 
 [ {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3138,47 +4064,7 @@ Content-Type: application/json
 
 }, {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3416,47 +4302,7 @@ Content-Type: application/json
 
 [ {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3512,47 +4358,7 @@ Content-Type: application/json
 
 }, {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3889,47 +4695,7 @@ Content-Type: application/json
 
 [ {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -3985,47 +4751,7 @@ Content-Type: application/json
 
 }, {
 
-`  `"contests" : [ {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `}, {
-
-`    `"endDate" : "2000-01-23T04:56:07.000+00:00",
-
-`    `"wordles" : [ [ ], [ ] ],
-
-`    `"id" : 1,
-
-`    `"contestName" : "Concurso",
-
-`    `"numTries" : 6,
-
-`    `"useDictionary" : true,
-
-`    `"useExternalFile" : true,
-
-`    `"wordlesLength" : [ [ ], [ ] ],
-
-`    `"startDate" : "2000-01-23T04:56:07.000+00:00"
-
-`  `} ],
+`  `"contests" : [ null, null ],
 
 `  `"folder" : {
 
@@ -4104,6 +4830,7 @@ Concurso, carpeta o profesor no encontrado. []()
 1. [Competition](#competition)
 1. [CompetitionInput](#competitioninput)
 1. [Contest](#contest)
+1. [ContestInfo](#contestinfo)
 1. [ContestInput](#contestinput)
 1. [ContestState](#conteststate)
 1. [DictionaryExternalSaved](#dictionaryexternalsaved)
@@ -4113,14 +4840,17 @@ Concurso, carpeta o profesor no encontrado. []()
 1. [Game](#game)
 1. [JwtDto](#jwtdto)
 1. [JwtDto_authorities](#jwtdto_authorities)
+1. [Letter](#letter)
 1. [LoginUser](#loginuser)
 1. [NewUser](#newuser)
 1. [Participation](#participation)
+1. [ResumeContestDTO](#resumecontestdto)
 1. [Rol](#rol)
 1. [RolName](#rolname)
 1. [RolProfessor](#rolprofessor)
 1. [RolStudent](#rolstudent)
 1. [State](#state)
+1. [Try](#try)
 1. [User](#user)
 1. [UserProfessor](#userprofessor)
 1. [UserState](#userstate)
@@ -4130,6 +4860,7 @@ Concurso, carpeta o profesor no encontrado. []()
 1. [WordleInput](#wordleinput)
 1. [WordleState](#wordlestate)
 1. [WordleStateLog](#wordlestatelog)
+1. [WordlesStudentDTO](#wordlesstudentdto)
 1. [addStudentsByExcel_competitionId_body](#addstudentsbyexcel_competitionid_body)
 ### <a name="competition"></a>**Competition [Up**](#__models)**
 **id (optional)**
@@ -4215,6 +4946,14 @@ Concurso, carpeta o profesor no encontrado. []()
 **wordlesLength (optional)**
 
 [*array\[null\]*]()
+### <a name="contestinfo"></a>**ContestInfo [Up**](#__models)**
+**contest (optional)**
+
+[*Contest*](#contest)
+
+**wordles (optional)**
+
+[*array\[Wordle\]*](#wordle)
 ### <a name="contestinput"></a>**ContestInput [Up**](#__models)**
 **id (optional)**
 
@@ -4405,6 +5144,22 @@ Concurso, carpeta o profesor no encontrado. []()
 [*String*](#string)
 
 *example: ROLE\_PROFESSOR*
+### <a name="letter"></a>**Letter [Up**](#__models)**
+**letter** 
+
+[*String*](#string) Letra ingresada en el intento. 
+
+**state** 
+
+[*Integer*](#integer) <p>Estado de la letra:</p> <ul> <li>0: Incorrecta</li> <li>1: Correcta pero en posición incorrecta</li> <li>2: Correcta y en posición correcta.</li> </ul> 
+
+**Enum:**
+
+*0*
+
+*1*
+
+*2*
 ### <a name="loginuser"></a>**LoginUser [Up**](#__models)**
 **userName** 
 
@@ -4441,6 +5196,30 @@ Concurso, carpeta o profesor no encontrado. []()
 [*Long*](#long) format: int64
 
 *example: 1*
+### <a name="resumecontestdto"></a>**ResumeContestDTO [Up**](#__models)**
+**wordlePosition (optional)**
+
+[*Integer*](#integer) Índice del Wordle actual que se está resolviendo. 
+
+**tryPosition (optional)**
+
+[*Integer*](#integer) Número de intentos realizados en el Wordle actual. 
+
+**charPosition (optional)**
+
+[*Integer*](#integer) Número total de caracteres introducidos hasta ahora. 
+
+**tries (optional)**
+
+[*array\[Try\]*](#try) Lista de intentos realizados. 
+
+**wordleOrder (optional)**
+
+[*array\[Integer\]*](#integer) Orden de los Wordles asignados al usuario (en modo aleatorio). 
+
+**wordleState (optional)**
+
+[*WordleState*](#wordlestate)
 ### <a name="rol"></a>**Rol [Up**](#__models)**
 **id (optional)**
 
@@ -4496,6 +5275,10 @@ Concurso, carpeta o profesor no encontrado. []()
 **wrong (optional)**
 
 [*Integer*](#integer)
+### <a name="try"></a>**Try [Up**](#__models)**
+**letters (optional)**
+
+[*array\[Letter\]*](#letter) Lista de letras ingresadas en un intento. 
 ### <a name="user"></a>**User [Up**](#__models)**
 **id (optional)**
 
@@ -4713,6 +5496,14 @@ Concurso, carpeta o profesor no encontrado. []()
 [*Boolean*](#boolean)
 
 *example: false*
+### <a name="wordlesstudentdto"></a>**WordlesStudentDTO [Up**](#__models)**
+**competition (optional)**
+
+[*Competition*](#competition)
+
+**contestInfo (optional)**
+
+[*ContestInfo*](#contestinfo)
 ### <a name="addstudentsbyexcel_competitionid_body"></a>**addStudentsByExcel\_competitionId\_body [Up**](#__models)**
 **file (optional)**
 
