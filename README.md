@@ -1,1 +1,7 @@
-# TFG
+## EducaWorldle
+
+La gamificación en el ámbito educativo ha demostrado ser una estrategia efectiva para mejorar la motivación y el aprendizaje de los estudiantes. Sin embargo, muchas herramientas educativas actuales carecen de la flexibilidad necesaria para que los profesores puedan adaptar el contenido a sus temarios específicos. En este contexto, el presente trabajo tiene como objetivo principal desarrollar una aplicación web educativa basada en la mecánica del popular juego wordle, que permita a los profesores crear partidas personalizadas con vocabulario específico de sus asignaturas.
+
+Desde el punto de vista tecnológico, se ha optado por una arquitectura de cliente-servidor. El backend utiliza el framework Spring Boot debido a su robustez en el desarrollo de APIs REST y su amplio ecosistema de módulos de seguridad y persistencia. Para el frontend, se ha seleccionado Angular por su capacidad de crear aplicaciones de página única (SPA) con una experiencia de usuario fluida y su integración nativa con TypeScript. La persistencia de datos se implementa con PostgreSQL.
+
+Como resultado, se ha desarrollado una aplicación web completamente funcional que incluye un panel de administración para profesores donde pueden crear y gestionar partidas con vocabulario personalizado, un sistema de autenticación, una interfaz de juego que replica la mecánica de wordle, y un sistema de estadísticas que permite el seguimiento del progreso de los estudiantes.
