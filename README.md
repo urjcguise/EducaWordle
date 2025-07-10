@@ -1,4 +1,4 @@
-## EducaWorldle
+## EducaWordle
 
 La gamificación en el ámbito educativo ha demostrado ser una estrategia efectiva para mejorar la motivación y el aprendizaje de los estudiantes. Sin embargo, muchas herramientas educativas actuales carecen de la flexibilidad necesaria para que los profesores puedan adaptar el contenido a sus temarios específicos. En este contexto, el presente trabajo tiene como objetivo principal desarrollar una aplicación web educativa basada en la mecánica del popular juego wordle, que permita a los profesores crear partidas personalizadas con vocabulario específico de sus asignaturas.
 
